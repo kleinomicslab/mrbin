@@ -1,0 +1,27 @@
+Package: mrbin
+Title: Binning, Scaling and Normalization of NMR Data
+Version: 0.94
+Authors@R: 
+    person(given = "Matthias",
+           family = "Klein",
+           role = c("aut", "cre"),
+           email = "klein.663@osu.edu",
+           comment = c(ORCID = "0000-0001-7455-5381"))
+Description: This package can create bin lists from Bruker 
+    NMR spectra and perform basic processing steps. 
+    The function negTrafo() replaces negative values by
+    small values in the noise range, preserving the order 
+    of values. mrbinGUI() lets the user set parameters, 
+    mrbin() performs the follwoing operations: Reading NMR 
+    files, creating bins, removing solvent area, removing 
+    additional user-defined areas, summing up bins that 
+    contain instable peaks such as citric acid, removes 
+    noise bins, crops HSQC spectra to the diagonal area,
+    performs PQN scaling, replaces negative values, log 
+    transforms and displays a PCA plot. Parameters are 
+    saved in a file and can be restored using 
+    recreatemrbin().
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.0.2.9000
