@@ -26,11 +26,12 @@ positive values in the data set is used as an estimate.
 It is recommended to us this function AFTER noise removal and other data
 clean-up methods, as it may alter (reduce) the noise level.
 If no NMR data and noise levels are provided as arguments, the funtion will
-use NMR data and noise levels from the global variables mrbinbins and
-mrbinTMP.
+use NMR data and noise levels from the global variables mrbin.env$bins and
+mrbin.env$mrbinTMP.
 }
 \examples{
+\donttest{
 negTrafo()
 negTrafo(NMRdataMatrix,noiseLevelVector)
-negTrafo()
+}
 }

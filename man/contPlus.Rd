@@ -11,5 +11,7 @@ This function increases the minimum contour level of the current 2D NMR
 spectrum plot.
 }
 \examples{
+\donttest{
 contPlus()
+}
 }

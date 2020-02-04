@@ -10,5 +10,7 @@ logTrafo()
 This function simply log transforms. Will not work with negative data.
 }
 \examples{
+\donttest{
 logTrafo()
+}
 }

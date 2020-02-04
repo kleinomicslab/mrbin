@@ -10,5 +10,7 @@ intMin()
 This function decreases the intensity of the current NMR spectrum plot.
 }
 \examples{
+\donttest{
 intMin()
+}
 }

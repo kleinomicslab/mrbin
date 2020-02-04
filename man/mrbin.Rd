@@ -2,20 +2,13 @@
 % Please edit documentation in R/mrbin.R
 \name{mrbin}
 \alias{mrbin}
-\title{A function performing all data read and processing steps.}
+\title{A function setting the parameters}
 \usage{
 mrbin()
 }
-\description{
-This function reads parameters from the global variable mrbinparam and
-performs the follwoing operations:
-Reading NMR files, creating bins, removing solvent area, removing additional
-user-defined areas, summing up bins that contain instable peaks such as
-citric acid, removes noise bins, crops HSQC spectra to the diagonal area,
-performs PQN scaling, replaces negative values, log transforms and displays a
-PCA plot. Parameters are then saved in a text file. These can be recreated
-using recreatemrbin().
+\value{
+An invisible list containing $bins (data after processing), $parameters
 }
-\examples{
-mrbin()
+\description{
+This function guides the user through the set-up of parameters and starts mrbin().
 }

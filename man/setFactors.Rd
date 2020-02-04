@@ -11,5 +11,7 @@ This function lets the user pick samples from a list to assign them to
 groups.
 }
 \examples{
+\donttest{
 setFactors()
+}
 }

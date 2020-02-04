@@ -10,5 +10,7 @@ zoomOut()
 This function zooms out from the plot region of the current NMR plot.
 }
 \examples{
+\donttest{
 zoomOut()
+}
 }

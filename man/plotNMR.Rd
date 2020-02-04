@@ -12,5 +12,7 @@ zoomIn(), zoomOut(), intPlus(), intMin(), left(), right().
 For 2D data use additionally: contMin(), contPlus(), up(), down()
 }
 \examples{
+\donttest{
 plotNMR()
+}
 }

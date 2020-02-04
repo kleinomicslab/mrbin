@@ -10,5 +10,7 @@ readBruker()
 This function reads Bruker NMR data.
 }
 \examples{
+\donttest{
 readBruker()
+}
 }

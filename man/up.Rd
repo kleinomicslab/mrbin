@@ -10,5 +10,7 @@ up()
 This function moves up the plot region of the current NMR plot (only 2D).
 }
 \examples{
+\donttest{
 up()
+}
 }

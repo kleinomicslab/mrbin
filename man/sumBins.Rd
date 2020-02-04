@@ -13,5 +13,7 @@ for signals that are know to vary between spectra due to pH or salt content,
 such as citric acid.
 }
 \examples{
+\donttest{
 sumBins()
+}
 }

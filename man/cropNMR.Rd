@@ -11,5 +11,7 @@ This function crops HSQC spectra to the region along the diagonal to remove
 uninformative signals. Will work only for 1H-13C HSQC spectra.
 }
 \examples{
+\donttest{
 cropNMR()
+}
 }

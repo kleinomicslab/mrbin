@@ -7,9 +7,11 @@
 binMultiNMR()
 }
 \description{
-This function creates bins for each spectrum in mrbinparam$NMRfolders and
-saves the bins to mrbinbins.
+This function creates bins for each spectrum in mrbin.env$mrbinparam$NMRfolders and
+saves the bins to mrbin.env$bins.
 }
 \examples{
+\donttest{
 binMultiNMR()
+}
 }

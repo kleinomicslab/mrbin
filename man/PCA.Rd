@@ -10,5 +10,7 @@ PCA()
 This function performs PCA, then plots PC1 and PC2 and loading plots.
 }
 \examples{
+\donttest{
 PCA()
+}
 }

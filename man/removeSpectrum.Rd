@@ -11,5 +11,7 @@ This function lets the user pick spectra from a list for removal from data
 analysis.
 }
 \examples{
+\donttest{
 removeSpectrum()
+}
 }

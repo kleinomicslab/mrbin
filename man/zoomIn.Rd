@@ -10,5 +10,7 @@ zoomIn()
 This function zooms into the plot region of the current NMR plot.
 }
 \examples{
+\donttest{
 zoomIn()
+}
 }

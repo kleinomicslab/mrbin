@@ -4,10 +4,10 @@
 \alias{recreatemrbin}
 \title{A function recreating parameters from previous runs.}
 \usage{
-recreatemrbin(file)
+recreatemrbin(filename = NULL)
 }
 \arguments{
-\item{file}{File path/name of the mrbin parameter file to be loaded}
+\item{filename}{File path/name of the mrbin parameter file to be loaded}
 }
 \description{
 This function reads parameters from a text file taht was created during a
@@ -16,5 +16,7 @@ mrbin(). File names in mrbin$param might need to be updated.
 using recreatemrbin().
 }
 \examples{
-recreatemrbin()
+\donttest{
+recreatemrbin("mrbin_01-03-20_12-00-10.txt")
+}
 }

@@ -11,5 +11,7 @@ This function selects the correct folder selection function for the vendor
 (currently only Bruker).
 }
 \examples{
+\donttest{
 selectFolders()
+}
 }

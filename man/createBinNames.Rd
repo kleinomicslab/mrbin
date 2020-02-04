@@ -11,5 +11,7 @@ This function creates titles for the bins to represent their average ppm
 value.
 }
 \examples{
+\donttest{
 createBinNames()
+}
 }

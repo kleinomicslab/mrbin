@@ -19,5 +19,7 @@ zoom(left = NULL, right = NULL, top = NULL, bottom = NULL)
 This function changes the plot region of the current NMR plot.
 }
 \examples{
+\donttest{
 zoom()
+}
 }
