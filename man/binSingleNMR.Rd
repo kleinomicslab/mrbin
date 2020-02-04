@@ -2,7 +2,7 @@
 % Please edit documentation in R/mrbin.R
 \name{binSingleNMR}
 \alias{binSingleNMR}
-\title{A function for binning a sinlge NMR spectrum.}
+\title{A function for binning a single NMR spectrum.}
 \usage{
 binSingleNMR()
 }

@@ -19,13 +19,13 @@ This function replaces (column-wise) negative values by a small positive
 number. The number is calculated as a linear transformation to the range of
 the lowest positive number to 0,01*the lowest positive number (of this
 column). Ranks stay unchanged. Positive numbers are not altered.
-If sample-wise noise levels are avaliable, the median nosie level of samples
+If sample-wise noise levels are available, the median noise level of samples
 with negative values is calculated and replaces the lowest positive number in
 case it is smaller. If no noise data is available, the 1% percentile of all
 positive values in the data set is used as an estimate.
 It is recommended to us this function AFTER noise removal and other data
 clean-up methods, as it may alter (reduce) the noise level.
-If no NMR data and noise levels are provided as arguments, the funtion will
+If no NMR data and noise levels are provided as arguments, the function will
 use NMR data and noise levels from the global variables mrbin.env$bins and
 mrbin.env$mrbinTMP.
 }

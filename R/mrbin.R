@@ -1,4 +1,4 @@
-#mrbin - Collection of R funtions for analyzing NMR metabolomics data.
+#mrbin - Collection of R functions for analyzing NMR metabolomics data.
 #Written by Matthias Klein, The Ohio State University
 #Feb 03 2020
 #Package: mrbin
@@ -621,7 +621,7 @@ mrbin<-function(){
 #' This function reads parameters from the global variable mrbin.env$mrbinparam and
 #' performs the following operations:
 #' Reading NMR files, creating bins, removing solvent area, removing additional
-#' user-defined areas, summing up bins that contain instable peaks such as
+#' user-defined areas, summing up bins that contain unstable peaks such as
 #' citric acid, removes noise bins, crops HSQC spectra to the diagonal area,
 #' performs PQN scaling, replaces negative values, log transforms and displays a
 #' PCA plot. Parameters are then saved in a text file. These can be recreated
@@ -656,7 +656,7 @@ mrbinrun<-function(){
 
 #' A function recreating parameters from previous runs.
 #'
-#' This function reads parameters from a text file taht was created during a
+#' This function reads parameters from a text file that was created during a
 #' previous run or mrbin(). After reading, the data can be recreated using
 #' mrbin(). File names in mrbin$param might need to be updated.
 #' using recreatemrbin().
@@ -692,13 +692,13 @@ recreatemrbin<-function(filename=NULL){
 #' number. The number is calculated as a linear transformation to the range of
 #' the lowest positive number to 0,01*the lowest positive number (of this
 #' column). Ranks stay unchanged. Positive numbers are not altered.
-#' If sample-wise noise levels are avaliable, the median nosie level of samples
+#' If sample-wise noise levels are available, the median noise level of samples
 #' with negative values is calculated and replaces the lowest positive number in
 #' case it is smaller. If no noise data is available, the 1% percentile of all
 #' positive values in the data set is used as an estimate.
 #' It is recommended to us this function AFTER noise removal and other data
 #' clean-up methods, as it may alter (reduce) the noise level.
-#' If no NMR data and noise levels are provided as arguments, the funtion will
+#' If no NMR data and noise levels are provided as arguments, the function will
 #' use NMR data and noise levels from the global variables mrbin.env$bins and
 #' mrbin.env$mrbinTMP.
 #' @param NMRdata A matrix containing NMR data. Columns=frequencies,rows=samples
@@ -1066,7 +1066,7 @@ createBinNumbers<-function(){
   }
 }
 
-#' A function for binning a sinlge NMR spectrum.
+#' A function for binning a single NMR spectrum.
 #'
 #' This function creates bins for the current spectrum.
 #' @param
@@ -1259,7 +1259,7 @@ referenceScaling<-function(){
 #' A function for summing up bins.
 #'
 #' This function sums up bins. The sums are saved to the middle (median) bin of
-#' the original area. All other bins of the area are removed then. Thsi is handy
+#' the original area. All other bins of the area are removed then. This is handy
 #' for signals that are know to vary between spectra due to pH or salt content,
 #' such as citric acid.
 #' @param
@@ -1475,9 +1475,9 @@ cropNMR<-function(){
 
 #' A function for PQN scaling.
 #'
-#' This function performs PQN scaling. To further exlude unreliable noise, only
+#' This function performs PQN scaling. To further exclude unreliable noise, only
 #' the most intense signals are used. For 1H-13C HSQC spectra, most of the sugar
-#' regions are excluded to avoid a dominating ffect of the multiple sugar
+#' regions are excluded to avoid a dominating effect of the multiple sugar
 #' signals.
 #' @param
 #' @keywords

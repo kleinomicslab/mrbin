@@ -43,7 +43,7 @@ The sequence of data processing is as follows:
 * Scaling to reference region
 * Binning 
 * Removing solvent region
-* Remvoing additional regions
+* Removing additional regions
 * Summing up region containing peaks with unstable positions such as citric acid
 * Removal of bins containing mostly noise
 * Cropping of HSQC spectra to the region along the diagonal

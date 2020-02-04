@@ -10,7 +10,7 @@ mrbinrun()
 This function reads parameters from the global variable mrbin.env$mrbinparam and
 performs the following operations:
 Reading NMR files, creating bins, removing solvent area, removing additional
-user-defined areas, summing up bins that contain instable peaks such as
+user-defined areas, summing up bins that contain unstable peaks such as
 citric acid, removes noise bins, crops HSQC spectra to the diagonal area,
 performs PQN scaling, replaces negative values, log transforms and displays a
 PCA plot. Parameters are then saved in a text file. These can be recreated

@@ -8,7 +8,7 @@ sumBins()
 }
 \description{
 This function sums up bins. The sums are saved to the middle (median) bin of
-the original area. All other bins of the area are removed then. Thsi is handy
+the original area. All other bins of the area are removed then. This is handy
 for signals that are know to vary between spectra due to pH or salt content,
 such as citric acid.
 }
