@@ -87,7 +87,7 @@ Please be aware that bins will have to be recalculated, so the original NMR spec
 
 ## Authors
 
-* **Matthias S. Klein** - [KleinOmicLab](https://github.com/kleinomicslab)
+* **Matthias S. Klein** - [KleinOmicsLab](https://github.com/kleinomicslab)
 
 
 ## License
