@@ -638,7 +638,7 @@ mrbin<-function(){
           #PCA
           if(!stopTMP){
             PCA<-utils::select.list(c("Yes","No"),preselect = mrbin.env$mrbinparam$PCA,
-                              title = "Create PCA plot?",graphics=T)
+                              title = "Create result plot?",graphics=T)
             if(length(PCA)==0|PCA=="") stopTMP<-T
           }
           if(!stopTMP){
@@ -1861,7 +1861,7 @@ plotResults<-function(){
       colorPalette<-grDevices::rainbow(length(levels(mrbin.env$mrbinparam$Factors)))
       mrbin.env$mrbinTMP$PCA<-stats::prcomp(mrbin.env$bins)
       graphics::par(mfrow=c(2,2),mar=c(3.1,2,1.0,0.5))
-      graphics::boxplot(mrbin.env$bins,main="",xlab="Bins",ylab="",boxwex=1)
+      graphics::boxplot(mrbin.env$bins,main="",xlab="Bins",ylab="",boxwex=1,cex.lab=.5)
       graphics::boxplot(t(mrbin.env$bins),main="",xlab="Samples",ylab="",boxwex=1)
       graphics::par(xpd=T,mar=c(4.2,4.1,2.8,0.5))
       graphics::plot(mrbin.env$mrbinTMP$PCA$x[,1],mrbin.env$mrbinTMP$PCA$x[,2],
@@ -1880,11 +1880,11 @@ plotResults<-function(){
               col=colorPalette[numlevels],
               pch=numlevels+14,
               cex=.75)
-      graphics::text(mrbin.env$mrbinTMP$PCA$x,labels=paste(substr(rownames(mrbin.env$mrbinTMP$PCA$x),1,mrbin.env$mrbinparam$PCAtitlelength)),pos=3,cex=.5,
+      graphics::text(mrbin.env$mrbinTMP$PCA$x,labels=paste(substr(rownames(mrbin.env$mrbinTMP$PCA$x),1,mrbin.env$mrbinparam$PCAtitlelength)),pos=3,cex=.75,
              col=colorPalette[as.numeric(mrbin.env$mrbinparam$Factors)])
       graphics::par(xpd=F)
-      graphics::plot(mrbin.env$mrbinTMP$PCA$rotation,pch=16,cex=.5,main="Loadings Plot")
-      graphics::text(mrbin.env$mrbinTMP$PCA$rotation,labels=substr(rownames(mrbin.env$mrbinTMP$PCA$rotation),1,12),pos=4,cex=.5)
+      graphics::plot(mrbin.env$mrbinTMP$PCA$rotation,pch=16,cex=.75,main="Loadings Plot")
+      graphics::text(mrbin.env$mrbinTMP$PCA$rotation,labels=substr(rownames(mrbin.env$mrbinTMP$PCA$rotation),1,12),pos=4,cex=.75)
     } else {
        cat("Too few samples to perform PCA.\n")
     }
