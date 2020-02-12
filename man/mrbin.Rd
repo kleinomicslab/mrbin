@@ -2,13 +2,21 @@
 % Please edit documentation in R/mrbin.R
 \name{mrbin}
 \alias{mrbin}
-\title{A function setting the parameters}
+\title{A function setting the parameters and performing binning and data processing}
 \usage{
-mrbin()
+mrbin(parameters = NULL, silent = F)
+}
+\arguments{
+\item{parameters}{Optional: A list of parameters to be used. If omitted, the user will be asked through a series of question to set the parameters.}
+
+\item{silent}{If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.}
 }
 \value{
-An invisible list containing $bins (data after processing), $parameters
+An invisible list containing bins (data after processing), parameters, and factors
 }
 \description{
-This function guides the user through the set-up of parameters and starts mrbin().
+This function guides the user through the set-up of parameters, starts binning
+and performs the chosen data processing steps
+If a list of parameters is provided and silent is set to TRUE, no user input
+is requested and binning and data processing are performed silently.
 }
