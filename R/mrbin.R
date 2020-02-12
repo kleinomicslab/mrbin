@@ -58,7 +58,6 @@ resetEnv<-function(){
     #mrbin.env$bins<-NULL
     assign("bins",NULL,mrbin.env)
     assign("paramChangeFlag",F,mrbin.env)
-    assign("saveFilesTMP",NULL,mrbin.env)
     assign("mrbinTMP",list(
                mrbinversion="1.0.0.9000",
                binsRaw=NULL,
@@ -137,6 +136,7 @@ resetEnv<-function(){
                useAsNames="Folder names",#Use spectrum titles as sample names or folder names will be used
                NMRvendor="Bruker",#NMR vendor. Currently, only Bruker data is supported.
                mrbinversionTracker=mrbin.env$mrbinTMP$mrbinversion,
+               saveFiles="No",
                outputFileName=NULL,
                NMRfolders=NULL,
                Factors=NULL,
@@ -158,23 +158,48 @@ resetEnv<-function(){
                heatmap=F),mrbin.env)
 }
 
-#' A function setting the parameters
+#' A function setting the parameters and performing binning and data processing
 #'
-#' This function guides the user through the set-up of parameters and starts mrbin().
-#' @param
-#' @return An invisible list containing $bins (data after processing), $parameters
+#' This function guides the user through the set-up of parameters, starts binning
+#' and performs the chosen data processing steps
+#' If a list of parameters is provided and silent is set to TRUE, no user input
+#' is requested and binning and data processing are performed silently.
+#' @param parameters Optional: A list of parameters to be used. If omitted, the user will be asked through a series of question to set the parameters.
+#' @param silent If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.
+#' @return An invisible list containing bins (data after processing), parameters, and factors
 #' @keywords
 #' @export
 #' @examples
 #' \donttest{
 #' mrbin()
+#' mrbin(parameters=list(
+#'               dimension="1D",
+#'               binMethod="Rectangular bins",
+#'               binwidth1D=.01,
+#'               referenceScaling="Yes",
+#'               removeSolvent="Yes",
+#'               removeAreas="No",
+#'               sumBins="No",
+#'               noiseRemoval="Yes",
+#'               PQNScaling="Yes",
+#'               fixNegatives="Yes",
+#'               logTrafo="Yes",
+#'               saveFiles="Yes",
+#'               outputFileName="mrbin_test_results",
+#'               NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
+#'                            "C:/NMR/Sample19/1/pdata/1",
+#'                            "C:/NMR/Sample61/1/pdata/1")
+#'       ),silent=T)
 #" }
 
-mrbin<-function(){
-   #if(!"mrbinparam"%in%ls(envir = mrbin.env))    resetEnv()
-   stopTMP<-F
-   selectionRepeat<-""
-   #Create bin list?
+mrbin<-function(parameters=NULL,silent=F){
+  if(!is.null(parameters)){
+      setParam(parameters)
+  }
+  stopTMP<-F
+  selectionRepeat<-""
+  #Create bin list?
+  if(!silent){
    selection<-utils::select.list(c("Yes","No"),preselect="Yes",
               title="mrbin: Create bin list?",graphics=T)
      if(!selection=="Yes")         stopTMP<-T
@@ -703,8 +728,8 @@ mrbin<-function(){
      if(length(saveFilesTMP)==0|saveFilesTMP=="") stopTMP<-T
    }
    if(!stopTMP){
-     mrbin.env$saveFilesTMP<-saveFilesTMP
-     if(mrbin.env$saveFilesTMP=="Yes"&!stopTMP){
+     mrbin.env$mrbinparam$saveFiles<-saveFilesTMP
+     if(mrbin.env$mrbinparam$saveFiles=="Yes"&!stopTMP){
        filenameTMP<-utils::select.list(c(paste("mrbin_",gsub(":","-",gsub(" ","_",Sys.time())),
                    sep=""),"Change..."),
                    title ="Output file name: ",graphics=T)
@@ -748,13 +773,18 @@ mrbin<-function(){
                  }
              }
          }
-         mrbinrun()
-         mrbin.env$paramChangeFlag<-F
-         mrbin.env$mrbinparam$createBins<-"Yes"
-         invisible(list(bins=mrbin.env$bins,factors=mrbin.env$mrbinparam$Factors,parameters=mrbin.env$mrbinparam))
      }
    }
   }
+ }
+ if(!stopTMP){
+   if(startmrbin=="Start binning now"|silent){
+     mrbinrun()
+     mrbin.env$paramChangeFlag<-F
+     mrbin.env$mrbinparam$createBins<-"Yes"
+     invisible(list(bins=mrbin.env$bins,factors=mrbin.env$mrbinparam$Factors,parameters=mrbin.env$mrbinparam))
+   }
+ }
 }
 
 #' A function performing all data read and processing steps.
@@ -787,7 +817,7 @@ mrbinrun<-function(){
     if(mrbin.env$mrbinparam$PQNScaling=="Yes") PQNScaling()
     if(mrbin.env$mrbinparam$fixNegatives=="Yes") atnv()
     if(mrbin.env$mrbinparam$logTrafo=="Yes") logTrafo()
-    if(mrbin.env$saveFilesTMP=="Yes"){
+    if(mrbin.env$mrbinparam$saveFiles=="Yes"){
       dput(mrbin.env$mrbinparam, file = paste(mrbin.env$mrbinparam$outputFileName,".txt",sep=""))
       utils::write.csv(mrbin.env$bins, file = paste(mrbin.env$mrbinparam$outputFileName,"bins.csv",sep=""))
     }
@@ -856,8 +886,36 @@ recreatemrbin<-function(filename=NULL){
      filename<-selectList
   }
   if(!is.null(filename)){
-    mrbin.env$mrbinparam<-dget(filename)
+    setParam(dget(filename))
+    cat(paste("Parameter file was loaded. Folder names may need adjustment.\n",
+           "Update mrbin.env$mrbinparam$NMRfolders if necessary.\n",
+           sep=""))
+  } else {
+    cat("No filename was specified. No file loaded.\n")
+  }
+}
+
+#' A function setting parameters and checking for consistency.
+#'
+#' This function set parameters and checks parameters for consistency.
+#' @param parameters List of parameters to be set
+#' @keywords
+#' @export
+#' @examples
+#' \donttest{
+#' setParam(parameter)
+#' }
+setParam<-function(parameters=NULL){
+  if(!is.null(parameters)){
+    mrbin.env$mrbinparam<-parameters
     diffSet<-setdiff(names(mrbin.env$mrbinparam_copy),names(mrbin.env$mrbinparam))
+    diffSet2<-setdiff(names(mrbin.env$mrbinparam),names(mrbin.env$mrbinparam_copy))
+    if(length(diffSet2)>0){
+       cat(paste("The following unexpected variables were found in the provided parameter set: ",
+           paste(diffSet2,sep=", ", collpase=", "),"\n",
+           "These parameters will not be used. Potentially they were created in a different mrbin version.\n",
+           "Check for new versions at: kleinomicslab.com\n", sep=""))
+    }
     if(length(diffSet)>0){
        cat(paste("The following variables were not found in the imported parameter set: ",
            paste(diffSet,sep=", ", collpase=", "),"\n", sep=""))
@@ -875,9 +933,11 @@ recreatemrbin<-function(filename=NULL){
            sep=""))
     }
   } else {
-    cat("No filename was specified. No file loaded.\n")
+      cat("No parameters were provided.\n")
   }
 }
+
+
 
 #' A function replacing negative values.
 #'
