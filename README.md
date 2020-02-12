@@ -68,13 +68,13 @@ In order to create reproducible results, mrbin will save the used parameters to 
 While it is fine to view the parameter text file in a text editor, please do not change its contents, as this may break its formatting.
 
 
-In order to recreate a previous data set, or to reload previously used parameters, use this function:
+In order to recreate a previous data set, or to reload previously used parameters, use:
 
 ```
-recreatemrbin("mrbin_01-03-20_12-00-10.txt")
+mrbin()
 ```
 
-Make sure you enter the full file name and path. This will restore all parameters that were previously used.
+and select ""Reload from file" when asked "Set parameters or use existing parameters?". This will restore all parameters that were previously used. If the file was created using an older version of mrbin, this may cause inconsistencies. Missing parameters will be added using standard parameters. Ideally, download the older mrbin version at kleinomicslab.com and use the old version to recreated the data in an exact way.
 
 Please be aware that bins will have to be recalculated, so the original NMR spectra will have to be present to do this.
 
