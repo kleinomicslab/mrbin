@@ -999,13 +999,18 @@ setCurrentSpectrum<-function(){
 #' }
 
 removeSpectrum<-function(){
- if(!is.null(mrbin.env$bins)){
-    listTMP<-utils::select.list(rownames(mrbin.env$bins),preselect = NULL, multiple = T,title ="Select spectra to be removed",graphics=T)
+ if(!is.null(mrbin.env$mrbinparam$NMRfolders)){
+    listTMP<-utils::select.list(mrbin.env$mrbinparam$NMRfolders,preselect = NULL, multiple = T,title ="Select spectra to be removed",graphics=T)
     if(length(listTMP)>0){
-         mrbin.env$mrbinparam$NMRfolders<-mrbin.env$mrbinparam$NMRfolders[-which(rownames(mrbin.env$bins)%in%listTMP)]
-         mrbin.env$mrbinparam$Factors<-mrbin.env$mrbinparam$Factors[-which(rownames(mrbin.env$bins)%in%listTMP)]
-
-         mrbin.env$bins<-mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),]
+      if(!listTMP==""){
+         if(length(mrbin.env$mrbinparam$Factors)==length(mrbin.env$mrbinparam$NMRfolders)){
+           mrbin.env$mrbinparam$Factors<-mrbin.env$mrbinparam$Factors[-which(mrbin.env$mrbinparam$NMRfolders%in%listTMP)]
+         }
+         if(nrow(mrbin.env$bins)==length(mrbin.env$mrbinparam$NMRfolders)){
+           mrbin.env$bins<-mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),]
+         }
+         mrbin.env$mrbinparam$NMRfolders<-mrbin.env$mrbinparam$NMRfolders[-which(mrbin.env$mrbinparam$NMRfolders%in%listTMP)]
+      }
     }
  }
 }
