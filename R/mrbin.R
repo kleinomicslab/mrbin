@@ -198,6 +198,9 @@ mrbin<-function(parameters=NULL,silent=F){
   }
   stopTMP<-F
   selectionRepeat<-""
+  if(silent){
+      startmrbin<-"Start binning now"
+  }
   #Create bin list?
   if(!silent){
    selection<-utils::select.list(c("Yes","No"),preselect="Yes",
@@ -778,7 +781,7 @@ mrbin<-function(parameters=NULL,silent=F){
   }
  }
  if(!stopTMP){
-   if(startmrbin=="Start binning now"|silent){
+   if(startmrbin=="Start binning now"){
      mrbinrun()
      mrbin.env$paramChangeFlag<-F
      mrbin.env$mrbinparam$createBins<-"Yes"
@@ -907,30 +910,42 @@ recreatemrbin<-function(filename=NULL){
 #' }
 setParam<-function(parameters=NULL){
   if(!is.null(parameters)){
+    mrbin.env$mrbinparam_copy<-mrbin.env$mrbinparam
     mrbin.env$mrbinparam<-parameters
     diffSet<-setdiff(names(mrbin.env$mrbinparam_copy),names(mrbin.env$mrbinparam))
+    diffSet3<-setdiff(diffSet,c("mrbinversionTracker", "medians", "noise_level",
+               "numberOfFeaturesRaw", "numberOfFeaturesAfterRemovingSolvent",
+               "numberOfFeaturesAfterRemovingAreas","numberOfFeaturesAfterSummingBins",
+               "numberOfFeaturesAfterNoiseRemoval", "numberOfFeaturesAfterCropping"))
     diffSet2<-setdiff(names(mrbin.env$mrbinparam),names(mrbin.env$mrbinparam_copy))
     if(length(diffSet2)>0){
-       cat(paste("The following unexpected variables were found in the provided parameter set: ",
-           paste(diffSet2,sep=", ", collpase=", "),"\n",
+       cat(paste("Unexpected parameters: ",
+           paste(diffSet2,sep=", ", collapse=", "),"\n",
            "These parameters will not be used. Potentially they were created in a different mrbin version.\n",
            "Check for new versions at: kleinomicslab.com\n", sep=""))
     }
+    if(length(diffSet3)>0){
+       cat(paste("Parameters not found in parameter set: ",
+           paste(diffSet,sep=", ", collapse=", "),"\n",
+           "Previous or default parameters are being used for the missing parameters.\n",
+           sep=""))
+    }
     if(length(diffSet)>0){
-       cat(paste("The following variables were not found in the imported parameter set: ",
-           paste(diffSet,sep=", ", collpase=", "),"\n", sep=""))
        for(idiffSet in diffSet){
             mrbin.env$mrbinparam[[idiffSet]]<-mrbin.env$mrbinparam_copy[[idiffSet]]
        }
     }
-    if(!mrbin.env$mrbinTMP$mrbinversion==mrbin.env$mrbinparam$mrbinversion){
-       cat(paste("Imported file was created using the older mrbin version ",mrbin.env$mrbinparam$mrbinversion,
+    if(!mrbin.env$mrbinTMP$mrbinversion==mrbin.env$mrbinparam$mrbinversionTracker){
+       cat(paste("Imported file was created using the older mrbin version ",mrbin.env$mrbinparam$mrbinversionTracker,
            ".\n For exact reproduction of results, please get the old version at: kleinomicslab.com\n",
            sep=""))
     } else {
-        cat(paste("Parameter file was succesfully loaded. Folder names may need adjustment.\n",
+        cat(paste("Parameters were loaded.\n"))
+        if("NMRfolders"%in%names(parameters)){
+          cat(paste("Folder names may need adjustment if folders were renamed.\n",
            "Update mrbin.env$mrbinparam$NMRfolders if necessary.\n",
            sep=""))
+        }
     }
   } else {
       cat("No parameters were provided.\n")
