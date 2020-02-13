@@ -20,7 +20,7 @@
 #License: GPL-3
 
 #' @importFrom grDevices colorRamp heat.colors rainbow rgb
-#' @importFrom graphics axis contour hist legend lines par plot text boxplot
+#' @importFrom graphics axis contour hist legend lines par plot text boxplot points
 #' @importFrom stats heatmap median prcomp quantile sd
 #' @importFrom utils flush.console select.list write.csv
 NULL
@@ -1361,15 +1361,6 @@ createBinNames<-function(){
 
        }
        mrbin.env$mrbinTMP$binNames<-rownames(mrbin.env$mrbinTMP$binRegions)
-       #if(mrbin.env$mrbinparam$dimension=="2D"){
-       #   binNames2<-mrbin.env$mrbinparam$binRegion[1]+mrbin.env$mrbinparam$binwidth2D/2-(1:mrbin.env$mrbinTMP$nbins2)*mrbin.env$mrbinparam$binwidth2D
-       #   binNames1<-mrbin.env$mrbinparam$binRegion[4]+mrbin.env$mrbinparam$binheight/2-(1:mrbin.env$mrbinTMP$nbins1)*mrbin.env$mrbinparam$binheight
-       #   mrbin.env$mrbinTMP$binNames<-paste(sort(rep(binNames1,mrbin.env$mrbinTMP$nbins2),decreasing=T),
-       #                      rep(binNames2,mrbin.env$mrbinTMP$nbins1),sep=",")
-      #}
-      #if(mrbin.env$mrbinparam$dimension=="1D"){
-      #    mrbin.env$mrbinTMP$binNames<-mrbin.env$mrbinparam$binRegion[1]+mrbin.env$mrbinparam$binwidth1D/2-(1:mrbin.env$mrbinTMP$nbins)*mrbin.env$mrbinparam$binwidth1D
-      #}
   }
 }
 #' A function for creating bin numbers.
@@ -1432,23 +1423,6 @@ binSingleNMR<-function(){
                                          sum(NMRspectrumColnames<=mrbin.env$mrbinTMP$binRegions[ibinTMP,1]&
                                          NMRspectrumColnames>mrbin.env$mrbinTMP$binRegions[ibinTMP,2]))
      }
-      #which_j<-matrix(rep(F,nrow(mrbin.env$mrbinTMP$currentSpectrum)*mrbin.env$mrbinTMP$nbins1),ncol=mrbin.env$mrbinTMP$nbins1)
-      #which_i<-matrix(rep(F,ncol(mrbin.env$mrbinTMP$currentSpectrum)*mrbin.env$mrbinTMP$nbins2),nrow=mrbin.env$mrbinTMP$nbins2)
-      #for(j in 1:mrbin.env$mrbinTMP$nbins1){
-      #     which_j[,j]<-(NMRspectrumRownames>(mrbin.env$mrbinparam$binRegion[4]-j*mrbin.env$mrbinparam$binheight)&
-      #                    NMRspectrumRownames<=(mrbin.env$mrbinparam$binRegion[4]-(j-1)*mrbin.env$mrbinparam$binheight))
-      #}
-      #for(i in 1:mrbin.env$mrbinTMP$nbins2){
-      #     which_i[i,]<-(NMRspectrumColnames>(mrbin.env$mrbinparam$binRegion[1]-i*mrbin.env$mrbinparam$binwidth2D)&
-      #                    NMRspectrumColnames<=(mrbin.env$mrbinparam$binRegion[1]-(i-1)*mrbin.env$mrbinparam$binwidth2D))
-      #}
-      #for(j in 1:mrbin.env$mrbinTMP$nbins1){
-      #    for(i in 1:mrbin.env$mrbinTMP$nbins2){
-      #       mrbin.env$mrbinTMP$binTMP[counter]<-sum(mrbin.env$mrbinTMP$currentSpectrum[which_j[,j],which_i[i,]])/
-      #                                  (sum(which_j[,j])*sum(which_i[i,]))
-      #       counter<-counter+1
-      #   }
-      #}
    } else {#1D spectra
        if(is.null(mrbin.env$mrbinTMP$binNames)) createBinNames()
        mrbin.env$mrbinTMP$binTMP<-rep(0,nrow(mrbin.env$mrbinTMP$binRegions))
@@ -1462,12 +1436,6 @@ binSingleNMR<-function(){
                                         (sum(NMRspectrumNames<=mrbin.env$mrbinTMP$binRegions[ibinTMP,1]&
                                          NMRspectrumNames>mrbin.env$mrbinTMP$binRegions[ibinTMP,2]))
      }
-       #for(i in 1:mrbin.env$mrbinTMP$nbins){
-       #        indexTMP<-which(NMRspectrumNames>(mrbin.env$mrbinparam$binRegion[1]-i*mrbin.env$mrbinparam$binwidth1D)&
-       #                     NMRspectrumNames<=(mrbin.env$mrbinparam$binRegion[1]-(i-1)*mrbin.env$mrbinparam$binwidth1D))
-       #        mrbin.env$mrbinTMP$binTMP[counter]<-sum(mrbin.env$mrbinTMP$currentSpectrum[indexTMP])/length(indexTMP)
-       #        counter<-counter+1
-       #}
     }
     if(sum(mrbin.env$mrbinTMP$binTMP==0)>0){
         cat("Warning: Binning region may be larger than total spectrum size.\n")
@@ -1563,12 +1531,10 @@ readBruker<-function(){#Read Bruker NMR spectral data
         colnames(currentSpectrum)<-frequencynames2
      } else {
        names(currentSpectrum)<-frequencynames2
-       #if(XDIM2>1){cat("Spectrum might be distorted (XDIM>1)\n")}
      }
   mrbin.env$mrbinTMP$currentSpectrum<-currentSpectrum
   if(mrbin.env$mrbinparam$useAsNames=="Spectrum titles")    mrbin.env$mrbinTMP$currentSpectrumName<-TITLE
   if(mrbin.env$mrbinparam$useAsNames=="Folder names")    mrbin.env$mrbinTMP$currentSpectrumName<-rev(strsplit(mrbin.env$mrbinTMP$currentFolder,"/")[[1]])[4]
-
   if(mrbin.env$mrbinparam$referenceScaling=="Yes") referenceScaling()
  }
 }
@@ -1799,7 +1765,7 @@ removeNoise<-function(){#remove noise peaks
 #'
 #' This function crops HSQC spectra to the region along the diagonal to remove
 #' uninformative signals. Will work only for 1H-13C HSQC spectra.
-#' @param
+#' @param plot Should a plot of the bins before and after cropping be shown? Defaults to FALSE.
 #' @keywords
 #' @export
 #' @examples
@@ -1807,7 +1773,7 @@ removeNoise<-function(){#remove noise peaks
 #' cropNMR()
 #' }
 
-cropNMR<-function(){
+cropNMR<-function(plot=F){
  if(!is.null(mrbin.env$bins)){
    if(mrbin.env$mrbinparam$dimension=="2D"){
      selectedCols<-NULL
@@ -1821,12 +1787,14 @@ cropNMR<-function(){
             selectedCols<-c(selectedCols,j)
         }
     }
+    if(plot){
+        graphics::plot(t(matrix(as.numeric(unlist(strsplit(colnames(mrbin.env$bins),","))),
+             nrow=2))[,c(2,1)],
+             xlim=c(10,0),ylim=c(160,0),xlab="1H",ylab="13C",pch=20,col="black")
+        graphics::points(t(matrix(as.numeric(unlist(strsplit(colnames(mrbin.env$bins[,selectedCols]),","))),
+             nrow=2))[,c(2,1)],col="red",pch=20)
+    }
     mrbin.env$bins<-mrbin.env$bins[,selectedCols]
-    #plot(t(matrix(as.numeric(unlist(strsplit(colnames(NMRdataTmp),","))),
-    #     nrow=2))[,c(2,1)],
-    #     xlim=c(10,0),ylim=c(160,0),xlab="1H",ylab="13C",pch=20,col="black")
-    #points(t(matrix(as.numeric(unlist(strsplit(colnames(NMRdataTmp2),","))),
-    #     nrow=2))[,c(2,1)],col="red",pch=20)
   }
   mrbin.env$mrbinparam$numberOfFeaturesAfterCropping<-ncol(mrbin.env$bins)
  }
@@ -1869,7 +1837,8 @@ PQNScaling<-function(){#Scale to PQN
     }
     #Calculate fold changes versus reference sample
     NMRdataTmp_scaledMedian<-NMRdataTmp
-    if(mrbin.env$mrbinparam$PQNminimumFeatures>ncol(NMRdataTmp2)) mrbin.env$mrbinparam$PQNminimumFeatures<-ncol(NMRdataTmp2)
+    PQNminimumFeatures<-min(max(mrbin.env$mrbinparam$PQNminimumFeatures,floor(.25*ncol(NMRdataTmp2))),ncol(NMRdataTmp2))
+    #if(mrbin.env$mrbinparam$PQNminimumFeatures>ncol(NMRdataTmp2)) mrbin.env$mrbinparam$PQNminimumFeatures<-ncol(NMRdataTmp2)
     medianFoldChanges<-rep(0,nrow(NMRdataTmp_scaledMedian))
     names(medianFoldChanges)<-rownames(NMRdataTmp_scaledMedian)
     if(mrbin.env$mrbinparam$PQNshowHist){#Plot distribution of fold changes per sample
@@ -1877,7 +1846,7 @@ PQNScaling<-function(){#Scale to PQN
       graphics::par(mar=c(.1,.1,3,.1))
     }
     for(i in 1:nrow(NMRdataTmp2)){#scale to spectral area, use only points above X% quantile for better reliability
-        overlapAboveNoise<- sort(NMRdataTmp2[i,],index.return=T,decreasing=T)$ix[1:mrbin.env$mrbinparam$PQNminimumFeatures]
+        overlapAboveNoise<- sort(NMRdataTmp2[i,],index.return=T,decreasing=T)$ix[1:PQNminimumFeatures]#$ix returns the index for matrix data
         medianFoldChanges[i]<-stats::median(NMRdataTmp2[i,overlapAboveNoise]/
                                      NMRdataTmp2[medianSample,overlapAboveNoise])
         NMRdataTmp_scaledMedian[i,]<-NMRdataTmp[i,]/medianFoldChanges[i]
