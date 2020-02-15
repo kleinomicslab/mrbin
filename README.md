@@ -10,8 +10,17 @@ The main functions of this package are controlled via the mrbin() function. Most
 
 To install  mrbin, please install the latest version of R first. Then install the package as follows:
 
+To install the latest stable version from CRAN:
+
 ```
 install.packages("mrbin")
+```
+
+To install the latest development version from Github:
+
+```
+library(devtools)
+install_github("kleinomicslab/mrbin")
 ```
 
 ### Running
