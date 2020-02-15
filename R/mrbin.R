@@ -38,7 +38,6 @@ NULL
 #' }
 
 .onLoad <- function(libname, pkgname){
-    #mrbin.env<-new.env(parent=emptyenv())
     assign("mrbin.env",new.env(emptyenv()),parent.env(environment()))
     resetEnv()
 }
@@ -55,7 +54,6 @@ NULL
 #' }
 
 resetEnv<-function(){
-    #mrbin.env$bins<-NULL
     assign("bins",NULL,mrbin.env)
     assign("paramChangeFlag",F,mrbin.env)
     assign("mrbinTMP",list(
@@ -166,6 +164,7 @@ resetEnv<-function(){
 #' is requested and binning and data processing are performed silently.
 #' @param parameters Optional: A list of parameters to be used. If omitted, the user will be asked through a series of question to set the parameters.
 #' @param silent If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.
+#' @param setDefault If TRUE, all current parameters will be replaced by the default parameters (before loading any provided parameters sets). Defaults to FALSE.
 #' @return An invisible list containing bins (data after processing), parameters, and factors
 #' @keywords
 #' @export
@@ -192,15 +191,18 @@ resetEnv<-function(){
 #'       ),silent=T)
 #" }
 
-mrbin<-function(parameters=NULL,silent=F){
+mrbin<-function(silent=F,setDefault=F,parameters=NULL){
+  if(!exists("mrbin.env", mode="environment")) .onLoad()
+  cat(paste("mrbin version ",mrbin.env$mrbinTMP$mrbinversion,"\n",
+       "Binning, Scaling and Normalization of NMR Data\n",
+       "\n",sep=""))
+  if(setDefault) resetEnv()
   if(!is.null(parameters)){
       setParam(parameters)
   }
   stopTMP<-F
   selectionRepeat<-""
-  if(silent){
-      startmrbin<-"Start binning now"
-  }
+  if(silent) startmrbin<-"Start binning now"
   #Create bin list?
   if(!silent){
    selection<-utils::select.list(c("Yes","No"),preselect="Yes",
@@ -908,6 +910,7 @@ recreatemrbin<-function(filename=NULL){
 #' \donttest{
 #' setParam(parameter)
 #' }
+
 setParam<-function(parameters=NULL){
   if(!is.null(parameters)){
     mrbin.env$mrbinparam_copy<-mrbin.env$mrbinparam
@@ -942,8 +945,7 @@ setParam<-function(parameters=NULL){
     } else {
         cat(paste("Parameters were loaded.\n"))
         if("NMRfolders"%in%names(parameters)){
-          cat(paste("Folder names may need adjustment if folders were renamed.\n",
-           "Update mrbin.env$mrbinparam$NMRfolders if necessary.\n",
+          cat(paste("mrbin.env$mrbinparam$NMRfolders may need adjustment if folders were renamed.\n",
            sep=""))
         }
     }
@@ -1012,7 +1014,13 @@ atnv<-function(NMRdata=NULL,noiseLevels=NULL){
         }
      }
      if("bins"%in%ls(envir=mrbin.env)&"mrbinparam"%in%ls(envir=mrbin.env)){
-          mrbin.env$bins<-NMRdata
+          if(nrow(mrbin.env$bins)==1){
+            mrbin.env$bins<-matrix(NMRdata,nrow=1)
+            rownames(mrbin.env$bins)<-rownames(NMRdata)
+            colnames(mrbin.env$bins)<-colnames(NMRdata)
+          } else {
+            mrbin.env$bins<-NMRdata
+          }
      }
      return(NMRdata)
  }
@@ -1035,7 +1043,15 @@ logTrafo<-function(){
      if(sum(mrbin.env$bins<=0)>0){
          stop("Log transform does not work with negative values.")
      } else {
+        if(nrow(mrbin.env$bins)==1){
+          rownamesTMP<-rownames(mrbin.env$bins)
+          colnamesTMP<-colnames(mrbin.env$bins)
+          mrbin.env$bins<-matrix(log(mrbin.env$bins),nrow=1)
+          rownames(mrbin.env$bins)<-rownamesTMP
+          colnames(mrbin.env$bins)<-colnamesTMP
+        } else {
          mrbin.env$bins<-log(mrbin.env$bins)
+        }
      }
  }
 }
@@ -1082,7 +1098,15 @@ removeSpectrum<-function(){
            mrbin.env$mrbinparam$Factors<-mrbin.env$mrbinparam$Factors[-which(mrbin.env$mrbinparam$NMRfolders%in%listTMP)]
          }
          if(nrow(mrbin.env$bins)==length(mrbin.env$mrbinparam$NMRfolders)){
-           mrbin.env$bins<-mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),]
+          if((nrow(mrbin.env$bins)-listTMP)==1){
+            rownamesTMP<-rownames(mrbin.env$bins)[-which(rownames(mrbin.env$bins)%in%listTMP)]
+            colnamesTMP<-colnames(mrbin.env$bins)
+            mrbin.env$bins<-matrix(mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),],nrow=1)
+            rownames(mrbin.env$bins)<-rownamesTMP
+            colnames(mrbin.env$bins)<-colnamesTMP
+          } else {
+             mrbin.env$bins<-mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),]
+          }
          }
          mrbin.env$mrbinparam$NMRfolders<-mrbin.env$mrbinparam$NMRfolders[-which(mrbin.env$mrbinparam$NMRfolders%in%listTMP)]
       }
@@ -1598,7 +1622,15 @@ sumBins<-function(){#sum up regions with shifting peaks and remove remaining bin
           if(sum(TMP)>0){
               i_TMP<-quantile(x=1:sum(TMP), probs = .5,type=3)#define "middle" bin. This one will be kept
               mrbin.env$bins[,which(TMP)[i_TMP]]<-apply(mrbin.env$bins[,which(TMP)],1,sum)
-              mrbin.env$bins<-mrbin.env$bins[,-which(TMP)[-i_TMP]]
+              if(nrow(mrbin.env$bins)==1){
+                rownamesTMP<-rownames(mrbin.env$bins)
+                colnamesTMP<-colnames(mrbin.env$bins)[-which(TMP)[-i_TMP]]
+                mrbin.env$bins<-matrix(mrbin.env$bins[,-which(TMP)[-i_TMP]],nrow=1)
+                rownames(mrbin.env$bins)<-rownamesTMP
+                colnames(mrbin.env$bins)<-colnamesTMP
+              } else {
+                mrbin.env$bins<-mrbin.env$bins[,-which(TMP)[-i_TMP]]
+              }
               mrbin.env$mrbinTMP$binRegions<-mrbin.env$mrbinTMP$binRegions[-which(TMP)[-i_TMP],]
           }
        } else {#2D limits=c(4.04,4.08,58,60)
@@ -1608,7 +1640,15 @@ sumBins<-function(){#sum up regions with shifting peaks and remove remaining bin
            if(sum(TMP)>0){
               i_TMP<-quantile(x=1:sum(TMP), probs = .5,type=3)#define "middle" bin. This one will be kept
               mrbin.env$bins[,which(TMP)[i_TMP]]<-apply(mrbin.env$bins[,which(TMP)],1,sum)
-              mrbin.env$bins<-mrbin.env$bins[,-which(TMP)[-i_TMP]]
+              if(nrow(mrbin.env$bins)==1){
+                rownamesTMP<-rownames(mrbin.env$bins)
+                colnamesTMP<-colnames(mrbin.env$bins)[-which(TMP)[-i_TMP]]
+                mrbin.env$bins<-matrix(mrbin.env$bins[,-which(TMP)[-i_TMP]],nrow=1)
+                rownames(mrbin.env$bins)<-rownamesTMP
+                colnames(mrbin.env$bins)<-colnamesTMP
+              } else {
+                mrbin.env$bins<-mrbin.env$bins[,-which(TMP)[-i_TMP]]
+              }
               mrbin.env$mrbinTMP$binRegions<-mrbin.env$mrbinTMP$binRegions[-which(TMP)[-i_TMP],]
            }
        }
@@ -1640,8 +1680,16 @@ removeSolvent<-function(){
        solventTMP<-NMRdataNames[,2]>mrbin.env$mrbinparam$solventRegion[2]&NMRdataNames[,2]<mrbin.env$mrbinparam$solventRegion[1]
    }
    if(sum(solventTMP)>0){
-       mrbin.env$bins<-mrbin.env$bins[,-which(solventTMP)]
-       mrbin.env$mrbinTMP$binRegions<-mrbin.env$mrbinTMP$binRegions[-which(solventTMP),]
+      if(nrow(mrbin.env$bins)==1){
+        rownamesTMP<-rownames(mrbin.env$bins)
+        colnamesTMP<-colnames(mrbin.env$bins)[-which(solventTMP)]
+        mrbin.env$bins<-matrix(mrbin.env$bins[,-which(solventTMP)],nrow=1)
+        rownames(mrbin.env$bins)<-rownamesTMP
+        colnames(mrbin.env$bins)<-colnamesTMP
+      } else {
+        mrbin.env$bins<-mrbin.env$bins[,-which(solventTMP)]
+      }
+      mrbin.env$mrbinTMP$binRegions<-mrbin.env$mrbinTMP$binRegions[-which(solventTMP),]
    }
    mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingSolvent<-ncol(mrbin.env$bins)
  }
@@ -1680,7 +1728,15 @@ removeAreas<-function(){#limits=c(4.75,4.95,-10,160)
      }
      if(!is.null(removeTMP)){
          removeTMP<-unique(removeTMP)
-         mrbin.env$bins<-mrbin.env$bins[,-removeTMP]
+         if(nrow(mrbin.env$bins)==1){
+            rownamesTMP<-rownames(mrbin.env$bins)
+            colnamesTMP<-colnames(mrbin.env$bins)[-removeTMP]
+            mrbin.env$bins<-matrix(mrbin.env$bins[,-removeTMP],nrow=1)
+            rownames(mrbin.env$bins)<-rownamesTMP
+            colnames(mrbin.env$bins)<-colnamesTMP
+         } else {
+            mrbin.env$bins<-mrbin.env$bins[,-removeTMP]
+         }
          mrbin.env$mrbinTMP$binRegions<-mrbin.env$mrbinTMP$binRegions[-removeTMP,]
      }
   }
@@ -1752,7 +1808,16 @@ removeNoise<-function(){#remove noise peaks
           }
     }
     if(!is.null(colnames_NMRdata_no_noise)){
-        mrbin.env$bins<-mrbin.env$bins[,colnames_NMRdata_no_noise]
+        if(nrow(mrbin.env$bins)==1){
+            rownamesTMP<-rownames(mrbin.env$bins)
+            colnamesTMP<-colnames(mrbin.env$bins)[colnames_NMRdata_no_noise]
+            mrbin.env$bins<-matrix(mrbin.env$bins[,colnames_NMRdata_no_noise],nrow=1)
+            rownames(mrbin.env$bins)<-rownamesTMP
+            colnames(mrbin.env$bins)<-colnamesTMP
+        } else {
+          mrbin.env$bins<-mrbin.env$bins[,colnames_NMRdata_no_noise]
+        }
+
         mrbin.env$mrbinTMP$binRegions<-mrbin.env$mrbinTMP$binRegions[colnames_NMRdata_no_noise,]
     } else {
         stop("No bins above noise level. Noise removal stopped.\n")
@@ -1794,7 +1859,15 @@ cropNMR<-function(plot=F){
         graphics::points(t(matrix(as.numeric(unlist(strsplit(colnames(mrbin.env$bins[,selectedCols]),","))),
              nrow=2))[,c(2,1)],col="red",pch=20)
     }
-    mrbin.env$bins<-mrbin.env$bins[,selectedCols]
+    if(nrow(mrbin.env$bins)==1){
+            rownamesTMP<-rownames(mrbin.env$bins)
+            colnamesTMP<-colnames(mrbin.env$bins)[selectedCols]
+            mrbin.env$bins<-matrix(mrbin.env$bins[,selectedCols],nrow=1)
+            rownames(mrbin.env$bins)<-rownamesTMP
+            colnames(mrbin.env$bins)<-colnamesTMP
+    } else {
+      mrbin.env$bins<-mrbin.env$bins[,selectedCols]
+    }
   }
   mrbin.env$mrbinparam$numberOfFeaturesAfterCropping<-ncol(mrbin.env$bins)
  }
@@ -1816,7 +1889,7 @@ cropNMR<-function(plot=F){
 
 PQNScaling<-function(){#Scale to PQN
  if(!is.null(mrbin.env$bins)){
-  if(ncol(mrbin.env$bins)>1){
+  if(nrow(mrbin.env$bins)>1){
     #Create synthetic median spectrum by averaging all spectra
     NMRdataTmp<-rbind(mrbin.env$bins,apply(mrbin.env$bins,2,mean))
     rownames(NMRdataTmp)[nrow(NMRdataTmp)]<-"Median"
@@ -1858,10 +1931,18 @@ PQNScaling<-function(){#Scale to PQN
     }
     #Remove reference sample from list
     NMRdataTmp_scaledMedian<-NMRdataTmp_scaledMedian[-nrow(NMRdataTmp_scaledMedian),]
-    mrbin.env$bins<-NMRdataTmp_scaledMedian
+    if(nrow(mrbin.env$bins)==1){
+            rownamesTMP<-rownames(mrbin.env$bins)
+            colnamesTMP<-colnames(mrbin.env$bins)
+            mrbin.env$bins<-matrix(NMRdataTmp_scaledMedian,nrow=1)
+            rownames(mrbin.env$bins)<-rownamesTMP
+            colnames(mrbin.env$bins)<-colnamesTMP
+    } else {
+      mrbin.env$bins<-NMRdataTmp_scaledMedian
+    }
     mrbin.env$mrbinparam$medians<-medianFoldChanges
    } else {
-      stop("Too few samples to perform PQN normalization.\n")
+      cat("Too few samples, did not perform PQN normalization.\n")
    }
  }
 }
@@ -1905,13 +1986,13 @@ plotBins<-function(){#Plot 2D NMR bin data
 
 plotResults<-function(){
  if(!is.null(mrbin.env$bins)){
-    if(ncol(mrbin.env$bins)>1){
       if(is.null(mrbin.env$mrbinparam$Factors)) mrbin.env$mrbinparam$Factors<-factor(rep("Group 0",nrow(mrbin.env$bins)))
       colorPalette<-grDevices::rainbow(length(levels(mrbin.env$mrbinparam$Factors)))
       mrbin.env$mrbinTMP$PCA<-stats::prcomp(mrbin.env$bins)
       graphics::par(mfrow=c(2,2),mar=c(3.1,2,1.0,0.5))
       graphics::boxplot(mrbin.env$bins,main="",xlab="Bins",ylab="",boxwex=1,cex.lab=.25)
       graphics::boxplot(t(mrbin.env$bins),main="",xlab="Samples",ylab="",boxwex=1,cex.lab=.25)
+    if(nrow(mrbin.env$bins)>1){
       graphics::par(xpd=T,mar=c(4.2,4.1,2.8,0.5))
       graphics::plot(mrbin.env$mrbinTMP$PCA$x[,1],mrbin.env$mrbinTMP$PCA$x[,2],
            pch=as.numeric(mrbin.env$mrbinparam$Factors)+14,
