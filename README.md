@@ -79,7 +79,7 @@ and select ""Reload from file" when asked "Set parameters or use existing parame
 
 Please be aware that bins will have to be recalculated, so the original NMR spectra will have to be present to do this.
 
-### Submitting parameters at the comman line
+### Submitting Parameters at the Command Line
 Parameters can be submitted at the command line, using the following syntax:
 
 ```
