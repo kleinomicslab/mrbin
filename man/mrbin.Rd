@@ -4,12 +4,14 @@
 \alias{mrbin}
 \title{A function setting the parameters and performing binning and data processing}
 \usage{
-mrbin(parameters = NULL, silent = F)
+mrbin(silent = F, setDefault = F, parameters = NULL)
 }
 \arguments{
-\item{parameters}{Optional: A list of parameters to be used. If omitted, the user will be asked through a series of question to set the parameters.}
-
 \item{silent}{If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.}
+
+\item{setDefault}{If TRUE, all current parameters will be replaced by the default parameters (before loading any provided parameters sets). Defaults to FALSE.}
+
+\item{parameters}{Optional: A list of parameters to be used. If omitted, the user will be asked through a series of question to set the parameters.}
 }
 \value{
 An invisible list containing bins (data after processing), parameters, and factors
