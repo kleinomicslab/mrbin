@@ -25,17 +25,84 @@
 #' @importFrom utils flush.console select.list write.csv
 NULL
 
+#' A function replacing negative values.
+#'
+#' This function replaces (column-wise) negative values by a small positive
+#' number. The number is calculated as an affine transformation to the range of
+#' the lowest positive number to 0,01*the lowest positive number (of this
+#' column). Ranks stay unchanged. Positive numbers are not altered.
+#' If sample-wise noise levels are available, the median noise level of samples
+#' with negative values is calculated and replaces the lowest positive number in
+#' case it is smaller. If no noise data is available, the 1% percentile of all
+#' positive values in the data set is used as an estimate.
+#' It is recommended to us this function AFTER noise removal and other data
+#' clean-up methods, as it may alter (reduce) the noise level.
+#' If no NMR data and noise levels are provided as arguments, the function will
+#' use NMR data and noise levels from the global variables mrbin.env$bins and
+#' mrbin.env$mrbinTMP.
+#' @param NMRdata A matrix containing NMR data. Columns=frequencies,rows=samples
+#' @param noiseLevels A vector
+#' @return NMRdata A matrix containing NMR data without negative values.
+#' @export
+#' @examples
+#' ## Use own data
+#' # atnv(NMRdataMatrix,noiseLevelVector)
+#' ## Use current mrbin data. Requires data loaded using mrbin()
+#' # atnv()
+
+atnv<-function(NMRdata=NULL,noiseLevels=NULL){
+ if(!is.null(mrbin.env$bins)|!is.null(NMRdata)){
+     if(is.null(NMRdata)){
+       if("bins"%in%ls(envir=mrbin.env)&"mrbinparam"%in%ls(envir=mrbin.env)){
+         NMRdata <- mrbin.env$bins
+         noiseLevels <- mrbin.env$mrbinparam$noise_level
+       }
+     }
+     if(is.null(noiseLevels)){
+             noiseTMP<-sort(NMRdata[NMRdata>0])[ceiling(.01*length(NMRdata[NMRdata>0]))]
+     }
+     for(i in 1:ncol(NMRdata)){
+        negatives<-NMRdata[,i]<=0
+
+        if(!is.null(noiseLevels)){#If noise levels are available, restrict range to below noise
+           if(length(negatives)>0){
+             noiseTMP<-stats::median(mrbin.env$mrbinparam$noise_level[negatives])
+           } else {
+             noiseTMP<-stats::median(mrbin.env$mrbinparam$noise_level)
+           }
+        }
+        if(sum(negatives)>0){
+            minTMP<-min(NMRdata[negatives,i])#select lowest bin
+            maxTMP<-min(noiseTMP,min(NMRdata[!negatives,i]))#select lowest bin above 0
+
+            #mrbin.env$bins[negatives,i]<-(NMRdata[negatives,i]+(maxTMP-minTMP))/
+            #                              (maxTMP-minTMP)*(maxTMP*.99)+maxTMP*.01
+            NMRdata[negatives,i]<-(NMRdata[negatives,i]+(maxTMP-minTMP))/
+                                          (maxTMP-minTMP)*(maxTMP*.99)+maxTMP*.01
+        }
+     }
+     if("bins"%in%ls(envir=mrbin.env)&"mrbinparam"%in%ls(envir=mrbin.env)){
+          if(nrow(mrbin.env$bins)==1){
+            mrbin.env$bins<-matrix(NMRdata,nrow=1)
+            rownames(mrbin.env$bins)<-rownames(NMRdata)
+            colnames(mrbin.env$bins)<-colnames(NMRdata)
+          } else {
+            mrbin.env$bins<-NMRdata
+          }
+     }
+     return(NMRdata)
+ }
+}
+
 #' A function executed when loading this package
 #'
 #' This function resets the parameter variables.
 #' @param  libname Library name
 #' @param  pkgname Package name
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' .onLoad()
-#' }
+#' ## Don't run
+#' # .onLoad()
 
 .onLoad <- function(libname, pkgname){
     assign("mrbin.env",new.env(emptyenv()),parent.env(environment()))
@@ -46,14 +113,13 @@ NULL
 #'
 #' This function resets the parameter variables.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' resetEnv()
-#' }
+#' ## Don't run
+#' # resetEnv()
 
 resetEnv<-function(){
+    if(!exists("mrbin.env", mode="environment")) .onLoad()
     assign("bins",NULL,mrbin.env)
     assign("paramChangeFlag",F,mrbin.env)
     assign("mrbinTMP",list(
@@ -166,30 +232,31 @@ resetEnv<-function(){
 #' @param silent If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.
 #' @param setDefault If TRUE, all current parameters will be replaced by the default parameters (before loading any provided parameters sets). Defaults to FALSE.
 #' @return An invisible list containing bins (data after processing), parameters, and factors
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' mrbin()
-#' mrbin(parameters=list(
-#'               dimension="1D",
-#'               binMethod="Rectangular bins",
-#'               binwidth1D=.01,
-#'               referenceScaling="Yes",
-#'               removeSolvent="Yes",
-#'               removeAreas="No",
-#'               sumBins="No",
-#'               noiseRemoval="Yes",
-#'               PQNScaling="Yes",
-#'               fixNegatives="Yes",
-#'               logTrafo="Yes",
-#'               saveFiles="Yes",
-#'               outputFileName="mrbin_test_results",
-#'               NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
-#'                            "C:/NMR/Sample19/1/pdata/1",
-#'                            "C:/NMR/Sample61/1/pdata/1")
-#'       ),silent=T)
-#" }
+#' ## Let the user set parameters interactively
+#' # mrbin()
+#' ## Set all parameters in the console and run without user intervention
+#' # mrbin(silent=T,
+#' #      setDefault=F,
+#' #      parameters=list(
+#' #              dimension="1D",
+#' #              binMethod="Rectangular bins",
+#' #              binwidth1D=.01,
+#' #              referenceScaling="Yes",
+#' #              removeSolvent="Yes",
+#' #              removeAreas="No",
+#' #              sumBins="No",
+#' #              noiseRemoval="Yes",
+#' #              PQNScaling="Yes",
+#' #              fixNegatives="Yes",
+#' #              logTrafo="Yes",
+#' #              saveFiles="Yes",
+#' #              outputFileName="mrbin_test_results",
+#' #              NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
+#' #                           "C:/NMR/Sample19/1/pdata/1",
+#' #                           "C:/NMR/Sample61/1/pdata/1")
+#' #      ))
 
 mrbin<-function(silent=F,setDefault=F,parameters=NULL){
   if(!exists("mrbin.env", mode="environment")) .onLoad()
@@ -674,6 +741,31 @@ mrbin<-function(silent=F,setDefault=F,parameters=NULL){
           if(!stopTMP){
             mrbin.env$mrbinparam$PCA<-PCA
           }
+          if(!stopTMP&mrbin.env$mrbinparam$PCA=="Yes"){
+            PCAtitlelength<-utils::select.list(c(sort(unique(c(2,4,6,8,
+                              mrbin.env$mrbinparam$PCAtitlelength))),
+                              "Use whole title","Custom..."),
+                              preselect = as.character(mrbin.env$mrbinparam$PCAtitlelength),
+                              title = "Crop titles for plot?",graphics=T)
+            if(length(PCAtitlelength)==0|PCAtitlelength=="") stopTMP<-T
+          }
+          if(!stopTMP&mrbin.env$mrbinparam$PCA=="Yes"){
+                 if(PCAtitlelength=="Use whole title") PCAtitlelength<-"500"
+          }
+          if(!stopTMP&mrbin.env$mrbinparam$PCA=="Yes"){
+                  if(PCAtitlelength=="Custom..."){
+                      PCAtitlelengthTMP<-readline(prompt=paste("New title length, press enter to keep ",
+                          mrbin.env$mrbinparam$PCAtitlelength,": ",sep=""))
+                      if(!PCAtitlelengthTMP=="") {
+                          PCAtitlelength<-PCAtitlelengthTMP
+                      } else {
+                          PCAtitlelength<-as.character(mrbin.env$mrbinparam$PCAtitlelength)
+                      }
+                  }
+          }
+          if(!stopTMP&mrbin.env$mrbinparam$PCA=="Yes"){
+                 mrbin.env$mrbinparam$PCAtitlelength<-as.numeric(PCAtitlelength)
+          }
           #Select folders
           if(!stopTMP){
             if(!is.null(mrbin.env$mrbinparam$NMRfolders)){
@@ -803,14 +895,13 @@ mrbin<-function(silent=F,setDefault=F,parameters=NULL){
 #' PCA plot. Parameters are then saved in a text file. These can be recreated
 #' using recreatemrbin().
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' mrbinrun()
-#' }
+#' ## Only works after setting all parameters
+#' # mrbinrun()
 
 mrbinrun<-function(){
+  if(!exists("mrbin.env", mode="environment")) .onLoad()
   if(!is.null(mrbin.env$mrbinparam$NMRfolders)){
     #if(!"mrbinparam"%in%ls(envir = mrbin.env))    resetEnv()
     if(mrbin.env$mrbinparam$createBins=="Yes") binMultiNMR()
@@ -837,15 +928,16 @@ mrbinrun<-function(){
 #' mrbin(). File names in mrbin$param might need to be updated.
 #' using recreatemrbin().
 #' @param filename File path/name of the mrbin parameter file to be loaded
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' recreatemrbin("mrbin_01-03-20_12-00-10.txt")
-#' }
+#' ## Lets the user browse for the parameter file
+#' # recreatemrbin()
+#' ## Insert full folder path and file name
+#' # recreatemrbin("mrbin_01-03-20_12-00-10.txt")
 
 
 recreatemrbin<-function(filename=NULL){
+  if(!exists("mrbin.env", mode="environment")) .onLoad()
   if(is.null(filename)){
    selectFlag<-0
    parentFolder<-getwd()
@@ -904,12 +996,10 @@ recreatemrbin<-function(filename=NULL){
 #'
 #' This function set parameters and checks parameters for consistency.
 #' @param parameters List of parameters to be set
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' setParam(parameter)
-#' }
+#' ## Provide the parameters you like to set
+#' # setParam(list(dimension="1D"))
 
 setParam<-function(parameters=NULL){
   if(!is.null(parameters)){
@@ -955,87 +1045,14 @@ setParam<-function(parameters=NULL){
 }
 
 
-
-#' A function replacing negative values.
-#'
-#' This function replaces (column-wise) negative values by a small positive
-#' number. The number is calculated as an affine transformation to the range of
-#' the lowest positive number to 0,01*the lowest positive number (of this
-#' column). Ranks stay unchanged. Positive numbers are not altered.
-#' If sample-wise noise levels are available, the median noise level of samples
-#' with negative values is calculated and replaces the lowest positive number in
-#' case it is smaller. If no noise data is available, the 1% percentile of all
-#' positive values in the data set is used as an estimate.
-#' It is recommended to us this function AFTER noise removal and other data
-#' clean-up methods, as it may alter (reduce) the noise level.
-#' If no NMR data and noise levels are provided as arguments, the function will
-#' use NMR data and noise levels from the global variables mrbin.env$bins and
-#' mrbin.env$mrbinTMP.
-#' @param NMRdata A matrix containing NMR data. Columns=frequencies,rows=samples
-#' @param noiseLevels A vector
-#' @return NMRdata A matrix containing NMR data without negative values.
-#' @keywords
-#' @export
-#' @examples
-#' \donttest{
-#' atnv()
-#' atnv(NMRdataMatrix,noiseLevelVector)
-#' }
-
-atnv<-function(NMRdata=NULL,noiseLevels=NULL){
- if(!is.null(mrbin.env$bins)|!is.null(NMRdata)){
-     if(is.null(NMRdata)){
-       if("bins"%in%ls(envir=mrbin.env)&"mrbinparam"%in%ls(envir=mrbin.env)){
-         NMRdata <- mrbin.env$bins
-         noiseLevels <- mrbin.env$mrbinparam$noise_level
-       }
-     }
-     if(is.null(noiseLevels)){
-             noiseTMP<-sort(NMRdata[NMRdata>0])[ceiling(.01*length(NMRdata[NMRdata>0]))]
-     }
-     for(i in 1:ncol(NMRdata)){
-        negatives<-NMRdata[,i]<=0
-
-        if(!is.null(noiseLevels)){#If noise levels are available, restrict range to below noise
-           if(length(negatives)>0){
-             noiseTMP<-stats::median(mrbin.env$mrbinparam$noise_level[negatives])
-           } else {
-             noiseTMP<-stats::median(mrbin.env$mrbinparam$noise_level)
-           }
-        }
-        if(sum(negatives)>0){
-            minTMP<-min(NMRdata[negatives,i])#select lowest bin
-            maxTMP<-min(noiseTMP,min(NMRdata[!negatives,i]))#select lowest bin above 0
-
-            #mrbin.env$bins[negatives,i]<-(NMRdata[negatives,i]+(maxTMP-minTMP))/
-            #                              (maxTMP-minTMP)*(maxTMP*.99)+maxTMP*.01
-            NMRdata[negatives,i]<-(NMRdata[negatives,i]+(maxTMP-minTMP))/
-                                          (maxTMP-minTMP)*(maxTMP*.99)+maxTMP*.01
-        }
-     }
-     if("bins"%in%ls(envir=mrbin.env)&"mrbinparam"%in%ls(envir=mrbin.env)){
-          if(nrow(mrbin.env$bins)==1){
-            mrbin.env$bins<-matrix(NMRdata,nrow=1)
-            rownames(mrbin.env$bins)<-rownames(NMRdata)
-            colnames(mrbin.env$bins)<-colnames(NMRdata)
-          } else {
-            mrbin.env$bins<-NMRdata
-          }
-     }
-     return(NMRdata)
- }
-}
-
 #' A function for log transforming data.
 #'
 #' This function simply log transforms. Will not work with negative data.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' logTrafo()
-#' }
+#' ## Will work only after creating bins
+#' # logTrafo()
 
 
 logTrafo<-function(){
@@ -1061,12 +1078,10 @@ logTrafo<-function(){
 #' This function lets the user pick a spectrum from the list of spectra
 #' analysis.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' setCurrentSpectrum()
-#' }
+#' ## Will work only after setting a list of spectra
+#' # setCurrentSpectrum()
 
 setCurrentSpectrum<-function(){
        newCurrent<-utils::select.list(mrbin.env$mrbinparam$NMRfolders,preselect=mrbin.env$mrbinTMP$currentFolder,
@@ -1082,12 +1097,10 @@ setCurrentSpectrum<-function(){
 #' This function lets the user pick spectra from a list for removal from data
 #' analysis.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' removeSpectrum()
-#' }
+#' ## Will work only after creating a spectrum list
+#' # removeSpectrum()
 
 removeSpectrum<-function(){
  if(!is.null(mrbin.env$mrbinparam$NMRfolders)){
@@ -1119,12 +1132,10 @@ removeSpectrum<-function(){
 #' This function lets the user pick samples from a list to assign them to
 #' groups.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' setFactors()
-#' }
+#' ## Will work only after setting a sectrum list
+#' # setFactors()
 
 setFactors<-function(){
    if(length(mrbin.env$mrbinparam$NMRfolders)>0){
@@ -1156,12 +1167,10 @@ setFactors<-function(){
 #' This function selects the correct folder selection function for the vendor
 #' (currently only Bruker).
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' selectFolders()
-#' }
+#' ## Requires user input
+#' # selectFolders()
 
 selectFolders<-function(){#Select NMR spectral folders
       if(mrbin.env$mrbinparam$NMRvendor=="Bruker"){
@@ -1175,12 +1184,10 @@ selectFolders<-function(){#Select NMR spectral folders
 #'
 #' This function lets the user set NMR data folders (for Bruker data).
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' selectBrukerFolders()
-#' }
+#' ## Requires user input
+#' # selectBrukerFolders()
 
 selectBrukerFolders<-function(){#Select Bruker NMR spectral folders
    NMRfolders<-NULL
@@ -1301,12 +1308,10 @@ selectBrukerFolders<-function(){#Select Bruker NMR spectral folders
 #' This function creates bins for each spectrum in mrbin.env$mrbinparam$NMRfolders and
 #' saves the bins to mrbin.env$bins.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' binMultiNMR()
-#' }
+#' ## Requires spectrum list
+#' # binMultiNMR()
 
 binMultiNMR<-function(){
  if(!is.null(mrbin.env$mrbinparam$NMRfolders)){
@@ -1348,12 +1353,10 @@ binMultiNMR<-function(){
 #' This function creates titles for the bins to represent their average ppm
 #' value.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' createBinNames()
-#' }
+#' ## Requires data
+#' # createBinNames()
 
 createBinNames<-function(){
    createBinNumbers()
@@ -1392,12 +1395,10 @@ createBinNames<-function(){
 #' This function calculates numbers of bins from the chosen parameters
 #' value.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' createBinNumbers()
-#' }
+#' ##Requires data
+#' #createBinNumbers()
 
 createBinNumbers<-function(){
    if(mrbin.env$mrbinparam$binMethod=="Special bin list"){
@@ -1419,12 +1420,10 @@ createBinNumbers<-function(){
 #'
 #' This function creates bins for the current spectrum.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' binSingleNMR()
-#' }
+#' ## Requires data
+#' # binSingleNMR()
 
 binSingleNMR<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentFolder)){
@@ -1471,12 +1470,10 @@ binSingleNMR<-function(){
 #'
 #' This function picks the correct NMR reading function, based on vendor.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' readNMR()
-#' }
+#' ## Requires data
+#' # readNMR()
 
 readNMR<-function(){#Read NMR spectral data
  if(!is.null(mrbin.env$mrbinTMP$currentFolder)){
@@ -1492,12 +1489,10 @@ readNMR<-function(){#Read NMR spectral data
 #'
 #' This function reads Bruker NMR data.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' readBruker()
-#' }
+#' ## Requires folder names
+#' # readBruker()
 
 readBruker<-function(){#Read Bruker NMR spectral data
  if(!is.null(mrbin.env$mrbinTMP$currentFolder)){
@@ -1567,12 +1562,10 @@ readBruker<-function(){#Read Bruker NMR spectral data
 #'
 #' This function scales NMR data to the reference area.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' referenceScaling()
-#' }
+#' ## Requires data
+#' # referenceScaling()
 
 referenceScaling<-function(){
  if(!is.null(mrbin.env$bins)){
@@ -1605,12 +1598,10 @@ referenceScaling<-function(){
 #' for signals that are know to vary between spectra due to pH or salt content,
 #' such as citric acid.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' sumBins()
-#' }
+#' ## Requires data
+#' # sumBins()
 
 sumBins<-function(){#sum up regions with shifting peaks and remove remaining bins
  if(!is.null(mrbin.env$bins)){
@@ -1662,12 +1653,10 @@ sumBins<-function(){#sum up regions with shifting peaks and remove remaining bin
 #'
 #' This function removes the solvent region.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' removeSolvent()
-#' }
+#' ## Requires data
+#' # removeSolvent()
 
 removeSolvent<-function(){
  if(!is.null(mrbin.env$bins)){
@@ -1700,12 +1689,10 @@ removeSolvent<-function(){
 #' This function removes additional regions. This can be useful when some areas
 #' are visibly affected by spectral artifacts.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' removeAreas()
-#' }
+#' ## Requires data
+#' # removeAreas()
 
 removeAreas<-function(){#limits=c(4.75,4.95,-10,160)
  if(!is.null(mrbin.env$bins)){
@@ -1748,12 +1735,10 @@ removeAreas<-function(){#limits=c(4.75,4.95,-10,160)
 #'
 #' This function calculates noise levels.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' calculateNoise()
-#' }
+#' ## Requires data
+#' # calculateNoise()
 
 calculateNoise<-function(){
  if(!is.null(mrbin.env$bins)){
@@ -1784,12 +1769,10 @@ calculateNoise<-function(){
 #' individual noise level times the signal-to-noise ratio. If less than the
 #' defined threshold level are above noise*SNR, the whole bin is removed.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' removeNoise()
-#' }
+#' ## Requires data
+#' # removeNoise()
 
 removeNoise<-function(){#remove noise peaks
  if(!is.null(mrbin.env$bins)){
@@ -1831,12 +1814,10 @@ removeNoise<-function(){#remove noise peaks
 #' This function crops HSQC spectra to the region along the diagonal to remove
 #' uninformative signals. Will work only for 1H-13C HSQC spectra.
 #' @param plot Should a plot of the bins before and after cropping be shown? Defaults to FALSE.
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' cropNMR()
-#' }
+#' ## Requires data
+#' # cropNMR()
 
 cropNMR<-function(plot=F){
  if(!is.null(mrbin.env$bins)){
@@ -1880,12 +1861,10 @@ cropNMR<-function(plot=F){
 #' regions are excluded to avoid a dominating effect of the multiple sugar
 #' signals.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' PQNScaling()
-#' }
+#' ## Requires data
+#' # PQNScaling()
 
 PQNScaling<-function(){#Scale to PQN
  if(!is.null(mrbin.env$bins)){
@@ -1951,12 +1930,10 @@ PQNScaling<-function(){#Scale to PQN
 #'
 #' This function plots the current binned spectrum. Works only for 2D data.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' plotBins()
-#' }
+#' ## Requires data
+#' # plotBins()
 
 plotBins<-function(){#Plot 2D NMR bin data
  if(!is.null(mrbin.env$bins)){
@@ -1977,12 +1954,10 @@ plotBins<-function(){#Plot 2D NMR bin data
 #'
 #' This function plots boxplots (bin-wise and sample-wise) as visual quality indicators. It also performs PCA, then plots PC1 and PC2 and loading plots.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' plotResults()
-#' }
+#' ## Requires data
+#' # plotResults()
 
 plotResults<-function(){
  if(!is.null(mrbin.env$bins)){
@@ -2027,12 +2002,10 @@ plotResults<-function(){
 #' zoomIn(), zoomOut(), intPlus(), intMin(), left(), right().
 #' For 2D data use additionally: contMin(), contPlus(), up(), down()
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' plotNMR()
-#' }
+#' ## Requires data
+#' # plotNMR()
 
 plotNMR<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2119,12 +2092,10 @@ plotNMR<-function(){
 #'
 #' This function increases the intensity of the current NMR spectrum plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' intPlus()
-#' }
+#' ## Requires data
+#' # intPlus()
 
 intPlus<-function(){#increase plot intensity
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2137,12 +2108,10 @@ intPlus<-function(){#increase plot intensity
 #'
 #' This function decreases the intensity of the current NMR spectrum plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' intMin()
-#' }
+#' ## Requires data
+#' # intMin()
 
 intMin<-function(){#decrease plot intensity
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2156,12 +2125,10 @@ intMin<-function(){#decrease plot intensity
 #' This function increases the minimum contour level of the current 2D NMR
 #' spectrum plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' contPlus()
-#' }
+#' ## Requires data
+#' # contPlus()
 
 contPlus<-function(){#decrease plot intensity
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2175,12 +2142,10 @@ contPlus<-function(){#decrease plot intensity
 #' This function decreases the minimum contour level of the current 2D NMR
 #' spectrum plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' contMin()
-#' }
+#' ## Requires data
+#' # contMin()
 
 contMin<-function(){#decrease plot intensity
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2196,12 +2161,12 @@ contMin<-function(){#decrease plot intensity
 #' @param right New right boundary
 #' @param top New top boundary
 #' @param bottom New bottom boundary
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' zoom()
-#' }
+#' ## Requires data
+#' # zoom(left=4.6,right=2,top=20,bottom=100)
+#' ## Ask for user input
+#' # zoom()
 
 zoom<-function(left=NULL,right=NULL,top=NULL,bottom=NULL){
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2223,12 +2188,10 @@ zoom<-function(left=NULL,right=NULL,top=NULL,bottom=NULL){
 #'
 #' This function zooms into the plot region of the current NMR plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' zoomIn()
-#' }
+#' ## Requires data
+#' # zoomIn()
 
 zoomIn<-function(){#Zoom into NMR spectrum plot
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2260,12 +2223,10 @@ zoomIn<-function(){#Zoom into NMR spectrum plot
 #'
 #' This function zooms out from the plot region of the current NMR plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' zoomOut()
-#' }
+#' ## Requires data
+#' # zoomOut()
 
 zoomOut<-function(){#Zoom out from NMR spectrum plot
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2297,12 +2258,10 @@ zoomOut<-function(){#Zoom out from NMR spectrum plot
 #'
 #' This function moves left the plot region of the current NMR plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' left()
-#' }
+#' ## Requires data
+#' # left()
 
 left<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2326,12 +2285,10 @@ left<-function(){
 #'
 #' This function moves right the plot region of the current NMR plot.
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' right()
-#' }
+#' ## Requires data
+#' # right()
 
 right<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2355,12 +2312,10 @@ right<-function(){
 #'
 #' This function moves down the plot region of the current NMR plot (only 2D).
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' down()
-#' }
+#' ## Requires data
+#' # down()
 
 down<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2380,12 +2335,10 @@ down<-function(){
 #'
 #' This function moves up the plot region of the current NMR plot (only 2D).
 #' @param
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' up()
-#' }
+#' ## Requires data
+#' # up()
 
 up<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -2406,13 +2359,11 @@ up<-function(){
 #' This function returns a list of all objects of the current package environment.
 #' This may be helpful for debugging or for accessing NMR spectral data and the raw bin data.
 #' @param
-#' @keywords
 #' @return A list containing all objects from the local package environment.
 #' @export
 #' @examples
-#' \donttest{
-#' tempList<-getEnv()
-#' }
+#' ## Requires data
+#' # tempList<-getEnv()
 
 getEnv<-function(){
   mrbin.envCopy <- mget(ls(envir = mrbin.env), mrbin.env)
@@ -2424,12 +2375,10 @@ getEnv<-function(){
 #' This function can change variables in the current package environment.
 #' This may be helpful for debugging or for some plotting functions.
 #' @param variableList A list containing all objects to be saved in the local package environment.
-#' @keywords
 #' @export
 #' @examples
-#' \donttest{
-#' putToEnv(list(mrbinparam=tempList$mrbinparam))
-#' }
+#' ## Requires data
+#' # putToEnv(list(mrbinparam=tempList$mrbinparam))
 
 putToEnv<-function(variableList){
   if(!is.list(variableList)){
@@ -2440,6 +2389,3 @@ putToEnv<-function(variableList){
    }
   }
 }
-
-
-
