@@ -10,7 +10,6 @@ selectBrukerFolders()
 This function lets the user set NMR data folders (for Bruker data).
 }
 \examples{
-\donttest{
-selectBrukerFolders()
-}
+## Requires user input
+# selectBrukerFolders()
 }

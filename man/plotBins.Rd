@@ -10,7 +10,6 @@ plotBins()
 This function plots the current binned spectrum. Works only for 2D data.
 }
 \examples{
-\donttest{
-plotBins()
-}
+## Requires data
+# plotBins()
 }

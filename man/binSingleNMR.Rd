@@ -10,7 +10,6 @@ binSingleNMR()
 This function creates bins for the current spectrum.
 }
 \examples{
-\donttest{
-binSingleNMR()
-}
+## Requires data
+# binSingleNMR()
 }

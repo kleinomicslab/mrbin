@@ -10,7 +10,6 @@ readBruker()
 This function reads Bruker NMR data.
 }
 \examples{
-\donttest{
-readBruker()
-}
+## Requires folder names
+# readBruker()
 }

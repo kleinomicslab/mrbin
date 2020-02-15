@@ -17,7 +17,6 @@ PCA plot. Parameters are then saved in a text file. These can be recreated
 using recreatemrbin().
 }
 \examples{
-\donttest{
-mrbinrun()
-}
+## Only works after setting all parameters
+# mrbinrun()
 }

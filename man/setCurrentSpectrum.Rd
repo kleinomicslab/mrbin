@@ -11,7 +11,6 @@ This function lets the user pick a spectrum from the list of spectra
 analysis.
 }
 \examples{
-\donttest{
-setCurrentSpectrum()
-}
+## Will work only after setting a list of spectra
+# setCurrentSpectrum()
 }

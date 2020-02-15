@@ -10,7 +10,6 @@ calculateNoise()
 This function calculates noise levels.
 }
 \examples{
-\donttest{
-calculateNoise()
-}
+## Requires data
+# calculateNoise()
 }

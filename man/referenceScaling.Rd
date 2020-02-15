@@ -10,7 +10,6 @@ referenceScaling()
 This function scales NMR data to the reference area.
 }
 \examples{
-\donttest{
-referenceScaling()
-}
+## Requires data
+# referenceScaling()
 }

@@ -10,7 +10,6 @@ intPlus()
 This function increases the intensity of the current NMR spectrum plot.
 }
 \examples{
-\donttest{
-intPlus()
-}
+## Requires data
+# intPlus()
 }

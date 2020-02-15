@@ -30,8 +30,8 @@ use NMR data and noise levels from the global variables mrbin.env$bins and
 mrbin.env$mrbinTMP.
 }
 \examples{
-\donttest{
-atnv()
-atnv(NMRdataMatrix,noiseLevelVector)
-}
+## Use own data
+# atnv(NMRdataMatrix,noiseLevelVector)
+## Use current mrbin data. Requires data loaded using mrbin()
+# atnv()
 }

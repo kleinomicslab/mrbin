@@ -19,7 +19,8 @@ zoom(left = NULL, right = NULL, top = NULL, bottom = NULL)
 This function changes the plot region of the current NMR plot.
 }
 \examples{
-\donttest{
-zoom()
-}
+## Requires data
+# zoom(left=4.6,right=2,top=20,bottom=100)
+## Ask for user input
+# zoom()
 }

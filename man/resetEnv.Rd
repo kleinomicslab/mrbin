@@ -10,7 +10,6 @@ resetEnv()
 This function resets the parameter variables.
 }
 \examples{
-\donttest{
-resetEnv()
-}
+## Don't run
+# resetEnv()
 }

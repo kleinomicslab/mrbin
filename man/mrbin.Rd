@@ -22,3 +22,28 @@ and performs the chosen data processing steps
 If a list of parameters is provided and silent is set to TRUE, no user input
 is requested and binning and data processing are performed silently.
 }
+\examples{
+## Let the user set parameters interactively
+# mrbin()
+## Set all parameters in the console and run without user intervention
+# mrbin(silent=T,
+#      setDefault=F,
+#      parameters=list(
+#              dimension="1D",
+#              binMethod="Rectangular bins",
+#              binwidth1D=.01,
+#              referenceScaling="Yes",
+#              removeSolvent="Yes",
+#              removeAreas="No",
+#              sumBins="No",
+#              noiseRemoval="Yes",
+#              PQNScaling="Yes",
+#              fixNegatives="Yes",
+#              logTrafo="Yes",
+#              saveFiles="Yes",
+#              outputFileName="mrbin_test_results",
+#              NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
+#                           "C:/NMR/Sample19/1/pdata/1",
+#                           "C:/NMR/Sample61/1/pdata/1")
+#      ))
+}

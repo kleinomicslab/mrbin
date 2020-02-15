@@ -10,7 +10,6 @@ readNMR()
 This function picks the correct NMR reading function, based on vendor.
 }
 \examples{
-\donttest{
-readNMR()
-}
+## Requires data
+# readNMR()
 }

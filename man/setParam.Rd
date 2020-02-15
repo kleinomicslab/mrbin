@@ -13,7 +13,6 @@ setParam(parameters = NULL)
 This function set parameters and checks parameters for consistency.
 }
 \examples{
-\donttest{
-setParam(parameter)
-}
+## Provide the parameters you like to set
+# setParam(list(dimension="1D"))
 }

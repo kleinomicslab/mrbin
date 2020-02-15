@@ -15,7 +15,6 @@
 This function resets the parameter variables.
 }
 \examples{
-\donttest{
-.onLoad()
-}
+## Don't run
+# .onLoad()
 }

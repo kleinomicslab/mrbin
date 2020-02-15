@@ -10,7 +10,6 @@ removeSolvent()
 This function removes the solvent region.
 }
 \examples{
-\donttest{
-removeSolvent()
-}
+## Requires data
+# removeSolvent()
 }

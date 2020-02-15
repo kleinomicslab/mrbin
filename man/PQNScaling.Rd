@@ -13,7 +13,6 @@ regions are excluded to avoid a dominating effect of the multiple sugar
 signals.
 }
 \examples{
-\donttest{
-PQNScaling()
-}
+## Requires data
+# PQNScaling()
 }

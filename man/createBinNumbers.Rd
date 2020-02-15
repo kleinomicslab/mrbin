@@ -11,7 +11,6 @@ This function calculates numbers of bins from the chosen parameters
 value.
 }
 \examples{
-\donttest{
-createBinNumbers()
-}
+##Requires data
+#createBinNumbers()
 }

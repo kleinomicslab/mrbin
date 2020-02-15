@@ -12,7 +12,6 @@ individual noise level times the signal-to-noise ratio. If less than the
 defined threshold level are above noise*SNR, the whole bin is removed.
 }
 \examples{
-\donttest{
-removeNoise()
-}
+## Requires data
+# removeNoise()
 }

@@ -10,7 +10,6 @@ logTrafo()
 This function simply log transforms. Will not work with negative data.
 }
 \examples{
-\donttest{
-logTrafo()
-}
+## Will work only after creating bins
+# logTrafo()
 }
