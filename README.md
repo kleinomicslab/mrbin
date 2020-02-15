@@ -1,6 +1,6 @@
 # mrbin
 
-Nuclear Magnetic Resonance (NMR) is widely used for metabolomics research. This package converts 1D or 2D NMR data into a matrix of values suitable for further data analysis and performs basic processing steps in a reproducible way. Negative values, a common issue in NMR data, are replaced by positive values. All used parameters are stored in a readable text file and can be restored from that file to enable exact reproduction of the data at a later time.
+Nuclear Magnetic Resonance (NMR) is widely used for metabolomics research. This package uses spectral binning to convert 1D or 2D NMR data into a matrix of values suitable for further data analysis and performs basic processing steps in a reproducible way. Negative values, a common issue in NMR data, are replaced by positive values. All used parameters are stored in a readable text file and can be restored from that file to enable exact reproduction of the data at a later time.
 
 ## Getting Started
 
@@ -57,6 +57,7 @@ After finishing, a PCA can be displayed. mrbin() also returns a list containing 
 
 * bins: A matrix containing bin data for all samples, Depending on the option you chose, the data will be cleaned up and scaled.
 * parameters: A list containing all parameters used to create the bin matrix.
+* factors: A vector containing group names for all samples.
 
 Two text files may be written to the working directory:
 * A .txt file containing all parameters. This file can be reloaded to R using recreatemrbin("filename"). This will enable reusing parameters used in a previous run and can help increase reproducibility.
@@ -78,6 +79,60 @@ and select ""Reload from file" when asked "Set parameters or use existing parame
 
 Please be aware that bins will have to be recalculated, so the original NMR spectra will have to be present to do this.
 
+### Submitting parameters at the comman line
+Parameters can be submitted at the command line, using the following syntax:
+
+```
+mrbin(silent=T,
+     setDefault=F,
+     parameters=list(
+             dimension="1D",
+             binMethod="Rectangular bins",
+             binwidth1D=.01,
+             referenceScaling="Yes",
+             removeSolvent="Yes",
+             removeAreas="No",
+             sumBins="No",
+             noiseRemoval="Yes",
+             PQNScaling="Yes",
+             fixNegatives="Yes",
+             logTrafo="Yes",
+             saveFiles="Yes",
+             outputFileName="mrbin_test_results",
+             NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
+                          "C:/NMR/Sample19/1/pdata/1",
+                          "C:/NMR/Sample61/1/pdata/1")
+     ))
+```
+
+This will set up all parameters and run all steps without asking for user input.
+
+When setting silent=F, the user will be guided through the user input questionnaire to make adjustments to the parameters.
+
+### Affine Transformation of Negative Values
+
+The function atnv replaces (column-wise) negative values by a small positive
+number. The number is calculated as an affine transformation to the range of
+the lowest positive number to 0,01*the lowest positive number (of this
+column). Ranks stay unchanged. Positive numbers are not altered.
+If sample-wise noise levels are available, the median noise level of samples
+with negative values is calculated and replaces the lowest positive number in
+case it is smaller. If no noise data is available, the 1% percentile of all
+positive values in the data set is used as an estimate.
+It is recommended to us this function AFTER noise removal and other data
+clean-up methods, as it may alter (reduce) the noise level.
+If no NMR data and noise levels are provided as arguments, the function will
+use NMR data and noise levels from the global variables mrbin.env$bins and
+mrbin.env$mrbinTMP.
+
+To use own data:
+```
+atnv(NMRdataMatrix,noiseLevelVector)
+```
+To use current mrbin data, use the following syntax. This requires data loaded using mrbin(). This is usually not necessary as it is included in the mrbin work flow.
+```
+atnv()
+```
 
 ## Built With
 
