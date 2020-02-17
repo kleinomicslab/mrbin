@@ -6,6 +6,9 @@
 \usage{
 zoomIn()
 }
+\value{
+{None}
+}
 \description{
 This function zooms into the plot region of the current NMR plot.
 }

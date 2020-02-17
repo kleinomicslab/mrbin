@@ -6,6 +6,9 @@
 \usage{
 logTrafo()
 }
+\value{
+{None}
+}
 \description{
 This function simply log transforms. Will not work with negative data.
 }

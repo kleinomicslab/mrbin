@@ -6,6 +6,9 @@
 \usage{
 binSingleNMR()
 }
+\value{
+{None}
+}
 \description{
 This function creates bins for the current spectrum.
 }

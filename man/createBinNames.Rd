@@ -6,6 +6,9 @@
 \usage{
 createBinNames()
 }
+\value{
+{None}
+}
 \description{
 This function creates titles for the bins to represent their average ppm
 value.

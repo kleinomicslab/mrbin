@@ -6,6 +6,9 @@
 \usage{
 plotNMR()
 }
+\value{
+{None}
+}
 \description{
 This function plots the current NMR spectrum. To change the plot, use zoom(),
 zoomIn(), zoomOut(), intPlus(), intMin(), left(), right().

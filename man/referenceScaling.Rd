@@ -6,6 +6,9 @@
 \usage{
 referenceScaling()
 }
+\value{
+{None}
+}
 \description{
 This function scales NMR data to the reference area.
 }

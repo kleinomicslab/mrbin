@@ -6,6 +6,9 @@
 \usage{
 left()
 }
+\value{
+{None}
+}
 \description{
 This function moves left the plot region of the current NMR plot.
 }

@@ -2,12 +2,18 @@
 % Please edit documentation in R/mrbin.R
 \name{plotBins}
 \alias{plotBins}
-\title{A function for plotting the current 2D bin data.}
+\title{A function for plotting the current bin positions}
 \usage{
-plotBins()
+plotBins(showtitle = TRUE)
+}
+\arguments{
+\item{showtitle}{If TRUE, the spectrum title is shown. Defaults to TRUE.}
+}
+\value{
+{None}
 }
 \description{
-This function plots the current binned spectrum. Works only for 2D data.
+This function plots the current binned spectrum.
 }
 \examples{
 ## Requires data

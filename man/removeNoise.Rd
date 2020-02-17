@@ -6,6 +6,9 @@
 \usage{
 removeNoise()
 }
+\value{
+{None}
+}
 \description{
 This function checks for each bin (column) whether its level is below the
 individual noise level times the signal-to-noise ratio. If less than the

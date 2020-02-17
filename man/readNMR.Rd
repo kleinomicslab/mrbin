@@ -6,6 +6,9 @@
 \usage{
 readNMR()
 }
+\value{
+{None}
+}
 \description{
 This function picks the correct NMR reading function, based on vendor.
 }

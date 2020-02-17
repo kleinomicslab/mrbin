@@ -4,10 +4,13 @@
 \alias{cropNMR}
 \title{A function for cropping HSQC spectra.}
 \usage{
-cropNMR(plot = F)
+cropNMR(plot = FALSE)
 }
 \arguments{
 \item{plot}{Should a plot of the bins before and after cropping be shown? Defaults to FALSE.}
+}
+\value{
+{None}
 }
 \description{
 This function crops HSQC spectra to the region along the diagonal to remove

@@ -9,6 +9,9 @@ putToEnv(variableList)
 \arguments{
 \item{variableList}{A list containing all objects to be saved in the local package environment.}
 }
+\value{
+{None}
+}
 \description{
 This function can change variables in the current package environment.
 This may be helpful for debugging or for some plotting functions.

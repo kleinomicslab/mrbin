@@ -6,6 +6,9 @@
 \usage{
 sumBins()
 }
+\value{
+{None}
+}
 \description{
 This function sums up bins. The sums are saved to the middle (median) bin of
 the original area. All other bins of the area are removed then. This is handy

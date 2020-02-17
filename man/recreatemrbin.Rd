@@ -9,6 +9,9 @@ recreatemrbin(filename = NULL)
 \arguments{
 \item{filename}{File path/name of the mrbin parameter file to be loaded}
 }
+\value{
+{None}
+}
 \description{
 This function reads parameters from a text file that was created during a
 previous run or mrbin(). After reading, the data can be recreated using

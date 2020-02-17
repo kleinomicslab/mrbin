@@ -9,6 +9,9 @@ setParam(parameters = NULL)
 \arguments{
 \item{parameters}{List of parameters to be set}
 }
+\value{
+{None}
+}
 \description{
 This function set parameters and checks parameters for consistency.
 }

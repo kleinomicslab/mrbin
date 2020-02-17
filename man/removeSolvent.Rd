@@ -6,6 +6,9 @@
 \usage{
 removeSolvent()
 }
+\value{
+{None}
+}
 \description{
 This function removes the solvent region.
 }

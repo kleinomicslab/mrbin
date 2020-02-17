@@ -6,6 +6,9 @@
 \usage{
 calculateNoise()
 }
+\value{
+{None}
+}
 \description{
 This function calculates noise levels.
 }

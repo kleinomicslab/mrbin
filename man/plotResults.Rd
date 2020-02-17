@@ -6,6 +6,9 @@
 \usage{
 plotResults()
 }
+\value{
+{None}
+}
 \description{
 This function plots boxplots (bin-wise and sample-wise) as visual quality indicators. It also performs PCA, then plots PC1 and PC2 and loading plots.
 }

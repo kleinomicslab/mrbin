@@ -6,6 +6,9 @@
 \usage{
 mrbinrun()
 }
+\value{
+{None}
+}
 \description{
 This function reads parameters from the global variable mrbin.env$mrbinparam and
 performs the following operations:

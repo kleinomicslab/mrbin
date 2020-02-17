@@ -6,6 +6,9 @@
 \usage{
 selectBrukerFolders()
 }
+\value{
+{None}
+}
 \description{
 This function lets the user set NMR data folders (for Bruker data).
 }

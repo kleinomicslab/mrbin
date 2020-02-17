@@ -6,6 +6,9 @@
 \usage{
 contMin()
 }
+\value{
+{None}
+}
 \description{
 This function decreases the minimum contour level of the current 2D NMR
 spectrum plot.

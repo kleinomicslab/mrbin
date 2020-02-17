@@ -6,6 +6,9 @@
 \usage{
 removeAreas()
 }
+\value{
+{None}
+}
 \description{
 This function removes additional regions. This can be useful when some areas
 are visibly affected by spectral artifacts.

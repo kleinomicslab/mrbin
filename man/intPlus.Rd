@@ -6,6 +6,9 @@
 \usage{
 intPlus()
 }
+\value{
+{None}
+}
 \description{
 This function increases the intensity of the current NMR spectrum plot.
 }

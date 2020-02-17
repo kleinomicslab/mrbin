@@ -6,6 +6,9 @@
 \usage{
 intMin()
 }
+\value{
+{None}
+}
 \description{
 This function decreases the intensity of the current NMR spectrum plot.
 }

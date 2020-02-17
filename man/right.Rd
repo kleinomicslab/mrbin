@@ -6,6 +6,9 @@
 \usage{
 right()
 }
+\value{
+{None}
+}
 \description{
 This function moves right the plot region of the current NMR plot.
 }

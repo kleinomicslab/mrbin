@@ -6,6 +6,9 @@
 \usage{
 PQNScaling()
 }
+\value{
+{None}
+}
 \description{
 This function performs PQN scaling. To further exclude unreliable noise, only
 the most intense signals are used. For 1H-13C HSQC spectra, most of the sugar

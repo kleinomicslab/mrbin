@@ -6,6 +6,9 @@
 \usage{
 zoomOut()
 }
+\value{
+{None}
+}
 \description{
 This function zooms out from the plot region of the current NMR plot.
 }

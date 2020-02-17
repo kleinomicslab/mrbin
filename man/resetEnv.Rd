@@ -6,6 +6,9 @@
 \usage{
 resetEnv()
 }
+\value{
+{None}
+}
 \description{
 This function resets the parameter variables.
 }

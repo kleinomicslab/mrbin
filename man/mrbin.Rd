@@ -4,7 +4,7 @@
 \alias{mrbin}
 \title{A function setting the parameters and performing binning and data processing}
 \usage{
-mrbin(silent = F, setDefault = F, parameters = NULL)
+mrbin(silent = FALSE, setDefault = FALSE, parameters = NULL)
 }
 \arguments{
 \item{silent}{If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.}
@@ -24,11 +24,11 @@ is requested and binning and data processing are performed silently.
 }
 \examples{
 ## Let the user set parameters interactively
-# mrbin()
+# results <- mrbin()
 ## Set all parameters in the console and run without user intervention
-# mrbin(silent=T,
-#      setDefault=F,
-#      parameters=list(
+# results <- mrbin(silent=TRUE,
+#              setDefault=FALSE,
+#              parameters=list(
 #              dimension="1D",
 #              binMethod="Rectangular bins",
 #              binwidth1D=.01,
@@ -46,4 +46,16 @@ is requested and binning and data processing are performed silently.
 #                           "C:/NMR/Sample19/1/pdata/1",
 #                           "C:/NMR/Sample61/1/pdata/1")
 #      ))
+## Test example, uses variables instead of files for speed
+results <- mrbin(silent=TRUE,
+                 parameters=list(dimension="1D",
+                        binwidth1D=0.05,
+                        signal_to_noise1D=35,
+                        PCAtitlelength=20,
+                        readFromFile = FALSE,#Only for testing, should be TRUE in all other cases
+                        NMRfolders = c("spectrum1",
+                                       "spectrum2",
+                                       "spectrum3")#Usually this should be folder names
+                        )
+        )
 }

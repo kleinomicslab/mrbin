@@ -6,6 +6,9 @@
 \usage{
 readBruker()
 }
+\value{
+{None}
+}
 \description{
 This function reads Bruker NMR data.
 }

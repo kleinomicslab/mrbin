@@ -15,6 +15,9 @@ zoom(left = NULL, right = NULL, top = NULL, bottom = NULL)
 
 \item{bottom}{New bottom boundary}
 }
+\value{
+{None}
+}
 \description{
 This function changes the plot region of the current NMR plot.
 }

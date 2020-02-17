@@ -6,6 +6,9 @@
 \usage{
 setCurrentSpectrum()
 }
+\value{
+{None}
+}
 \description{
 This function lets the user pick a spectrum from the list of spectra
 analysis.
