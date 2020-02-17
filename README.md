@@ -92,8 +92,8 @@ Please be aware that bins will have to be recalculated, so the original NMR spec
 Parameters can be submitted at the command line, using the following syntax:
 
 ```
-mrbin(silent=T,
-     setDefault=F,
+mrbin(silent=TRUE,
+     setDefault=FALSE,
      parameters=list(
              dimension="1D",
              binMethod="Rectangular bins",
@@ -116,7 +116,7 @@ mrbin(silent=T,
 
 This will set up all parameters and run all steps without asking for user input.
 
-When setting silent=F, the user will be guided through the user input questionnaire to make adjustments to the parameters.
+When setting silent=FALSE, the user will be guided through the user input questionnaire to make adjustments to the parameters.
 
 ### Affine Transformation of Negative Values
 
