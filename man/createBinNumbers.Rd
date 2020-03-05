@@ -10,10 +10,9 @@ createBinNumbers()
 {None}
 }
 \description{
-This function calculates numbers of bins from the chosen parameters
-value.
+This function calculates numbers of bins from the chosen parameters. This function is
+meant only for use within the mrbin function.
 }
 \examples{
-##Requires data
-#createBinNumbers()
+\dontrun{ createBinNumbers() }
 }

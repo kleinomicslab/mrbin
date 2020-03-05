@@ -13,6 +13,10 @@ down()
 This function moves down the plot region of the current NMR plot (only 2D).
 }
 \examples{
-## Requires data
-# down()
+setParam(parameters=list(dimension="2D",binwidth2D=1,binheight=10,
+         NMRfolders=system.file("extdata/1/12/pdata/10",package="mrbin")))
+binMultiNMR()
+plotNMR()
+zoomIn()
+down()
 }

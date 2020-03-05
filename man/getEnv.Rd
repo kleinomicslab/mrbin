@@ -14,6 +14,5 @@ This function returns a list of all objects of the current package environment.
 This may be helpful for debugging or for accessing NMR spectral data and the raw bin data.
 }
 \examples{
-## Requires data
-# tempList<-getEnv()
+tempList<-getEnv()
 }

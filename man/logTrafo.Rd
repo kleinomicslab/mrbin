@@ -13,6 +13,9 @@ logTrafo()
 This function simply log transforms. Will not work with negative data.
 }
 \examples{
-## Will work only after creating bins
-# logTrafo()
+mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
+                    binwidth1D=0.05,signal_to_noise1D=50, verbose=FALSE, PCA="No",
+                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                                system.file("extdata/2/10/pdata/10",package="mrbin"))))
+logTrafo()
 }

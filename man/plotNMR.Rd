@@ -4,17 +4,47 @@
 \alias{plotNMR}
 \title{A function for plotting NMR spectra.}
 \usage{
-plotNMR()
+plotNMR(
+  region = NULL,
+  rectangleRegions = NULL,
+  rectangleColors = c("green", "orange", "blue", "red", "yellow", "gray", "purple"),
+  polygonRegion = NULL,
+  color = NULL,
+  add = FALSE,
+  manualScale = TRUE,
+  plotTitle = ""
+)
+}
+\arguments{
+\item{region}{A vector defining the plot region (left, right, top, bottom)}
+
+\item{rectangleRegions}{A 4-column matrix defining areas where to plot rectangles}
+
+\item{rectangleColors}{Define colors for the rectangles}
+
+\item{polygonRegion}{Defines 4 corners of a polygon to be plotted}
+
+\item{color}{Defines the color of the spectrum plot. If NULL, a rainbow theme is used for 2D NMR}
+
+\item{add}{If TRUE, additional spectrum plots are overlaid with the current plot}
+
+\item{manualScale}{If TRUE, scaling factor is taken from environment variables.}
+
+\item{plotTitle}{Defines the main title of the plot}
 }
 \value{
 {None}
 }
 \description{
-This function plots the current NMR spectrum. To change the plot, use zoom(),
+This function plots the current NMR spectrum. If no parameters are provided, parameters
+are read from the mrbin.env environment variables, set by mrbin.
+To change the plot, use zoom(),
 zoomIn(), zoomOut(), intPlus(), intMin(), left(), right().
 For 2D data use additionally: contMin(), contPlus(), up(), down()
 }
 \examples{
-## Requires data
-# plotNMR()
+setParam(parameters=list(dimension="1D",binwidth1D=.1,
+         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+binMultiNMR()
+plotNMR()
 }

@@ -10,10 +10,9 @@ createBinNames()
 {None}
 }
 \description{
-This function creates titles for the bins to represent their average ppm
-value.
+This function creates titles for the bins to represent their average ppm. This function is
+meant only for use within the mrbin function.
 }
 \examples{
-## Requires data
-# createBinNames()
+\dontrun{ createBinNames() }
 }

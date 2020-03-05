@@ -7,12 +7,12 @@
 selectBrukerFolders()
 }
 \value{
-{None}
+An invisible list of folder names, or "Go back" or "stop"
 }
 \description{
-This function lets the user set NMR data folders (for Bruker data).
+This function lets the user set NMR data folders interactively (for Bruker data). This function
+is meant only for use within the mrbin function.
 }
 \examples{
-## Requires user input
-# selectBrukerFolders()
+\dontrun{ selectBrukerFolders() }
 }

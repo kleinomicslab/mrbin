@@ -12,7 +12,7 @@ atnv(NMRdata = NULL, noiseLevels = NULL)
 \item{noiseLevels}{A vector}
 }
 \value{
-NMRdata A matrix containing NMR data without negative values.
+NMRdata An invisible matrix containing NMR data without negative values.
 }
 \description{
 This function replaces (column-wise) negative values by a small positive
@@ -30,8 +30,16 @@ use NMR data and noise levels from the global variables mrbin.env$bins and
 mrbin.env$mrbinTMP.
 }
 \examples{
-## Use own data
-# atnv(NMRdataMatrix,noiseLevelVector)
-## Use current mrbin data. Requires data loaded using mrbin()
-# atnv()
+ mrbinExample<-mrbin(silent=TRUE,
+                   parameters=list(verbose=FALSE,dimension="1D",PQNScaling="No",
+                   binwidth1D=0.005,signal_to_noise1D=1,PCA="No",
+                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,
+                   NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
+                              system.file("extdata/3/10/pdata/10",package="mrbin"))
+                   ))
+ exampleNMR<-mrbinExample$bins
+ sum(exampleNMR<=0)
+ exampleNoise<-mrbinExample$parameters$noise_level
+ exampleNMRpositive<-atnv(NMRdata=exampleNMR, noiseLevels=exampleNoise)
+ sum(exampleNMRpositive<=0)
 }

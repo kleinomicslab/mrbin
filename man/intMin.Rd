@@ -13,6 +13,8 @@ intMin()
 This function decreases the intensity of the current NMR spectrum plot.
 }
 \examples{
-## Requires data
-# intMin()
+setParam(parameters=list(dimension="1D",binwidth1D=.1,
+         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+binMultiNMR()
+intMin()
 }

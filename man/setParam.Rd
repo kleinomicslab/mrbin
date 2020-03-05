@@ -16,6 +16,5 @@ setParam(parameters = NULL)
 This function set parameters and checks parameters for consistency.
 }
 \examples{
-## Provide the parameters you like to set
-# setParam(list(dimension="1D"))
+setParam(parameters=list(dimension="1D"))
 }

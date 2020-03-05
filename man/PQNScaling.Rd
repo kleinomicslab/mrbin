@@ -16,6 +16,10 @@ regions are excluded to avoid a dominating effect of the multiple sugar
 signals.
 }
 \examples{
-## Requires data
-# PQNScaling()
+mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,PQNScaling="No",PCA="No",
+                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                                system.file("extdata/2/10/pdata/10",package="mrbin"),
+                                system.file("extdata/3/10/pdata/10",package="mrbin"))))
+PQNScaling()
 }

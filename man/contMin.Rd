@@ -14,6 +14,8 @@ This function decreases the minimum contour level of the current 2D NMR
 spectrum plot.
 }
 \examples{
-## Requires data
-# contMin()
+setParam(parameters=list(dimension="2D",binwidth2D=1,binheight=10,
+         NMRfolders=system.file("extdata/1/12/pdata/10",package="mrbin")))
+binMultiNMR()
+contMin()
 }

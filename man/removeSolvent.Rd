@@ -13,6 +13,10 @@ removeSolvent()
 This function removes the solvent region.
 }
 \examples{
-## Requires data
-# removeSolvent()
+mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,signal_to_noise1D=50,removeSolvent="No",
+                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                                system.file("extdata/2/10/pdata/10",package="mrbin"))))
+setParam(parameters=list(solventRegion=c(5.3,4.6)))
+removeSolvent()
 }

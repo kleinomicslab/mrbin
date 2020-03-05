@@ -13,6 +13,5 @@ resetEnv()
 This function resets the parameter variables.
 }
 \examples{
-## Don't run
-# resetEnv()
+resetEnv()
 }

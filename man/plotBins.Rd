@@ -16,6 +16,8 @@ plotBins(showtitle = TRUE)
 This function plots the current binned spectrum.
 }
 \examples{
-## Requires data
-# plotBins()
+mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,PQNScaling="No",PCA="No",
+                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"))))
+plotBins()
 }

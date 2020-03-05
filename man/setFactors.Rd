@@ -11,9 +11,8 @@ setFactors()
 }
 \description{
 This function lets the user pick samples from a list to assign them to
-groups.
+groups. This function is meant only for use within the mrbin function.
 }
 \examples{
-## Will work only after setting a sectrum list
-# setFactors()
+\dontrun{ setFactors() }
 }

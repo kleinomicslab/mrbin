@@ -13,6 +13,9 @@ referenceScaling()
 This function scales NMR data to the reference area.
 }
 \examples{
-## Requires data
-# referenceScaling()
+resetEnv()
+setParam(parameters=list(dimension="1D",referenceScaling="No",
+         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+binMultiNMR()
+referenceScaling()
 }

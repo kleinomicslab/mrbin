@@ -22,8 +22,10 @@ zoom(left = NULL, right = NULL, top = NULL, bottom = NULL)
 This function changes the plot region of the current NMR plot.
 }
 \examples{
-## Requires data
-# zoom(left=4.6,right=2,top=20,bottom=100)
-## Ask for user input
-# zoom()
+# Ask for user input
+\donttest{ zoom() }
+setParam(parameters=list(dimension="1D",binwidth1D=.1,
+         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+binMultiNMR()
+zoom(left=4.6,right=2,top=10,bottom=150)
 }

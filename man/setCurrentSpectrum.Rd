@@ -2,7 +2,7 @@
 % Please edit documentation in R/mrbin.R
 \name{setCurrentSpectrum}
 \alias{setCurrentSpectrum}
-\title{A function for setting the current spectrum.}
+\title{A function for interactively setting the current spectrum.}
 \usage{
 setCurrentSpectrum()
 }
@@ -11,9 +11,8 @@ setCurrentSpectrum()
 }
 \description{
 This function lets the user pick a spectrum from the list of spectra
-analysis.
+analysis. This function is meant only for use within the mrbin function.
 }
 \examples{
-## Will work only after setting a list of spectra
-# setCurrentSpectrum()
+\dontrun{ setCurrentSpectrum() }
 }

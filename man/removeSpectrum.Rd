@@ -11,9 +11,8 @@ removeSpectrum()
 }
 \description{
 This function lets the user pick spectra from a list for removal from data
-analysis.
+analysis. This function is meant only for use within the mrbin function.
 }
 \examples{
-## Will work only after creating a spectrum list
-# removeSpectrum()
+\dontrun{ removeSpectrum() }
 }

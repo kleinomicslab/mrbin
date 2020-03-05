@@ -13,6 +13,10 @@ left()
 This function moves left the plot region of the current NMR plot.
 }
 \examples{
-## Requires data
-# left()
+setParam(parameters=list(dimension="1D",binwidth1D=.1,
+         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+binMultiNMR()
+plotNMR()
+zoomIn()
+left()
 }

@@ -10,9 +10,9 @@ readNMR()
 {None}
 }
 \description{
-This function picks the correct NMR reading function, based on vendor.
+This function picks the correct NMR reading function, based on vendor. This function is
+meant only for use within the mrbin function.
 }
 \examples{
-## Requires data
-# readNMR()
+\dontrun{ readNMR() }
 }

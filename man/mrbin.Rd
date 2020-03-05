@@ -23,39 +23,14 @@ If a list of parameters is provided and silent is set to TRUE, no user input
 is requested and binning and data processing are performed silently.
 }
 \examples{
-## Let the user set parameters interactively
-# results <- mrbin()
-## Set all parameters in the console and run without user intervention
-# results <- mrbin(silent=TRUE,
-#              setDefault=FALSE,
-#              parameters=list(
-#              dimension="1D",
-#              binMethod="Rectangular bins",
-#              binwidth1D=.01,
-#              referenceScaling="Yes",
-#              removeSolvent="Yes",
-#              removeAreas="No",
-#              sumBins="No",
-#              noiseRemoval="Yes",
-#              PQNScaling="Yes",
-#              fixNegatives="Yes",
-#              logTrafo="Yes",
-#              saveFiles="Yes",
-#              outputFileName="mrbin_test_results",
-#              NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
-#                           "C:/NMR/Sample19/1/pdata/1",
-#                           "C:/NMR/Sample61/1/pdata/1")
-#      ))
-## Test example, uses variables instead of files for speed
-results <- mrbin(silent=TRUE,
-                 parameters=list(dimension="1D",
-                        binwidth1D=0.05,
-                        signal_to_noise1D=35,
-                        PCAtitlelength=20,
-                        readFromFile = FALSE,#Only for testing, should be TRUE in all other cases
-                        NMRfolders = c("spectrum1",
-                                       "spectrum2",
-                                       "spectrum3")#Usually this should be folder names
-                        )
-        )
+# Let the user set parameters interactively
+\dontrun{ results <- mrbin() }
+# Set parameters in command line.
+mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                binwidth1D=0.05,signal_to_noise1D=50,
+                NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                            system.file("extdata/2/10/pdata/10",package="mrbin"),
+                            system.file("extdata/3/10/pdata/10",package="mrbin"),
+                            system.file("extdata/4/10/pdata/10",package="mrbin")),
+                Factors=factor(c("Group A","Group A","Group A","Group B","Group B"))))
 }

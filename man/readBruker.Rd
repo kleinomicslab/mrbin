@@ -4,15 +4,20 @@
 \alias{readBruker}
 \title{A function for reading Bruker NMR spectra.}
 \usage{
-readBruker()
+readBruker(folder = NULL, dimension = NULL)
+}
+\arguments{
+\item{folder}{Defines the exact NMR data folder. If NULL, mrbin parameter set is used}
+
+\item{dimension}{Defines the data dimension, "1D" or "2D". Only used if "folder" is not NULL}
 }
 \value{
-{None}
+An (invisible) object containing spectral data
 }
 \description{
 This function reads Bruker NMR data.
 }
 \examples{
-## Requires folder names
-# readBruker()
+exampleData<-readBruker(folder=system.file("extdata/1/10/pdata/10",package="mrbin"),
+                        dimension="1D")
 }

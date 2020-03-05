@@ -7,13 +7,13 @@
 selectFolders()
 }
 \value{
-{None}
+An invisible list of folder names, or "Go back" or "stop"
 }
 \description{
 This function selects the correct folder selection function for the vendor
-(currently only Bruker).
+(currently only Bruker). This function is meant only for use within the
+mrbin function.
 }
 \examples{
-## Requires user input
-# selectFolders()
+\dontrun{ selectFolders() }
 }

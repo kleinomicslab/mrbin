@@ -14,6 +14,8 @@ This function creates bins for each spectrum in mrbin.env$mrbinparam$NMRfolders 
 saves the bins to mrbin.env$bins.
 }
 \examples{
-## Requires spectrum list
-# binMultiNMR()
+setParam(parameters=list(dimension="1D",binwidth1D=.05,PCA="No",
+         NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                      system.file("extdata/2/10/pdata/10",package="mrbin"))))
+binMultiNMR()
 }

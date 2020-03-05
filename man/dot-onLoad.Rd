@@ -18,6 +18,5 @@
 This function resets the parameter variables.
 }
 \examples{
-## Don't run
-# .onLoad()
+\dontrun{ .onLoad() }
 }

@@ -15,6 +15,11 @@ individual noise level times the signal-to-noise ratio. If less than the
 defined threshold level are above noise*SNR, the whole bin is removed.
 }
 \examples{
-## Requires data
-# removeNoise()
+mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,noiseRemoval="No",
+                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                                system.file("extdata/2/10/pdata/10",package="mrbin"),
+                                system.file("extdata/3/10/pdata/10",package="mrbin"))))
+calculateNoise()
+removeNoise()
 }

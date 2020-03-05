@@ -17,6 +17,5 @@ This function can change variables in the current package environment.
 This may be helpful for debugging or for some plotting functions.
 }
 \examples{
-## Requires data
-# putToEnv(list(mrbinparam=tempList$mrbinparam))
+\dontrun{ putToEnv(list(bins=NULL)) }
 }

@@ -20,7 +20,7 @@ using recreatemrbin().
 }
 \examples{
 ## Lets the user browse for the parameter file
-# recreatemrbin()
-## Insert full folder path and file name
-# recreatemrbin("mrbin_01-03-20_12-00-10.txt")
+\dontrun{ recreatemrbin() }
+# Insert full folder path and file name
+recreatemrbin(system.file("extdata/mrbin.txt",package="mrbin"))
 }

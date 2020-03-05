@@ -10,9 +10,9 @@ binSingleNMR()
 {None}
 }
 \description{
-This function creates bins for the current spectrum.
+This function creates bins for the current spectrum. This function is
+meant only for use within the mrbin function.
 }
 \examples{
-## Requires data
-# binSingleNMR()
+\dontrun{ binSingleNMR() }
 }

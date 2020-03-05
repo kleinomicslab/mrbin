@@ -14,6 +14,10 @@ This function removes additional regions. This can be useful when some areas
 are visibly affected by spectral artifacts.
 }
 \examples{
-## Requires data
-# removeAreas()
+mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,signal_to_noise1D=50,
+                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                                system.file("extdata/2/10/pdata/10",package="mrbin"))))
+setParam(parameters=list(removeAreaList=matrix(c(5.3,4.6),ncol=4)))
+removeAreas()
 }
