@@ -1,0 +1,29 @@
+list(dimension = "1D", binMethod = "Rectangular bins", binwidth1D = 0.05, 
+    binwidth2D = 0.02, binheight = 1, binRegion = c(10, 0.5, 
+    10, 156), specialBinList = structure(logical(0), .Dim = c(0L, 
+    4L), .Dimnames = list(NULL, c("left", "right", "top", "bottom"
+    ))), referenceScaling = "Yes", removeSolvent = "Yes", removeAreas = "No", 
+    sumBins = "No", noiseRemoval = "Yes", cropHSQC = "Yes", PQNScaling = "No", 
+    fixNegatives = "No", logTrafo = "No", defineGroups = "Yes", 
+    PCA = "Yes", reference1D = c(0.03, -0.03), reference2D = c(0.04, 
+    -0.04, -2, 2), solventRegion = c(4.95, 4.65), removeAreaList = structure(logical(0), .Dim = c(0L, 
+    4L), .Dimnames = list(NULL, c("left", "right", "top", "bottom"
+    ))), sumBinList = structure(logical(0), .Dim = c(0L, 4L), .Dimnames = list(
+        NULL, c("left", "right", "top", "bottom"))), noiseThreshold = 0.75, 
+    signal_to_noise1D = 50, signal_to_noise2D = 3, noiseRange2d = c(2.3, 
+    3.3, 90, 110), noiseRange1d = c(9.5, 10), croptopRight = c(0, 
+    -1.5), croptopLeft = c(0, 3.5), cropbottomRight = c(160, 
+    6), cropbottomLeft = c(160, 10), PQNsugarArea = c(5.4, 3.35, 
+    72, 100), PQNshowHist = FALSE, PQNminimumFeatures = 40, PCAtitlelength = 4, 
+    createBins = "Yes", useAsNames = c(`Folder names (1)` = "Folder names"), 
+    NMRvendor = "Bruker", mrbinversionTracker = "1.2.0", saveFiles = "Yes", 
+    verbose = TRUE, outputFileName = "C:/Users/klein.663/Box Sync/OSU/Projects/mrbin/mrbin", 
+    NMRfolders = c("C:/Users/klein.663/Documents/R/win-library/3.5/mrbin/extdata/1/10/pdata/10", 
+    "C:/Users/klein.663/Documents/R/win-library/3.5/mrbin/extdata/2/10/pdata/10", 
+    "C:/Users/klein.663/Documents/R/win-library/3.5/mrbin/extdata/3/10/pdata/10"
+    ), Factors = structure(c(1L, 2L, 2L), .Label = c("Group A", 
+    "Group B"), class = "factor"), medians = NULL, noise_level = c(`1` = 479.326902316496, 
+    `2` = 365.487631230575, `3` = 277.192059407702), numberOfFeaturesRaw = 190L, 
+    numberOfFeaturesAfterRemovingSolvent = 184L, numberOfFeaturesAfterRemovingAreas = NULL, 
+    numberOfFeaturesAfterSummingBins = NULL, numberOfFeaturesAfterNoiseRemoval = 152L, 
+    numberOfFeaturesAfterCropping = NULL)
