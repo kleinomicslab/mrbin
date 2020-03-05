@@ -1,5 +1,11 @@
 # mrbin News
 
+## Version 1.2.0
+
+* Default 1D noise range was changed to 10 - 9.5 ppm (was 10-9.4). Default 1D binning area changed to 10-0.5 (was 9.5-0.5)
+* Some minor and major fixes to increase user friendliness
+* Some minor and major bug fixes to increase stability
+
 
 ## Version 1.1.0
 

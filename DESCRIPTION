@@ -1,6 +1,6 @@
 Package: mrbin
-Title: Binning, Scaling and Normalization of Nuclear Magnetic Resonance Data
-Version: 1.1.0
+Title: Magnetic Resonance Binning, Integration and Normalization
+Version: 1.2.0
 Authors@R: 
     person(given = "Matthias",
            family = "Klein",

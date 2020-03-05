@@ -62,15 +62,16 @@ The sequence of data processing is as follows:
 * Plotting a PCA
 * Saving bins and parameters to the hard drive
 
-After finishing, a PCA can be displayed. mrbin() also returns a list containing two variables: 
+After finishing, a PCA can be displayed. mrbin() also returns a list containing three variables: 
 
 * bins: A matrix containing bin data for all samples, Depending on the option you chose, the data will be cleaned up and scaled.
 * parameters: A list containing all parameters used to create the bin matrix.
 * factors: A vector containing group names for all samples.
 
-Two text files may be written to the working directory:
+Up to three files may be written to the chosen directory:
 * A .txt file containing all parameters. This file can be reloaded to R using recreatemrbin("filename"). This will enable reusing parameters used in a previous run and can help increase reproducibility.
 * A .csv file containing the bin data for use in other software tools.
+* A .pdf file containing quality control plots, including a PCA plot 
 
 ### Recreating Data and Parameters
 In order to create reproducible results, mrbin will save the used parameters to a text file. Please keep this file. You may want to share this file in a data repository when publishing your findings.
@@ -107,7 +108,6 @@ mrbin(silent=TRUE,
              fixNegatives="Yes",
              logTrafo="Yes",
              saveFiles="Yes",
-             outputFileName="mrbin_test_results",
              NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
                           "C:/NMR/Sample19/1/pdata/1",
                           "C:/NMR/Sample61/1/pdata/1")
