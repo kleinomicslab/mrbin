@@ -1202,33 +1202,6 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL){
  if(!stopTMP){
    if(startmrbin=="Start binning now"){
      mrbinrun()
-     mrbin.env$paramChangeFlag<-FALSE
-     mrbin.env$mrbinparam$createBins<-"Yes"
-     resultOutputTMP<-c("\nNumber of spectra: ",nrow(mrbin.env$bins),"\n",
-         "Number of bins at start: ",mrbin.env$mrbinparam$numberOfFeaturesRaw,"\n")
-     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingSolvent)){
-          resultOutputTMP<-c(resultOutputTMP,
-             "Number of bins after removing solvent: ",mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingSolvent,"\n")
-     }
-     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingAreas)){
-          resultOutputTMP<-c(resultOutputTMP,
-             "Number of bins after removing areas: ",mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingAreas,"\n")
-     }
-     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterSummingBins)){
-          resultOutputTMP<-c(resultOutputTMP,
-             "Number of bins after summing bins: ",mrbin.env$mrbinparam$numberOfFeaturesAfterSummingBins,"\n")
-     }
-     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterNoiseRemoval)){
-          resultOutputTMP<-c(resultOutputTMP,
-             "Number of bins after noise removal: ",mrbin.env$mrbinparam$numberOfFeaturesAfterNoiseRemoval,"\n")
-     }
-     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterCropping)){
-          resultOutputTMP<-c(resultOutputTMP,
-             "Number of bins after cropping: ",mrbin.env$mrbinparam$numberOfFeaturesAfterCropping,"\n")
-     }
-     resultOutputTMP<-paste( resultOutputTMP,sep="")
-     if(mrbin.env$mrbinparam$verbose) message(resultOutputTMP)
-     if(mrbin.env$mrbinparam$verbose) printParameters()
      invisible(list(bins=mrbin.env$bins,factors=mrbin.env$mrbinparam$Factors,parameters=mrbin.env$mrbinparam))
    }
  }
@@ -1277,7 +1250,33 @@ mrbinrun<-function(){
         grDevices::dev.off()
       }
     }
-
+     mrbin.env$paramChangeFlag<-FALSE
+     mrbin.env$mrbinparam$createBins<-"Yes"
+     resultOutputTMP<-c("\nNumber of spectra: ",nrow(mrbin.env$bins),"\n",
+         "Number of bins at start: ",mrbin.env$mrbinparam$numberOfFeaturesRaw,"\n")
+     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingSolvent)){
+          resultOutputTMP<-c(resultOutputTMP,
+             "Number of bins after removing solvent: ",mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingSolvent,"\n")
+     }
+     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingAreas)){
+          resultOutputTMP<-c(resultOutputTMP,
+             "Number of bins after removing areas: ",mrbin.env$mrbinparam$numberOfFeaturesAfterRemovingAreas,"\n")
+     }
+     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterSummingBins)){
+          resultOutputTMP<-c(resultOutputTMP,
+             "Number of bins after summing bins: ",mrbin.env$mrbinparam$numberOfFeaturesAfterSummingBins,"\n")
+     }
+     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterNoiseRemoval)){
+          resultOutputTMP<-c(resultOutputTMP,
+             "Number of bins after noise removal: ",mrbin.env$mrbinparam$numberOfFeaturesAfterNoiseRemoval,"\n")
+     }
+     if(!is.null(mrbin.env$mrbinparam$numberOfFeaturesAfterCropping)){
+          resultOutputTMP<-c(resultOutputTMP,
+             "Number of bins after cropping: ",mrbin.env$mrbinparam$numberOfFeaturesAfterCropping,"\n")
+     }
+     resultOutputTMP<-paste(resultOutputTMP,sep="")
+     if(mrbin.env$mrbinparam$verbose) message(resultOutputTMP)
+     if(mrbin.env$mrbinparam$verbose) printParameters()
   }
 }
 
@@ -2468,6 +2467,7 @@ plotBins<-function(showtitle=TRUE){#Plot bin positions
            cex=.5,pch=15,main=titleTMP,col=colorTMP, ask=FALSE)
       graphics::rect(xleft=mrbin.env$mrbinTMP$binRegions[,1], ybottom=mrbin.env$mrbinTMP$binRegions[,4],
                      xright=mrbin.env$mrbinTMP$binRegions[,2], ytop=mrbin.env$mrbinTMP$binRegions[,3], col = "green", border = NA)
+      graphics::box()
    }
    if(mrbin.env$mrbinparam$dimension=="1D") {
       colorRampHSQC<-grDevices::colorRamp(c("blue","green","orange","red","red"))
@@ -2477,10 +2477,11 @@ plotBins<-function(showtitle=TRUE){#Plot bin positions
       if(!showtitle) titleTMP<-""
       graphics::plot(NULL,NULL,ylim=c(0,1),xlim=mrbin.env$mrbinparam$binRegion[1:2],yaxt="n",
            main=titleTMP, ask=FALSE)
-      graphics::rect(xleft=mrbin.env$mrbinTMP$binRegions[,1], ybottom=0, xright=mrbin.env$mrbinTMP$binRegions[,2], ytop=1.0, col = "green", border = NA)
+      graphics::rect(xleft=mrbin.env$mrbinTMP$binRegions[,1], ybottom=0, xright=mrbin.env$mrbinTMP$binRegions[,2], ytop=2.0, col = "green", border = NA)
       graphics::lines(as.numeric(names(mrbin.env$mrbinTMP$currentSpectrum)),
            mrbin.env$mrbinTMP$currentSpectrum/(sort(mrbin.env$mrbinTMP$currentSpectrum)[ceiling(.9999*length(mrbin.env$mrbinTMP$currentSpectrum))]),
            col="black")
+      graphics::box()
    }
  }
 }
