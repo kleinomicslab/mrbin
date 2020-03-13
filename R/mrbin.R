@@ -106,7 +106,7 @@ atnv<-function(NMRdata=NULL,noiseLevels=NULL){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ .onLoad() }
+#' \donttest{ .onLoad() }
 
 .onLoad <- function(libname, pkgname){
     assign("mrbin.env",new.env(emptyenv()),parent.env(environment()))
@@ -245,7 +245,7 @@ resetEnv<-function(){
 #' @export
 #' @examples
 #' # Let the user set parameters interactively
-#' \dontrun{ results <- mrbin() }
+#' \donttest{ results <- mrbin() }
 #' # Set parameters in command line.
 #' mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
 #'                 binwidth1D=0.05,signal_to_noise1D=50,
@@ -1440,7 +1440,7 @@ printParameters<-function(){
 #' @export
 #' @examples
 #' ## Lets the user browse for the parameter file
-#' \dontrun{ recreatemrbin() }
+#' \donttest{ recreatemrbin() }
 #' # Insert full folder path and file name
 #' recreatemrbin(system.file("extdata/mrbin.txt",package="mrbin"))
 
@@ -1576,7 +1576,7 @@ logTrafo<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ setCurrentSpectrum() }
+#' \donttest{ setCurrentSpectrum() }
 
 setCurrentSpectrum<-function(){
        newCurrent<-utils::select.list(mrbin.env$mrbinparam$NMRfolders,preselect=mrbin.env$mrbinTMP$currentFolder,
@@ -1594,7 +1594,7 @@ setCurrentSpectrum<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ removeSpectrum() }
+#' \donttest{ removeSpectrum() }
 
 removeSpectrum<-function(){
  if(!is.null(mrbin.env$mrbinparam$NMRfolders)){
@@ -1604,16 +1604,18 @@ removeSpectrum<-function(){
          if(length(mrbin.env$mrbinparam$Factors)==length(mrbin.env$mrbinparam$NMRfolders)){
            mrbin.env$mrbinparam$Factors<-mrbin.env$mrbinparam$Factors[-which(mrbin.env$mrbinparam$NMRfolders%in%listTMP)]
          }
-         if(nrow(mrbin.env$bins)==length(mrbin.env$mrbinparam$NMRfolders)){
-          if((nrow(mrbin.env$bins)-length(listTMP))==1){
-            rownamesTMP<-rownames(mrbin.env$bins)[-which(rownames(mrbin.env$bins)%in%listTMP)]
-            colnamesTMP<-colnames(mrbin.env$bins)
-            mrbin.env$bins<-matrix(mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),],nrow=1)
-            rownames(mrbin.env$bins)<-rownamesTMP
-            colnames(mrbin.env$bins)<-colnamesTMP
-          } else {
-             mrbin.env$bins<-mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),]
-          }
+         if(!is.null(mrbin.env$bins)){
+           if(nrow(mrbin.env$bins)==length(mrbin.env$mrbinparam$NMRfolders)){
+            if((nrow(mrbin.env$bins)-length(listTMP))==1){
+              rownamesTMP<-rownames(mrbin.env$bins)[-which(rownames(mrbin.env$bins)%in%listTMP)]
+              colnamesTMP<-colnames(mrbin.env$bins)
+              mrbin.env$bins<-matrix(mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),],nrow=1)
+              rownames(mrbin.env$bins)<-rownamesTMP
+              colnames(mrbin.env$bins)<-colnamesTMP
+            } else {
+               mrbin.env$bins<-mrbin.env$bins[-which(rownames(mrbin.env$bins)%in%listTMP),]
+            }
+           }
          }
          mrbin.env$mrbinparam$NMRfolders<-mrbin.env$mrbinparam$NMRfolders[-which(mrbin.env$mrbinparam$NMRfolders%in%listTMP)]
       }
@@ -1628,7 +1630,7 @@ removeSpectrum<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ setFactors() }
+#' \donttest{ setFactors() }
 
 setFactors<-function(){
    if(length(mrbin.env$mrbinparam$NMRfolders)>0){
@@ -1663,7 +1665,7 @@ setFactors<-function(){
 #' @return An invisible list of folder names, or "Go back" or "stop"
 #' @export
 #' @examples
-#' \dontrun{ selectFolders() }
+#' \donttest{ selectFolders() }
 
 selectFolders<-function(){#Select NMR spectral folders
       selectionFolders<-""
@@ -1682,11 +1684,11 @@ selectFolders<-function(){#Select NMR spectral folders
 #' @return An invisible list of folder names, or "Go back" or "stop"
 #' @export
 #' @examples
-#' \dontrun{ selectBrukerFolders() }
+#' \donttest{ selectBrukerFolders() }
 
 selectBrukerFolders<-function(){#Select Bruker NMR spectral folders
   selectionFolders<-""
-  NMRfolders<-NULL
+  NMRfoldersTMP<-NULL
   datanameDict<-c("1r","2rr")
   names(datanameDict)<-c("1D","2D")
   datanameTmp<-datanameDict[mrbin.env$mrbinparam$dimension]
@@ -1828,14 +1830,29 @@ selectBrukerFolders<-function(){#Select Bruker NMR spectral folders
                NMRfoldersTMP<-utils::select.list(spectrum_proc_pathTMP,preselect=NULL,multiple=TRUE,
                          title = "Select data sets",graphics=TRUE)
                if("Select all"%in%NMRfoldersTMP) NMRfoldersTMP<-spectrum_proc_path
-               NMRfolders<-c(NMRfolders,NMRfoldersTMP)
+               #NMRfolders<-c(NMRfolders,NMRfoldersTMP)
+               if(!is.null(NMRfoldersTMP)) mrbin.env$mrbinparam$NMRfolders<-unique(c(mrbin.env$mrbinparam$NMRfolders,NMRfoldersTMP))
                if(mrbin.env$mrbinparam$verbose) cat(paste("Adding to list:\n",paste(NMRfoldersTMP,"\n",
                                                     sep="",collapse="")))
-               yesorno<-utils::select.list(c("No","Yes"),preselect="No",multiple=FALSE,title="Add additional spectra?",graphics=TRUE)
-               if(yesorno=="Yes"){
-                   selectFlag<-0
-               } else {
-                   selectFlag<-1
+               addSpectrumTMP<-TRUE
+               while(addSpectrumTMP){
+                 yesorno<-utils::select.list(c("Keep current spectra list","Add additional spectra","Remove spectra from list"),
+                           preselect="Keep current spectra list",multiple=FALSE,title="Add additional spectra?",graphics=TRUE)
+                 if(yesorno==""){
+                     addSpectrumTMP<-FALSE
+                 }
+                 if(yesorno=="Add additional spectra"){
+                     selectFlag<-0
+                     addSpectrumTMP<-FALSE
+                 }
+                 if(yesorno=="Remove spectra from list") {
+                     removeSpectrum()
+                     addSpectrumTMP<-TRUE
+                 }
+                 if(yesorno=="Keep current spectra list") {
+                     selectFlag<-1
+                     addSpectrumTMP<-FALSE
+                 }
                }
              }
          } else {
@@ -1844,7 +1861,7 @@ selectBrukerFolders<-function(){#Select Bruker NMR spectral folders
        }
        }
       }
-      if(!is.null(NMRfolders)) mrbin.env$mrbinparam$NMRfolders<-unique(NMRfolders)
+      #if(!is.null(NMRfolders)) mrbin.env$mrbinparam$NMRfolders<-unique(c(mrbin.env$mrbinparam$NMRfolders,NMRfolders))
     }
   }
   invisible(selectionFolders)
@@ -1921,7 +1938,7 @@ binMultiNMR<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ createBinRegions() }
+#' \donttest{ createBinRegions() }
 
 createBinRegions<-function(){
    createBinNumbers()
@@ -1962,7 +1979,7 @@ createBinRegions<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ createBinNames() }
+#' \donttest{ createBinNames() }
 
 createBinNames<-function(){
    if(mrbin.env$mrbinparam$dimension=="1D"){
@@ -1982,7 +1999,7 @@ createBinNames<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ createBinNumbers() }
+#' \donttest{ createBinNumbers() }
 
 createBinNumbers<-function(){
    if(mrbin.env$mrbinparam$binMethod=="Custom bin list"){
@@ -2007,7 +2024,7 @@ createBinNumbers<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ binSingleNMR() }
+#' \donttest{ binSingleNMR() }
 
 binSingleNMR<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentFolder)){
@@ -2076,7 +2093,7 @@ binSingleNMR<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ readNMR() }
+#' \donttest{ readNMR() }
 
 readNMR<-function(){#Read NMR spectral data
  if(!is.null(mrbin.env$mrbinTMP$currentFolder)){
@@ -2224,7 +2241,7 @@ referenceScaling<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ sumBins() }
+#' \donttest{ sumBins() }
 
 sumBins<-function(){#sum up regions with shifting peaks and remove remaining bins
  #if(!is.null(mrbin.env$bins)){
@@ -2284,7 +2301,7 @@ sumBins<-function(){#sum up regions with shifting peaks and remove remaining bin
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ removeSolvent() }
+#' \donttest{ removeSolvent() }
 
 removeSolvent<-function(){
  #if(!is.null(mrbin.env$bins)){
@@ -2326,7 +2343,7 @@ removeSolvent<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ removeAreas() }
+#' \donttest{ removeAreas() }
 
 removeAreas<-function(){#limits=c(4.75,4.95,-10,160)
  #if(!is.null(mrbin.env$bins)){
@@ -2372,7 +2389,7 @@ removeAreas<-function(){#limits=c(4.75,4.95,-10,160)
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ calculateNoise() }
+#' \donttest{ calculateNoise() }
 
 calculateNoise<-function(){
  if(!is.null(mrbin.env$mrbinTMP$currentSpectrum)){
@@ -3228,7 +3245,7 @@ getEnv<-function(){
 #' @return {None}
 #' @export
 #' @examples
-#' \dontrun{ putToEnv(list(bins=NULL)) }
+#' \donttest{ putToEnv(list(bins=NULL)) }
 
 putToEnv<-function(variableList){
   if(!is.list(variableList)){
