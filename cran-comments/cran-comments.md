@@ -2,8 +2,7 @@
 
 This is a resubmission. In this version I have changed the following:
 
-* Shortened title to less than 65 characters
-* In examples, commented lines were removed, functioning examples were created for selected functions
+* In examples, \dontrun was replaced by \donttest
 
 Additional changes can be found in the NEWS.md file.
 
@@ -29,6 +28,36 @@ There are currently no downstream dependencies for this package.
 
 
 ## Previous cran-comments
+
+## Resubmission
+
+This is a resubmission. In this version I have changed the following:
+
+* Shortened title to less than 65 characters
+* In examples, commented lines were removed, functioning examples were created for selected functions
+
+Additional changes can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+## R CMD check results
+
+0 errors | 0 warnings | 1 note
+
+* This is a new release.
+
+On NOTE was produced:
+ checking CRAN incoming feasibility ... NOTE
+  Maintainer: ‘Matthias Klein <klein.663@osu.edu>’
+
+It seems that this is not a note I could possibly fix, but rather an internal note.
+
+## Downstream dependencies
+There are currently no downstream dependencies for this package.
+
 
 ## Resubmission
 
