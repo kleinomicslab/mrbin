@@ -3,8 +3,8 @@
 ## Version 1.3.0
 
 * Noise is now estimated from raw data points (not bin values) and mean number of data points per bin
-* New noise calculations tend to be 20-60% below the previous estimates. SNR levels may need to be increased. Default SNR levels have been raised to reflect this.
-* Solvent regions change: Any bins that contain any part of these regions are removed (previously only if mean of bin was within region)
+* New noise calculations tend to be lower than the previous estimates. SNR levels may need to be increased by a factor of 2.5. Default SNR levels have been raised to reflect this.
+* Solvent region change: Any bins that contain any part of these regions are removed (previously only if mean of bin was within region)
 * Added new way of creating sample names from EXPNO and folder name
 * Some minor and major fixes to increase user friendliness
 * Some minor and major bug fixes to increase stability

@@ -1,4 +1,4 @@
-# mrbin
+# mrbin - Magnetic Resonance Binning, Integration and Normalization
 
 Nuclear Magnetic Resonance (NMR) is widely used for metabolomics research. This package uses spectral binning to convert 1D or 2D NMR data into a matrix of values suitable for further data analysis and performs basic processing steps in a reproducible way. Negative values, a common issue in NMR data, are replaced by positive values. All used parameters are stored in a readable text file and can be restored from that file to enable exact reproduction of the data at a later time.
 
@@ -23,6 +23,8 @@ library(devtools)
 install_github("kleinomicslab/mrbin")
 ```
 
+To be able to run devtools, you may need to install additional software.
+
 ### Running
 
 To use this package, you will need your NMR data in the Bruker file format accessible on your computer. Please make sure your data is Fourier transformed, phase corrected, baseline corrected, and correctly referenced. The data has to be stored in folders according to standard Bruker folders, that means foldername/1/pdata/1 etc. Experiment numbers and processing numbers can be freely chosen.
@@ -36,7 +38,9 @@ Before starting mrbin, take a look at your NMR data, for example in Bruker Topsp
 * Solvent area: Area to exclude to remove solvent artifacts
 * Additional areas to be removed: Any other area containing artifacts, such as streaks surrounding strong peaks.
 
-Once you have decided on these values, you can start mrbin using the following code:
+mrbin will also show you preview plots for these parameters during the run.
+
+You can start mrbin using the following code:
 
 ```
 library("mrbin")
@@ -48,21 +52,22 @@ This will start a series of questions that will guide you through the parameters
 The sequence of data processing is as follows:
 
 * Gathering all parameters from user
+* Creating a set with coordinates of each bin 
+* Removing solvent region
+* Removing additional regions
+* Cropping of HSQC spectra to the region along the diagonal
+* Summing or merging regions containing peaks with unstable positions such as citric acid
 * Reading Bruker NMR data
 * Scaling to reference region
 * Binning 
-* Removing solvent region
-* Removing additional regions
-* Summing up region containing peaks with unstable positions such as citric acid
 * Removal of bins containing mostly noise
-* Cropping of HSQC spectra to the region along the diagonal
 * PQN transformation
-* Removal of negative values
+* Replacement of negative values
 * Log transform
-* Plotting a PCA
-* Saving bins and parameters to the hard drive
+* Plotting a quality control plot, including a PCA plot
+* Saving bins, parameters and the plot to the hard drive
 
-After finishing, a PCA can be displayed. mrbin() also returns a list containing three variables: 
+mrbin() also returns an (invisible) list containing three variables: 
 
 * bins: A matrix containing bin data for all samples, Depending on the option you chose, the data will be cleaned up and scaled.
 * parameters: A list containing all parameters used to create the bin matrix.
@@ -95,7 +100,7 @@ Parameters can be submitted at the command line, using the following syntax:
 ```
 mrbin(silent=TRUE,
      setDefault=FALSE,
-     parameters=list(
+     parameters=list(verbose=TRUE,
              dimension="1D",
              binMethod="Rectangular bins",
              binwidth1D=.01,
