@@ -3,7 +3,7 @@
 #
 #Package: mrbin
 #Title: Magnetic Resonance Binning, Integration and Normalization
-#Version: 1.2.0.9001
+#Version: 1.3.0.9000
 #Authors@R:
 #    person(given = "Matthias",
 #           family = "Klein",
@@ -126,7 +126,7 @@ resetEnv<-function(){
     assign("bins",NULL,mrbin.env)
     assign("paramChangeFlag",FALSE,mrbin.env)
     assign("mrbinTMP",list(
-               mrbinversion="1.2.0.9001",
+               mrbinversion="1.3.0.9000",
                binsRaw=NULL,
                medians=NULL,
                noise_level_Raw=NULL,
