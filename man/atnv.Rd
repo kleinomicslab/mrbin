@@ -30,16 +30,15 @@ use NMR data and noise levels from the global variables mrbin.env$bins and
 mrbin.env$mrbinTMP.
 }
 \examples{
- mrbinExample<-mrbin(silent=TRUE,
+ Example<-mrbin(silent=TRUE,
                    parameters=list(verbose=FALSE,dimension="1D",PQNScaling="No",
-                   binwidth1D=0.005,signal_to_noise1D=1,PCA="No",
+                   binwidth1D=0.005,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,7.5,10,156),
+                   saveFiles="No",referenceScaling="No",noiseRemoval="No",
                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,
                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
                               system.file("extdata/3/10/pdata/10",package="mrbin"))
                    ))
- exampleNMR<-mrbinExample$bins
- sum(exampleNMR<=0)
- exampleNoise<-mrbinExample$parameters$noise_level
- exampleNMRpositive<-atnv(NMRdata=exampleNMR, noiseLevels=exampleNoise)
+ sum(Example$bins<=0)
+ exampleNMRpositive<-atnv(NMRdata=Example$bins, noiseLevels=Example$parameters$noise_level)
  sum(exampleNMRpositive<=0)
 }

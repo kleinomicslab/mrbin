@@ -18,5 +18,5 @@
 This function resets the parameter variables.
 }
 \examples{
-\dontrun{ .onLoad() }
+\donttest{ .onLoad() }
 }

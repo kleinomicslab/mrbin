@@ -14,8 +14,8 @@ This function scales NMR data to the reference area.
 }
 \examples{
 resetEnv()
-setParam(parameters=list(dimension="1D",referenceScaling="No",
+mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+         referenceScaling="No",binwidth1D=0.05,PQNScaling="No",PCA="No",
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
-binMultiNMR()
 referenceScaling()
 }

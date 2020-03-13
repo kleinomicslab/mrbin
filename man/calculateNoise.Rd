@@ -10,12 +10,9 @@ calculateNoise()
 {None}
 }
 \description{
-This function calculates noise levels.
+This function calculates noise levels for the current spectrum. Only for use
+within the mrbin function.
 }
 \examples{
-mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-                    binwidth1D=0.05,noiseRemoval="No",
-                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                                system.file("extdata/2/10/pdata/10",package="mrbin"))))
-calculateNoise()
+\donttest{ calculateNoise() }
 }

@@ -24,7 +24,7 @@ is requested and binning and data processing are performed silently.
 }
 \examples{
 # Let the user set parameters interactively
-\dontrun{ results <- mrbin() }
+\donttest{ results <- mrbin() }
 # Set parameters in command line.
 mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
                 binwidth1D=0.05,signal_to_noise1D=50,

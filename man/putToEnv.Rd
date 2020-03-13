@@ -17,5 +17,5 @@ This function can change variables in the current package environment.
 This may be helpful for debugging or for some plotting functions.
 }
 \examples{
-\dontrun{ putToEnv(list(bins=NULL)) }
+\donttest{ putToEnv(list(bins=NULL)) }
 }

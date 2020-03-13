@@ -15,5 +15,5 @@ This function selects the correct folder selection function for the vendor
 mrbin function.
 }
 \examples{
-\dontrun{ selectFolders() }
+\donttest{ selectFolders() }
 }

@@ -14,5 +14,5 @@ This function calculates numbers of bins from the chosen parameters. This functi
 meant only for use within the mrbin function.
 }
 \examples{
-\dontrun{ createBinNumbers() }
+\donttest{ createBinNumbers() }
 }

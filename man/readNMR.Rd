@@ -14,5 +14,5 @@ This function picks the correct NMR reading function, based on vendor. This func
 meant only for use within the mrbin function.
 }
 \examples{
-\dontrun{ readNMR() }
+\donttest{ readNMR() }
 }

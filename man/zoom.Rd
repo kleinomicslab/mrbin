@@ -24,8 +24,10 @@ This function changes the plot region of the current NMR plot.
 \examples{
 # Ask for user input
 \donttest{ zoom() }
-setParam(parameters=list(dimension="1D",binwidth1D=.1,
+mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
+         PQNScaling="No",
+         fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
-binMultiNMR()
+plotNMR()
 zoom(left=4.6,right=2,top=10,bottom=150)
 }

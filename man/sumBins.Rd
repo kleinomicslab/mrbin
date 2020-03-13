@@ -13,14 +13,8 @@ sumBins()
 This function sums up bins. The sums are saved to the middle (median) bin of
 the original area. All other bins of the area are removed then. This is handy
 for signals that are know to vary between spectra due to pH or salt content,
-such as citric acid.
+such as citric acid. Intended for use within the mrbin function.
 }
 \examples{
-mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-                    binwidth1D=0.05,signal_to_noise1D=50,
-                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                                system.file("extdata/2/10/pdata/10",package="mrbin"))))
-setParam(parameters=list(sumBinList=rbind(c(2.77,2.63,45,51),
-                                            c(2.58,2.51,45,51))))
-sumBins()
+\donttest{ sumBins() }
 }

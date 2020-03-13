@@ -14,5 +14,5 @@ This function lets the user pick a spectrum from the list of spectra
 analysis. This function is meant only for use within the mrbin function.
 }
 \examples{
-\dontrun{ setCurrentSpectrum() }
+\donttest{ setCurrentSpectrum() }
 }

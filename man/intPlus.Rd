@@ -13,8 +13,10 @@ intPlus()
 This function increases the intensity of the current NMR spectrum plot.
 }
 \examples{
-setParam(parameters=list(dimension="1D",binwidth1D=.1,
+mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
+         PQNScaling="No",
+         fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
-binMultiNMR()
+plotNMR()
 intPlus()
 }

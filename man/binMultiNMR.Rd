@@ -11,11 +11,8 @@ binMultiNMR()
 }
 \description{
 This function creates bins for each spectrum in mrbin.env$mrbinparam$NMRfolders and
-saves the bins to mrbin.env$bins.
+saves the bins to mrbin.env$bins. Should only be run within the mrbin function.
 }
 \examples{
-setParam(parameters=list(dimension="1D",binwidth1D=.05,PCA="No",
-         NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                      system.file("extdata/2/10/pdata/10",package="mrbin"))))
-binMultiNMR()
+\donttest{ binMultiNMR() }
 }

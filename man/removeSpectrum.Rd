@@ -14,5 +14,5 @@ This function lets the user pick spectra from a list for removal from data
 analysis. This function is meant only for use within the mrbin function.
 }
 \examples{
-\dontrun{ removeSpectrum() }
+\donttest{ removeSpectrum() }
 }

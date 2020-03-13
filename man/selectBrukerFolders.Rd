@@ -14,5 +14,5 @@ This function lets the user set NMR data folders interactively (for Bruker data)
 is meant only for use within the mrbin function.
 }
 \examples{
-\dontrun{ selectBrukerFolders() }
+\donttest{ selectBrukerFolders() }
 }

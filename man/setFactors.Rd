@@ -14,5 +14,5 @@ This function lets the user pick samples from a list to assign them to
 groups. This function is meant only for use within the mrbin function.
 }
 \examples{
-\dontrun{ setFactors() }
+\donttest{ setFactors() }
 }
