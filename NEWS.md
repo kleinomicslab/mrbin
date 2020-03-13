@@ -1,5 +1,15 @@
 # mrbin News
 
+## Version 1.3.0
+
+* Noise is now estimated from raw data points (not bin values) and mean number of data points per bin
+* New noise calculations tend to be 20-60% below the previous estimates. SNR levels may need to be increased. Default SNR levels have been raised to reflect this.
+* Solvent regions change: Any bins that contain any part of these regions are removed (previously only if mean of bin was within region)
+* Added new way of creating sample names from EXPNO and folder name
+* Some minor and major fixes to increase user friendliness
+* Some minor and major bug fixes to increase stability
+* Speed improvements
+
 ## Version 1.2.0
 
 * Default 1D noise range was changed to 10 - 9.5 ppm (was 10-9.4). Default 1D binning area changed to 10-0.5 (was 9.5-0.5)
