@@ -1,14 +1,24 @@
 # mrbin - Magnetic Resonance Binning, Integration and Normalization
 
-Nuclear Magnetic Resonance (NMR) is widely used for metabolomics research. This package uses spectral binning to convert 1D or 2D NMR data into a matrix of values suitable for further data analysis and performs basic processing steps in a reproducible way. Negative values, a common issue in NMR data, are replaced by positive values. All used parameters are stored in a readable text file and can be restored from that file to enable exact reproduction of the data at a later time.
+Nuclear Magnetic Resonance (NMR) is widely used for metabolomics research. This 
+package uses spectral binning to convert 1D or 2D NMR data into a matrix of values 
+suitable for further data analysis and performs basic processing steps in a 
+reproducible way. Negative values, a common issue in NMR data, are replaced by 
+positive values. All used parameters are stored in a readable text file and can 
+be restored from that file to enable exact reproduction of the data at a later 
+time.
 
 ## Getting Started
 
-The main functions of this package are controlled via the mrbin() function. Most other functions in the package will not usually be ever called by the user, but serve internal purposes. Results returned include the final bin list and a set of used parameters.
+The main functions of this package are controlled via the mrbin() function. Most 
+other functions in the package will not usually be ever called by the user, but 
+serve internal purposes. Results returned include the final bin list and a set 
+of used parameters.
 
 ### Installation
 
-To install  mrbin, please install the latest version of R first. Then install the package as follows:
+To install  mrbin, please install the latest version of R first. Then install 
+the package as follows:
 
 To install the latest stable version from CRAN:
 
@@ -27,11 +37,17 @@ To be able to run devtools, you may need to install additional software.
 
 ### Running
 
-To use this package, you will need your NMR data in the Bruker file format accessible on your computer. Please make sure your data is Fourier transformed, phase corrected, baseline corrected, and correctly referenced. The data has to be stored in folders according to standard Bruker folders, that means foldername/1/pdata/1 etc. Experiment numbers and processing numbers can be freely chosen.
+To use this package, you will need your NMR data in the Bruker file format 
+accessible on your computer. Please make sure your data is Fourier transformed, 
+phase corrected, baseline corrected, and correctly referenced. The data has to 
+be stored in folders according to standard Bruker folders, that means 
+foldername/1/pdata/1 etc. Experiment numbers and processing numbers can be 
+freely chosen.
 
 This package has been tested for 1D NOESY and 2D 1H-13C HSQC spectra.
 
-Before starting mrbin, take a look at your NMR data, for example in Bruker Topspin, and decide on the following:
+Before starting mrbin, take a look at your NMR data, for example in Bruker 
+Topspin, and decide on the following:
 * Bin area: Area where signals are observed in your data set
 * Bin width: Should match roughly the width of a singlet peak in your data set. Given in ppm.
 * Bin height (only 2D): Should match roughly the height of a singlet peak in your data set. Given in ppm.
@@ -81,18 +97,26 @@ Up to three files may be written to the chosen directory:
 ### Recreating Data and Parameters
 In order to create reproducible results, mrbin will save the used parameters to a text file. Please keep this file. You may want to share this file in a data repository when publishing your findings.
 
-While it is fine to view the parameter text file in a text editor, please do not change its contents, as this may break its formatting.
+While it is fine to view the parameter text file in a text editor, please do not 
+change its contents, as this may break its formatting.
 
 
-In order to recreate a previous data set, or to reload previously used parameters, use:
+In order to recreate a previous data set, or to reload previously used parameters, 
+use:
 
 ```
 mrbin()
 ```
 
-and select ""Reload from file" when asked "Set parameters or use existing parameters?". This will restore all parameters that were previously used. If the file was created using an older version of mrbin, this may cause inconsistencies. Missing parameters will be added using standard parameters. Ideally, download the older mrbin version at kleinomicslab.com and use the old version to recreated the data in an exact way.
+and select ""Reload from file" when asked "Set parameters or use existing 
+parameters?". This will restore all parameters that were previously used. If the 
+file was created using an older version of mrbin, this may cause inconsistencies. 
+Missing parameters will be added using standard parameters. Ideally, download the 
+older mrbin version at kleinomicslab.com and use the old version to recreated the 
+data in an exact way.
 
-Please be aware that bins will have to be recalculated, so the original NMR spectra will have to be present to do this.
+Please be aware that bins will have to be recalculated, so the original NMR 
+spectra will have to be present to do this.
 
 ### Submitting Parameters at the Command Line
 Parameters can be submitted at the command line, using the following syntax:
@@ -121,7 +145,8 @@ mrbin(silent=TRUE,
 
 This will set up all parameters and run all steps without asking for user input.
 
-When setting silent=FALSE, the user will be guided through the user input questionnaire to make adjustments to the parameters.
+When setting silent=FALSE, the user will be guided through the user input 
+questionnaire to make adjustments to the parameters.
 
 ### Affine Transformation of Negative Values
 
@@ -133,8 +158,8 @@ If sample-wise noise levels are available, the median noise level of samples
 with negative values is calculated and replaces the lowest positive number in
 case it is smaller. If no noise data is available, the 1% percentile of all
 positive values in the data set is used as an estimate.
-It is recommended to us this function AFTER noise removal and other data
-clean-up methods, as it may alter (reduce) the noise level.
+It is recommended to use this function AFTER noise removal and other data
+clean-up methods, as it may alter (reduce) the noise level of the binned data.
 If no NMR data and noise levels are provided as arguments, the function will
 use NMR data and noise levels from the global variables mrbin.env$bins and
 mrbin.env$mrbinTMP.
@@ -143,10 +168,24 @@ To use own data:
 ```
 atnv(NMRdataMatrix,noiseLevelVector)
 ```
-To use current mrbin data, use the following syntax. This requires data loaded using mrbin(). This is usually not necessary as it is included in the mrbin work flow.
+To use current mrbin data, use the following syntax. This requires data loaded 
+using mrbin(). This is usually not necessary as it is included in the mrbin work 
+flow.
 ```
 atnv()
 ```
+
+## Known Issues
+
+### Pop-Up Windows
+mrbin is set up to ask for user input through pop-up windows. This requires 
+graphics support, otherwise the use input will be asked through command line 
+menus, which is less user friendly but still offers the full functionality.
+
+###Apple/Mac Computers And RStudio
+In some cases, running mrbin from within RStudio on Apple computers will not 
+generate pop-up windows. To enable pop-up windows, you will need to install 
+the newest version of xquartz from xquartz.com.
 
 ## Built With
 
