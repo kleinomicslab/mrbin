@@ -182,7 +182,7 @@ mrbin is set up to ask for user input through pop-up windows. This requires
 graphics support, otherwise the use input will be asked through command line 
 menus, which is less user friendly but still offers the full functionality.
 
-###Apple/Mac Computers And RStudio
+### Apple/Mac Computers And RStudio
 In some cases, running mrbin from within RStudio on Apple computers will not 
 generate pop-up windows. To enable pop-up windows, you will need to install 
 the newest version of xquartz from xquartz.com.
