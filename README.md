@@ -184,8 +184,8 @@ menus, which is less user friendly but still offers the full functionality.
 
 ### Apple/Mac Computers And RStudio
 In some cases, running mrbin from within RStudio on Apple computers will not 
-generate pop-up windows. To enable pop-up windows, you will need to install 
-the newest version of xquartz from xquartz.com.
+generate pop-up windows. To enable pop-up windows, it might be helpful to install 
+the newest version of xquartz from https://www.xquartz.org.
 
 ## Built With
 
