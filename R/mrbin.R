@@ -244,11 +244,9 @@ resetEnv<-function(){
 #' @return An invisible list containing bins (data after processing), parameters, and factors
 #' @export
 #' @examples
-#' # Let the user set parameters interactively
-#' \donttest{ results <- mrbin() }
 #' # Set parameters in command line.
 #' mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-#'                 binwidth1D=0.05,signal_to_noise1D=50,
+#'                 binwidth1D=0.05,signal_to_noise1D=100,
 #'                 NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
 #'                             system.file("extdata/2/10/pdata/10",package="mrbin"),
 #'                             system.file("extdata/3/10/pdata/10",package="mrbin"),
@@ -262,7 +260,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL){
       setParam(parameters)
   }
   if(mrbin.env$mrbinparam$verbose){
-       message(paste("\nmrbin version ",mrbin.env$mrbinTMP$mrbinversion,"\n",sep=""))
+       message(paste("\nmrbin version ",mrbin.env$mrbinTMP$mrbinversion,"\n",sep=""), appendLF = FALSE)
   }
   stopTMP<-FALSE
   selectionRepeat<-""
@@ -1275,7 +1273,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL){
 #' @export
 #' @examples
 #' setParam(parameters=list(dimension="2D",binwidth2D=0.05,binheight=3,PQNScaling="No",
-#'          fixNegatives="No",logTrafo="No",
+#'          fixNegatives="No",logTrafo="No",signal_to_noise2D=20,
 #'          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
 #'                       system.file("extdata/2/12/pdata/10",package="mrbin"))))
 #' mrbinrun()
@@ -1333,7 +1331,7 @@ mrbinrun<-function(){
      resultOutputTMP<-paste(resultOutputTMP,sep="")
      if(mrbin.env$mrbinparam$verbose){
        printParameters()
-       message(resultOutputTMP)
+       message(resultOutputTMP, appendLF = FALSE)
      }
   }
 }
@@ -1422,9 +1420,9 @@ printParameters<-function(){
         }
       }
       #printTMP<-paste(printTMP,"))\n",sep="")
-      cat("\nTo recreate this data set, use the following code:\n\n##################################################\n\n")
-      cat(printTMP)
-      cat("\n##################################################\n\nTo recreate this data set, use the code above this line.\n")
+      message("\nTo recreate this data set, use the following code:\n\n##################################################\n\n", appendLF = FALSE)
+      message(printTMP, appendLF = FALSE)
+      message("\n##################################################\n\nTo recreate this data set, use the code above this line.\n", appendLF = FALSE)
   }
 }
 
@@ -1522,7 +1520,7 @@ setParam<-function(parameters=NULL){
     }
     if(length(diffSet3)>0){
        if(mrbin.env$mrbinparam$verbose) message(paste("Current values are used for missing parameters: ",
-           paste(diffSet3,sep=", ", collapse=", "),sep=""))
+           paste(diffSet3,sep=", ", collapse=", "),sep=""), appendLF = FALSE)
     }
     if(length(intersectSet)>0){
        for(iintersectSet in intersectSet){
@@ -1715,7 +1713,7 @@ selectBrukerFolders<-function(){#Select Bruker NMR spectral folders
        #     singleFolderFlag<-TRUE
        #}
        if(enterFolders=="Browse..."){
-       if(!singleFolderFlag) message("Hint: When reaching the NMR parent folder, click OK WITHOUT selecting\nany folder.")
+       if(!singleFolderFlag) message("Hint: When reaching the NMR parent folder, click OK WITHOUT selecting\nany folder.", appendLF = FALSE)
        selectFlag<-0
        while(selectFlag<1){
          folderListFull<-list.dirs(path=parentFolder,recursive = FALSE,full.names=TRUE)
@@ -1832,8 +1830,8 @@ selectBrukerFolders<-function(){#Select Bruker NMR spectral folders
                if("Select all"%in%NMRfoldersTMP) NMRfoldersTMP<-spectrum_proc_path
                #NMRfolders<-c(NMRfolders,NMRfoldersTMP)
                if(!is.null(NMRfoldersTMP)) mrbin.env$mrbinparam$NMRfolders<-unique(c(mrbin.env$mrbinparam$NMRfolders,NMRfoldersTMP))
-               if(mrbin.env$mrbinparam$verbose) cat(paste("Adding to list:\n",paste(NMRfoldersTMP,"\n",
-                                                    sep="",collapse="")))
+               if(mrbin.env$mrbinparam$verbose) message(paste("Adding to list:\n",paste(NMRfoldersTMP,"\n",
+                                                    sep="",collapse="")), appendLF = FALSE)
                addSpectrumTMP<-TRUE
                while(addSpectrumTMP){
                  yesorno<-utils::select.list(c("Keep current spectra list","Add additional spectra","Remove spectra from list"),
@@ -1886,11 +1884,11 @@ binMultiNMR<-function(){
     mrbin.env$mrbinTMP$noise_level_Raw<-rep(NA,length(mrbin.env$mrbinparam$NMRfolders))
     mrbin.env$mrbinTMP$meanNumberOfPointsPerBin<-rep(NA,length(mrbin.env$mrbinparam$NMRfolders))
     if(mrbin.env$mrbinparam$verbose){
-      cat("Binning spectrum: ")
+      message("Binning spectrum: ", appendLF = FALSE)
       utils::flush.console()
     }
     for(i in 1:length(mrbin.env$mrbinparam$NMRfolders)){
-        if(mrbin.env$mrbinparam$verbose) cat(paste(i," ",sep=""))
+        if(mrbin.env$mrbinparam$verbose) message(paste(i," ",sep=""), appendLF = FALSE)
         utils::flush.console()
         mrbin.env$mrbinTMP$currentFolder<-mrbin.env$mrbinparam$NMRfolders[i]
         readNMR()
@@ -1923,7 +1921,7 @@ binMultiNMR<-function(){
             mrbin.env$mrbinTMP$currentSpectrumName<-currentSpectrumNameTMP
         }
     }
-    cat("Done.\n")
+    message("Done.\n", appendLF = FALSE)
     utils::flush.console()
     mrbin.env$bins<-mrbin.env$mrbinTMP$binsRaw
     #mrbin.env$mrbinparam$numberOfFeaturesRaw<-ncol(mrbin.env$bins)
