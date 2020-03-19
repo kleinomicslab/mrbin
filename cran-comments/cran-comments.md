@@ -1,3 +1,26 @@
+## Update
+
+This is an update. In this version I have changed the following:
+
+* cat() was replaced by warning() or message()
+
+Additional changes can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+## R CMD check results
+
+0 errors | 0 warnings | 0 notes
+
+## Downstream dependencies
+There are currently no downstream dependencies for this package.
+
+
+## Previous cran-comments
+
 ## Resubmission
 
 This is a resubmission. In this version I have changed the following:
@@ -27,7 +50,7 @@ It seems that this is not a note I could possibly fix, but rather an internal no
 There are currently no downstream dependencies for this package.
 
 
-## Previous cran-comments
+
 
 ## Resubmission
 
