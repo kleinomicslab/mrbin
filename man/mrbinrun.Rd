@@ -21,7 +21,7 @@ using recreatemrbin().
 }
 \examples{
 setParam(parameters=list(dimension="2D",binwidth2D=0.05,binheight=3,PQNScaling="No",
-         fixNegatives="No",logTrafo="No",
+         fixNegatives="No",logTrafo="No",signal_to_noise2D=20,
          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
                       system.file("extdata/2/12/pdata/10",package="mrbin"))))
 mrbinrun()
