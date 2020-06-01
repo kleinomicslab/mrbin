@@ -1,11 +1,11 @@
 ##TITLE= Parameter file, TopSpin 3.6.1
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 17	$$ modification sequence number
+##NPOINTS= 19	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= Administrator
-$$ 2020-02-28 23:22:58.299 -0500  BCD\klein.663@fst220415
-$$ C:/Users/klein.663/Box Sync/OSU/Projects/mrbin/NMR data set/1/12/pdata/10/proc2s
+$$ 2020-04-27 15:12:14.765 -0400  BCD\klein.663@fst220415
+$$ C:/Users/klein.663/Box Sync/OSU/Projects/mrbin/NMR data set/1 - Copy/12/pdata/10/proc2s
 $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc2d.exe
 ##$ABSF1= 0
 ##$ABSF2= 0
@@ -39,7 +39,7 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc2d.exe
 ##$F1P= 155.230194091797
 ##$F2P= -9.78630535482834
 ##$FCOR= 0.5
-##$FTSIZE= 512
+##$FTSIZE= 256
 ##$FT_mod= 6
 ##$GAMMA= 0
 ##$GB= 0
@@ -106,7 +106,7 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc2d.exe
 ##$RDPOS= 0
 ##$REVERSE= no
 ##$SF= 150.932572838989
-##$SI= 512
+##$SI= 256
 ##$SIGF1= 0
 ##$SIGF2= 0
 ##$SINO= 16
@@ -115,11 +115,11 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc2d.exe
 ##$SREF_mod= 1
 ##$SREGLST= <1H.MeOD>
 ##$SSB= 2
-##$STSI= 512
+##$STSI= 256
 ##$STSR= 0
 ##$SW_p= 24906.364716921
 ##$SYMM= 0
-##$S_DEV= 371823
+##$S_DEV= 360670
 ##$TDeff= 256
 ##$TDoff= 0
 ##$TI= <>
@@ -133,7 +133,7 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc2d.exe
 ##$USERP4= <user>
 ##$USERP5= <user>
 ##$WDW= 4
-##$XDIM= 512
+##$XDIM= 256
 ##$YMAX_p= 280012790
 ##$YMIN_p= -94842221
 ##END=
