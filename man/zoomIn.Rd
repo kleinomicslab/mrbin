@@ -14,8 +14,8 @@ This function zooms into the plot region of the current NMR plot.
 }
 \examples{
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",
-         fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",
+         fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
 plotNMR()
 zoomIn()

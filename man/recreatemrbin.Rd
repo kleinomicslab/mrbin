@@ -19,8 +19,6 @@ mrbin(). File names in mrbin$param might need to be updated.
 using recreatemrbin().
 }
 \examples{
-## Lets the user browse for the parameter file
-\donttest{ recreatemrbin() }
 # Insert full folder path and file name
 recreatemrbin(system.file("extdata/mrbin.txt",package="mrbin"))
 }

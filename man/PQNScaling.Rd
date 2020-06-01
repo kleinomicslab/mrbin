@@ -11,9 +11,9 @@ PQNScaling()
 }
 \description{
 This function performs PQN scaling. To further exclude unreliable noise, only
-the most intense signals are used. For 1H-13C HSQC spectra, most of the sugar
-regions are excluded to avoid a dominating effect of the multiple sugar
-signals.
+the most intense signals are used. For 1H and 1H-13C HSQC spectra, most of
+the sugar regions are excluded to avoid a dominating effect of the multiple
+sugar signals.
 }
 \examples{
 mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",

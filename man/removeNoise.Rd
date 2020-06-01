@@ -17,7 +17,7 @@ defined threshold level are above noise*SNR, the whole bin is removed.
 \examples{
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
                     binwidth1D=0.05,noiseRemoval="No",PQNScaling="No",
-                    fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,
+                    fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                                 system.file("extdata/2/10/pdata/10",package="mrbin"),
                                 system.file("extdata/3/10/pdata/10",package="mrbin"))))

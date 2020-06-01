@@ -8,9 +8,11 @@ plotNMR(
   region = NULL,
   rectangleRegions = NULL,
   rectangleColors = c("green", "orange", "blue", "red", "yellow", "gray", "purple"),
+  rectangleFront = FALSE,
   polygonRegion = NULL,
   color = NULL,
   add = FALSE,
+  showGrid = FALSE,
   manualScale = TRUE,
   plotTitle = ""
 )
@@ -22,13 +24,17 @@ plotNMR(
 
 \item{rectangleColors}{Define colors for the rectangles}
 
+\item{rectangleFront}{Plot rectangles in front of spectrum rather than in background (only 2D)}
+
 \item{polygonRegion}{Defines 4 corners of a polygon to be plotted}
 
 \item{color}{Defines the color of the spectrum plot. If NULL, a rainbow theme is used for 2D NMR}
 
 \item{add}{If TRUE, additional spectrum plots are overlaid with the current plot}
 
-\item{manualScale}{If TRUE, scaling factor is taken from environment variables.}
+\item{showGrid}{Shows a grid of data points. Defaults to FALSE}
+
+\item{manualScale}{If TRUE, scaling factor is taken from environment variables}
 
 \item{plotTitle}{Defines the main title of the plot}
 }
@@ -44,8 +50,8 @@ For 2D data use additionally: contMin(), contPlus(), up(), down()
 }
 \examples{
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",
-         fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",
+         fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
 plotNMR()
 }

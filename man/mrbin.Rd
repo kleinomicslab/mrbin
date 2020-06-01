@@ -11,14 +11,14 @@ mrbin(silent = FALSE, setDefault = FALSE, parameters = NULL)
 
 \item{setDefault}{If TRUE, all current parameters will be replaced by the default parameters (before loading any provided parameters sets). Defaults to FALSE.}
 
-\item{parameters}{Optional: A list of parameters to be used. If omitted, the user will be asked through a series of question to set the parameters.}
+\item{parameters}{Optional: A list of parameters, see examples for details. If omitted, the user will be asked through a series of question to set the parameters.}
 }
 \value{
 An invisible list containing bins (data after processing), parameters, and factors
 }
 \description{
 This function guides the user through the set-up of parameters, starts binning
-and performs the chosen data processing steps
+and performs the chosen data processing steps.
 If a list of parameters is provided and silent is set to TRUE, no user input
 is requested and binning and data processing are performed silently.
 }
@@ -28,7 +28,6 @@ mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
                 binwidth1D=0.05,signal_to_noise1D=100,
                 NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                             system.file("extdata/2/10/pdata/10",package="mrbin"),
-                            system.file("extdata/3/10/pdata/10",package="mrbin"),
-                            system.file("extdata/4/10/pdata/10",package="mrbin")),
-                Factors=factor(c("Group A","Group A","Group A","Group B","Group B"))))
+                            system.file("extdata/3/10/pdata/10",package="mrbin")),
+                Factors=factor(c("Group A","Group A","Group B"))))
 }

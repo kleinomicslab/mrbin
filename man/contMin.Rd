@@ -15,8 +15,9 @@ spectrum plot.
 }
 \examples{
 mrbin(silent=TRUE,parameters=list(dimension="2D",binwidth2D=0.5,
-         binheight=20,PQNScaling="No",referenceScaling="No",binRegion=c(8,2,20,140),
-         fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,saveFiles="No",
+         binheight=3,PQNScaling="No",referenceScaling="No",binRegion=c(4,3,60,65),
+         noiseRemoval="No",trimZeros="No",cropHSQC="No",
+         fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,saveFiles="No",
          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
 plotNMR()
 contMin()

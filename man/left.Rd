@@ -14,8 +14,9 @@ This function moves left the plot region of the current NMR plot.
 }
 \examples{
 mrbin(silent=TRUE,parameters=list(dimension="1D",binwidth1D=.5,
+         noiseRemoval="No",trimZeros="No",
          PQNScaling="No",saveFiles="No",referenceScaling="No",
-         fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,
+         fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
 plotNMR()
 zoomIn()

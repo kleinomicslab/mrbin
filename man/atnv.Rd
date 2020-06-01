@@ -31,7 +31,7 @@ mrbin.env$mrbinTMP.
 }
 \examples{
  Example<-mrbin(silent=TRUE,
-                   parameters=list(verbose=FALSE,dimension="1D",PQNScaling="No",
+                   parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.005,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,7.5,10,156),
                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,

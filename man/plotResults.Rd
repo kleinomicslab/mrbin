@@ -13,10 +13,12 @@ plotResults()
 This function plots boxplots (bin-wise and sample-wise) as visual quality indicators. It also performs PCA, then plots PC1 and PC2 and loading plots.
 }
 \examples{
-mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-                    binwidth1D=0.05,PCA="No",
-                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                                system.file("extdata/2/10/pdata/10",package="mrbin"),
-                                system.file("extdata/3/10/pdata/10",package="mrbin"))))
+mrbinExample<-mrbin(silent=TRUE,setDefault=FALSE,parameters=list(dimension="2D",
+                    binwidth2D=0.05,binheight=3,
+                    PQNScaling="No",noiseRemoval="Yes",trimZeros="Yes",
+                    fixNegatives="No",logTrafo="No",PCA="No",
+                    NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
+                                system.file("extdata/2/12/pdata/10",package="mrbin"),
+                                system.file("extdata/3/12/pdata/10",package="mrbin"))))
 plotResults()
 }

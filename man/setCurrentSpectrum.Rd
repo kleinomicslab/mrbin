@@ -4,7 +4,10 @@
 \alias{setCurrentSpectrum}
 \title{A function for interactively setting the current spectrum.}
 \usage{
-setCurrentSpectrum()
+setCurrentSpectrum(spectrumNumber = NULL)
+}
+\arguments{
+\item{spectrumNumber}{If provided, this number will be used; defaults to NULL}
 }
 \value{
 {None}
@@ -14,5 +17,5 @@ This function lets the user pick a spectrum from the list of spectra
 analysis. This function is meant only for use within the mrbin function.
 }
 \examples{
-\donttest{ setCurrentSpectrum() }
+\donttest{ setCurrentSpectrum(spectrumNumber=1) }
 }

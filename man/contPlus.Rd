@@ -14,10 +14,7 @@ This function increases the minimum contour level of the current 2D NMR
 spectrum plot.
 }
 \examples{
-mrbin(silent=TRUE,parameters=list(dimension="2D",binwidth2D=0.5,
-         binheight=20,PQNScaling="No",referenceScaling="No",binRegion=c(8,2,20,140),
-         fixNegatives="No",logTrafo="No",PCA="No",verbose=FALSE,saveFiles="No",
-         NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
+readBruker(folder=system.file("extdata/1/12/pdata/10",package="mrbin"),dimension="2D")
 plotNMR()
 contPlus()
 }
