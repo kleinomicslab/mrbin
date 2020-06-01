@@ -1,14 +1,14 @@
-##TITLE= Parameter file, TOPSPIN		Version 3.1
+##TITLE= Parameter file, TopSpin 3.6.1
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 12	$$ modification sequence number
+##NPOINTS= 13	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= Administrator
-$$ 2012-04-24 12:50:28.930 +0200  Administrator@pc59355
-$$ C:/Bruker/TOPSPIN/data/guest/nmr/Latin_Square_2_2012_04_05/12/pdata/10/proc
-$$ process C:\Bruker\TopSpin3.1\prog\mod\dataserver.exe
+$$ 2020-04-28 22:21:18.210 -0400  BCD\klein.663@fst220415
+$$ C:/Users/klein.663/Box Sync/OSU/Projects/mrbin/NMR data set/2 - Copy/12/pdata/10/proc
+$$ process C:\Bruker\TopSpin3.6.1\prog\mod\dataserver.exe
 ##$ABSF1= 15
-##$ABSF2= 5
+##$ABSF2= -5
 ##$ABSG= 5
 ##$ABSL= 3
 ##$ALPHA= 0
