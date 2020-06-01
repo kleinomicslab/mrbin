@@ -1,5 +1,39 @@
 ## Update
 
+This is an update. Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+## R CMD check results
+
+0 errors | 0 warnings | 0 notes
+
+## Downstream dependencies
+There are currently no downstream dependencies for this package.
+
+
+## Update
+
+This is an update. Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+## R CMD check results
+
+0 errors | 0 warnings | 0 notes
+
+## Downstream dependencies
+There are currently no downstream dependencies for this package.
+
+
+## Update
+
 This is an update. In this version I have changed the following:
 
 * cat() was replaced by warning() or message()
