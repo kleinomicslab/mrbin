@@ -1,1 +1,3 @@
 ^cran-comments$
+^doc$
+^Meta$

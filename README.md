@@ -24,9 +24,18 @@ To install the latest stable version from CRAN:
 
 ```
 install.packages("mrbin")
+library("mrbin")
 ```
 
-To install the latest development version from Github:
+You can get more help in the vignette file:
+
+```
+vignette("mrbin")
+```
+
+#### Development Version
+
+To install the latest development version of mrbin from Github, use this code:
 
 ```
 library(devtools)
@@ -59,7 +68,6 @@ mrbin will also show you preview plots for these parameters during the run.
 You can start mrbin using the following code:
 
 ```
-library("mrbin")
 mrbinResults<-mrbin()
 ```
 

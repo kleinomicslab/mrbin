@@ -1,5 +1,32 @@
 # mrbin News
 
+## Version 1.4.2
+
+* Summed bins are now calculated with the exact defined borders. Surrounding bins are truncated
+* Noise levels are now calculated separately for each bin in each spectrum, correcting for differences in data points per bin
+* PCA plot labels now show percentage of variance instead of percentage of standard deviation
+* Some minor and major fixes to increase user friendliness
+* Some minor and major bug fixes to increase stability, especially when analyzing single samples and/or single bins
+
+
+## Version 1.4.1
+
+* Vignette was expanded
+* Bin borders are now rounded to avoid floating point inconsistencies
+* PQN normalization now also ignores glucose signals in 1D spectra. This behavior can be turned off now as well.
+* Some minor and major fixes to increase user friendliness
+* Some minor and major bug fixes to increase stability, especially when analyzing single samples and/or single bins
+
+
+## Version 1.4.0
+
+* Solvent region change: Only bins that are completely within the solvent region are removed
+* Excluded regions: No NMR data from excluded regions or solvent regions is now used to calculate bins, even if the bin overlaps with the excluded region
+* New trimming function to remove bins that have mostly values of zero; These are created at the edges of the spectrum and at edges of removed regions
+* A vignette was added
+* Some minor and major fixes to increase user friendliness
+* Some minor and major bug fixes to increase stability
+
 ## Version 1.3.0
 
 * Noise is now estimated from raw data points (not bin values) and mean number of data points per bin
