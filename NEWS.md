@@ -1,5 +1,10 @@
 # mrbin News
 
+## Version 1.4.3
+
+* Noise levels per bin are no longer saved in the .txt file to keep this file clear and tidy. Instead, raw noise levels and median noise levels (adjusted for bin size) are now saved in the output .txt file
+
+
 ## Version 1.4.2
 
 * Summed bins are now calculated with the exact defined borders. Surrounding bins are truncated
