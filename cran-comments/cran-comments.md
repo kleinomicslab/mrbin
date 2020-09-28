@@ -1,5 +1,15 @@
 ## Update
 
+This is an update (version 1.4.3). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
 This is an update. Changes to this version are minor and can be found in the NEWS.md file.
 
 ## Test environments
