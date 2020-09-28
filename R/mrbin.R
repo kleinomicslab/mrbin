@@ -61,7 +61,7 @@ atnv<-function(NMRdata=NULL,noiseLevels=NULL){
      if(is.null(NMRdata)){
        if("bins"%in%ls(envir=mrbin.env)&"mrbinparam"%in%ls(envir=mrbin.env)){
          NMRdata <- mrbin.env$bins
-         noiseLevels <- apply(mrbin.env$mrbinparam$noise_level,1,median)
+         noiseLevels <- apply(mrbin.env$mrbinTMP$noise_level,1,median)
        }
      }
      if(is.null(noiseLevels)){
@@ -126,11 +126,11 @@ resetEnv<-function(){
     assign("bins",NULL,mrbin.env)
     assign("paramChangeFlag",FALSE,mrbin.env)
     assign("mrbinTMP",list(
-               mrbinversion="1.4.2",
+               mrbinversion="1.4.3",
                binsRaw=NULL,
                medians=NULL,
                noise_level_TMP=NULL,
-               noise_level_Raw=NULL,
+               noise_level=NULL,
                noise_level_Raw_TMP=NULL,
                meanNumberOfPointsPerBin=NULL,
                meanNumberOfPointsPerBin_TMP=NULL,
@@ -218,7 +218,8 @@ resetEnv<-function(){
                NMRfolders=NULL,
                Factors=NULL,
                medians=NULL,
-               noise_level=NULL,
+               noise_level_Raw=NULL,
+               noise_level_adjusted=NULL,
                numberOfFeaturesRaw=NULL,
                numberOfFeaturesAfterRemovingSolvent=NULL,
                numberOfFeaturesAfterRemovingAreas=NULL,
@@ -2620,8 +2621,8 @@ binMultiNMR<-function(){
     mrbin.env$mrbinTMP$binTMP<-NULL
     #Open and bin all spectra
     mrbin.env$mrbinTMP$binsRaw<-NULL
-    mrbin.env$mrbinTMP$noise_level_Raw<-NULL
-    mrbin.env$mrbinparam$noise_level<-NULL
+    mrbin.env$mrbinparam$noise_level_Raw<-NULL
+    mrbin.env$mrbinTMP$noise_level<-NULL
     mrbin.env$mrbinTMP$meanNumberOfPointsPerBin<-NULL
     if(mrbin.env$mrbinparam$verbose){
       message("Binning spectra: 0% ", appendLF = FALSE)
@@ -2643,10 +2644,10 @@ binMultiNMR<-function(){
         if(mrbin.env$mrbinparam$referenceScaling=="Yes") referenceScaling()
         if(mrbin.env$mrbinparam$removeSolvent=="Yes") removeSolvent2()
         if(mrbin.env$mrbinparam$removeAreas=="Yes") removeAreas2()
-        #cat(paste("noise",paste(mrbin.env$mrbinTMP$noise_level_Raw,collapse=" ")),"\n")
+        #cat(paste("noise",paste(mrbin.env$mrbinparam$noise_level_Raw,collapse=" ")),"\n")
         if(i==1){
-          mrbin.env$mrbinTMP$noise_level_Raw<-rep(NA,length(mrbin.env$mrbinparam$NMRfolders))
-          mrbin.env$mrbinparam$noise_level<-matrix(rep(NA,length(mrbin.env$mrbinparam$NMRfolders)*nrow(mrbin.env$mrbinTMP$binRegions)),ncol=nrow(mrbin.env$mrbinTMP$binRegions))
+          mrbin.env$mrbinparam$noise_level_Raw<-rep(NA,length(mrbin.env$mrbinparam$NMRfolders))
+          mrbin.env$mrbinTMP$noise_level<-matrix(rep(NA,length(mrbin.env$mrbinparam$NMRfolders)*nrow(mrbin.env$mrbinTMP$binRegions)),ncol=nrow(mrbin.env$mrbinTMP$binRegions))
           mrbin.env$mrbinTMP$meanNumberOfPointsPerBin<-matrix(rep(NA,length(mrbin.env$mrbinparam$NMRfolders)*nrow(mrbin.env$mrbinTMP$binRegions)),ncol=nrow(mrbin.env$mrbinTMP$binRegions))
           #cat(paste("mNoPpB",paste(dim(mrbin.env$mrbinTMP$meanNumberOfPointsPerBin),collapse=" "),"\n"))
         }
@@ -2665,8 +2666,9 @@ binMultiNMR<-function(){
         } else {
             mrbin.env$mrbinTMP$binsRaw[i,]<-mrbin.env$mrbinTMP$binTMP
             mrbin.env$mrbinTMP$meanNumberOfPointsPerBin[i,]<-mrbin.env$mrbinTMP$meanNumberOfPointsPerBin_TMP
-            mrbin.env$mrbinTMP$noise_level_Raw[i]<-mrbin.env$mrbinTMP$noise_level_Raw_TMP
-            mrbin.env$mrbinparam$noise_level[i,]<-mrbin.env$mrbinTMP$noise_level_TMP
+            mrbin.env$mrbinparam$noise_level_Raw[i]<-mrbin.env$mrbinTMP$noise_level_Raw_TMP
+            mrbin.env$mrbinTMP$noise_level[i,]<-mrbin.env$mrbinTMP$noise_level_TMP
+            mrbin.env$mrbinparam$noise_level_adjusted[i]<-median(mrbin.env$mrbinTMP$noise_level_TMP)
             currentSpectrumNameTMP<-mrbin.env$mrbinTMP$currentSpectrumName
             i_currentSpectrumNameTMP<-2
             while(currentSpectrumNameTMP%in%rownames(mrbin.env$mrbinTMP$binsRaw)){
@@ -3325,7 +3327,7 @@ removeNoise<-function(){#remove noise peaks
     }
     #calculateNoise()
     for(i in 1:ncol(mrbin.env$bins)){#Keep only bins where at least X spectra are > SNR
-          if(sum(mrbin.env$bins[,i]>(mrbin.env$mrbinparam$noise_level[,i]*SNR))>=minimumNumber){
+          if(sum(mrbin.env$bins[,i]>(mrbin.env$mrbinTMP$noise_level[,i]*SNR))>=minimumNumber){
               colnames_NMRdata_no_noise<-c(colnames_NMRdata_no_noise,i)
           }
     }
