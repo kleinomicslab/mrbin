@@ -2,13 +2,13 @@
 ### Encoding: ISO8859-1
 
 ###################################################
-### code chunk number 1: mrbin.Rnw:65-66
+### code chunk number 1: mrbin.Rnw:72-73
 ###################################################
 library(mrbin)
 
 
 ###################################################
-### code chunk number 2: mrbin.Rnw:156-175
+### code chunk number 2: mrbin.Rnw:163-182
 ###################################################
 mrbinResults<-mrbin(silent=TRUE,
      setDefault=FALSE,
@@ -32,7 +32,7 @@ mrbinResults<-mrbin(silent=TRUE,
 
 
 ###################################################
-### code chunk number 3: mrbin.Rnw:192-206
+### code chunk number 3: mrbin.Rnw:199-213
 ###################################################
 mrbinResults<-mrbin(silent=TRUE,
      setDefault=FALSE,
@@ -51,7 +51,7 @@ mrbinResults<-mrbin(silent=TRUE,
 
 
 ###################################################
-### code chunk number 4: mrbin.Rnw:240-266
+### code chunk number 4: mrbin.Rnw:247-273
 ###################################################
 results <- mrbin(silent=TRUE,parameters=list(binMethod="Custom bin list",
  dimension="1D",specialBinList=matrix(c(

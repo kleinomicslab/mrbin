@@ -18,7 +18,7 @@
 
 \title{mrbin - Magnetic Resonance Binning, Integration and Normalization}
 \author{Matthias S. Klein}
-\date{Version 1.4.3}
+\date{Version 1.5.2}
 \maketitle
 %\tableofcontents
 %\pagebreak
@@ -32,6 +32,13 @@ reproducible way. Negative values, a common issue in NMR data, are replaced by
 positive values. All used parameters are stored in a readable text file and can
 be restored from that file to enable exact reproduction of the data at a later
 time.\\
+
+\section{Citation}
+If you are using mrbin in a publication, please cite the following manuscript:\\
+
+Klein, M.S. (2021): Affine Transformation of Negative Values for NMR Metabolomics 
+Using the mrbin R Package. J. Proteome Res. 20(2):1397-1404, 
+DOI: 10.1021/acs.jproteome.0c00684\\
 
 \section{Getting Started}
 
@@ -112,7 +119,7 @@ mrbin() returns an (invisible) list containing three variables:\\
 
 Up to three files may be written to the chosen directory:\\
 \begin{itemize}
-  \item A .txt file containing all parameters. This file can be reloaded to R using recreatemrbin("filename"). This will enable reusing parameters used in a previous run and can help increase reproducibility.
+  \item A .txt file containing all parameters and potential warning messages from the mrbin run. This file can be reloaded to R using recreatemrbin("filename"). This will enable reusing parameters used in a previous run and can help increase reproducibility.
   \item A .csv file containing the bin data for use in other software tools.
   \item A .pdf file containing quality control plots, including a PCA plot
 \end{itemize}
@@ -285,8 +292,8 @@ The sequence of data processing is as follows:\\
   \item Scaling to reference region
   \item Binning
   \item Removal of bins containing mostly noise
-  \item PQN transformation
   \item Replacement of negative values
+  \item PQN transformation
   \item Log transform
   \item Plotting a quality control plot, including a PCA plot
   \item Saving bins, parameters and the plot to the hard drive
@@ -374,6 +381,12 @@ down() #Move spectrum down
 
 \section{Known Issues}
 
+\subsection{Firewall Warnings}
+If parallel computing is turned on and the package parallel is installed,
+mrbin will try to use the socket approach for computing. This requires
+establishing network connections to the local cluster, which might
+trigger the firewall. It is safe to unblock these connections.\\
+
 \subsection{Pop-Up Windows}
 mrbin is set up to ask for user input through pop-up windows. This requires
 graphics support, otherwise the user input will be asked through command line
@@ -383,6 +396,13 @@ menus, which is less user friendly but still offers the full functionality.\\
 In some cases, running mrbin from within RStudio on Apple computers will not
 generate pop-up windows. To enable pop-up windows, it might be helpful to install
 the newest version of xquartz from https://www.xquartz.org.\\
+
+\subsection{Spectra are Missing}
+If a Bruker spectrum is not shown during browsing, please make sure a file
+with filename title is present in the PROCNO folder of that spectrum. You
+can create a title file by opening the spectrum in Bruker Topspin, selecting
+the Title tab, entering a title and clicking the disk symbol for saving.\\
+
 
 \section{License}
 
