@@ -4,16 +4,39 @@
 \alias{PQNScaling}
 \title{A function for PQN scaling.}
 \usage{
-PQNScaling()
+PQNScaling(
+  NMRdata = NULL,
+  ignoreGlucose = "Yes",
+  dimension = "1D",
+  ppmNames = "borders",
+  sugarArea = c(5.4, 3.35, 72, 100),
+  minimumFeatures = 40,
+  showHist = FALSE
+)
+}
+\arguments{
+\item{NMRdata}{A matrix containing NMR data. Columns=frequencies,rows=samples}
+
+\item{ignoreGlucose}{A character value ("Yes" or "No")}
+
+\item{dimension}{A character value ("1D" or "2D")}
+
+\item{ppmNames}{A character value ("borders" or "mean")}
+
+\item{sugarArea}{A numeric vector defining the the borders of glucose area}
+
+\item{minimumFeatures}{A numeric value defining minimum feature number used}
+
+\item{showHist}{A logical value, default is FALSE}
 }
 \value{
-{None}
+NMRdata An invisible matrix containing scaled NMR data.
 }
 \description{
 This function performs PQN scaling. To further exclude unreliable noise, only
 the most intense signals are used. For 1H and 1H-13C HSQC spectra, most of
-the sugar regions are excluded to avoid a dominating effect of the multiple
-sugar signals.
+the sugar regions can be excluded to avoid a dominating effect of the
+multiple glucose signals.
 }
 \examples{
 mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
