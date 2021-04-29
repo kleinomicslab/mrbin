@@ -8,6 +8,12 @@ positive values. All used parameters are stored in a readable text file and can
 be restored from that file to enable exact reproduction of the data at a later 
 time.
 
+## Citation
+If you are using mrbin in a publication, please cite the following manuscript:
+Klein, M.S. (2021): Affine Transformation of Negative Values for NMR Metabolomics 
+Using the mrbin R Package. J. Proteome Res. 20(2):1397-1404, 
+DOI: 10.1021/acs.jproteome.0c00684
+
 ## Getting Started
 
 The main functions of this package are controlled via the mrbin() function. Most 
@@ -203,7 +209,7 @@ the newest version of xquartz from https://www.xquartz.org.
 
 ## Authors
 
-* **Matthias S. Klein** - [KleinOmicsLab](https://github.com/kleinomicslab)
+* **Matthias S. Klein** - [KleinOmicsLab](https://github.com/kleinomicslab/)
 
 
 ## License

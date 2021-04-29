@@ -1,6 +1,6 @@
 Package: mrbin
 Title: Magnetic Resonance Binning, Integration and Normalization
-Version: 1.4.3
+Version: 1.5.2
 Authors@R: 
     person(given = "Matthias",
            family = "Klein",
@@ -8,17 +8,17 @@ Authors@R:
            email = "klein.663@osu.edu",
            comment = c(ORCID = "0000-0001-7455-5381"))
 Description: Nuclear Magnetic Resonance is widely used in Life Science
-    research. The package (<http://www.kleinomicslab.com/software/>) converts 1D or 2D data into a matrix of values
-    suitable for further data analysis and performs basic processing steps in a
-    reproducible way. Negative values, a common issue in such data, are replaced
-    by positive values. All used parameters are stored in a readable text file
-    and can be restored from that file to enable exact reproduction of the data
-    at a later time.
+    research. The package (<doi:10.1021/acs.jproteome.0c00684>) converts 1D 
+    or 2D data into a matrix of values suitable for further data analysis and
+    performs basic processing steps in a reproducible way. Negative values, a
+    common issue in such data, are replaced by positive values. All used
+    parameters are stored in a readable text file and can be restored from that
+    file to enable exact reproduction of the data at a later time.
 Imports: grDevices, graphics, stats, utils
 Depends: R (>= 2.10)
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
-RoxygenNote: 7.0.2.9000
-Suggests: 
+RoxygenNote: 7.1.1
+Suggests: parallel
 VignetteBuilder: utils
+URL: http://www.kleinomicslab.com/software/, https://github.com/kleinomicslab/mrbin

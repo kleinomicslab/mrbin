@@ -1,5 +1,34 @@
 # mrbin News
 
+## Version 1.5.2
+
+* Speed improvements for 1D spectra
+* New quality check function checkBaseline: For severe baseline distortions in noise region, a warning is displayed
+* New quality check in function binMultiNMR2: For severe baseline distortions in the reference region, the reference peak integral might be negative. In this case,a warning is displayed and the absolute value is used instead
+* New quality check function binMultiNMR2: If reference scaling is used and the reference signal intensity is unexpectedly low, a warning is displayed
+* If quality check warnings are generated during a run, the warnings are saved in the parameter text file for later viewing
+
+
+## Version 1.5.1
+
+* Small improvement in spectrum browsing. Experiments with no title file are no longer displayed during browsing, as these are usually uninformative pulse calibration data
+* Added a message recommending installing xquartz on Apple computers
+* Citation information was added
+
+
+## Version 1.5.0
+
+* An error in reference scaling was fixed, this prevented reference scaling in some cases
+* PQN scaling is now performed after fixing negative values by atnv() (previously: before atnv). This might slightly change PQN scaling results in rare cases
+* Speed improvements by adding optional support for parallel computing using the parallel package
+
+
+## Version 1.4.4
+
+* Function PQNScaling now works with externally provided data
+* Minor improvements for user friendliness
+
+
 ## Version 1.4.3
 
 * Noise levels per bin are no longer saved in the .txt file to keep this file clear and tidy. Instead, raw noise levels and median noise levels (adjusted for bin size) are now saved in the output .txt file
