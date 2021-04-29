@@ -1,0 +1,14 @@
+citHeader("To cite mrbin in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "Affine Transformation of Negative Values for NMR Metabolomics Using the mrbin R Package",
+  author   = "Matthias S. Klein",
+  journal  = "J. Proteome Res.",
+  year     = "2021",
+  volume   = "20",
+  number   = "2",
+  pages    = "1397-1404",
+  url      = "https://doi.org/10.1021/acs.jproteome.0c00684",
+  textVersion = "Klein, M.S. (2021): Affine Transformation of Negative Values for NMR Metabolomics Using the mrbin R Package. J. Proteome Res. 20(2):1397-1404, DOI: 10.1021/acs.jproteome.0c00684"
+)
