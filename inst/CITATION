@@ -1,7 +1,7 @@
 citHeader("To cite mrbin in publications use:")
 
-citEntry(
-  entry    = "Article",
+bibentry(
+  bibtype    = "Article",
   title    = "Affine Transformation of Negative Values for NMR Metabolomics Using the mrbin R Package",
   author   = "Matthias S. Klein",
   journal  = "J. Proteome Res.",
