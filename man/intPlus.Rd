@@ -4,7 +4,12 @@
 \alias{intPlus}
 \title{A function for changing plotNMR plots.}
 \usage{
-intPlus()
+intPlus(dimension = "1D", refreshPlot = TRUE)
+}
+\arguments{
+\item{dimension}{Dimension to use. Defaults to "1D"}
+
+\item{refreshPlot}{Refresh plot automatically. Defaults to TRUE}
 }
 \value{
 {None}
@@ -14,7 +19,7 @@ This function increases the intensity of the current NMR spectrum plot.
 }
 \examples{
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",noiseRemoval="No",trimZeros="No",
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=FALSE,
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
 plotNMR()

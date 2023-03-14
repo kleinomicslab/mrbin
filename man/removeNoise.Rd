@@ -4,10 +4,17 @@
 \alias{removeNoise}
 \title{A function for removing bins below noise level.}
 \usage{
-removeNoise()
+removeNoise(mrbinResults, verbose = TRUE, errorsAsWarnings = FALSE)
+}
+\arguments{
+\item{mrbinResults}{An mrbin object}
+
+\item{verbose}{Should a summary be printed?}
+
+\item{errorsAsWarnings}{If TRUE, errors will be turned into warnings. Should be used with care, as errors indicate undocumented changes to the data.}
 }
 \value{
-{None}
+An invisible mrbin object
 }
 \description{
 This function checks for each bin (column) whether its level is below the
@@ -15,11 +22,11 @@ individual noise level times the signal-to-noise ratio. If less than the
 defined threshold level are above noise*SNR, the whole bin is removed.
 }
 \examples{
-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-                    binwidth1D=0.05,noiseRemoval="No",PQNScaling="No",
+mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,noiseRemoval="No",PQNScaling="No",tryParallel=FALSE,
                     fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                                 system.file("extdata/2/10/pdata/10",package="mrbin"),
                                 system.file("extdata/3/10/pdata/10",package="mrbin"))))
-removeNoise()
+mrbinResults<-removeNoise(mrbinResults)
 }

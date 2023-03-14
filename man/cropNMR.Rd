@@ -4,10 +4,7 @@
 \alias{cropNMR}
 \title{A function for cropping HSQC spectra.}
 \usage{
-cropNMR(plot = FALSE)
-}
-\arguments{
-\item{plot}{Should a plot of the bins before and after cropping be shown? Defaults to FALSE.}
+cropNMR()
 }
 \value{
 {None}
@@ -17,9 +14,10 @@ This function crops HSQC spectra to the region along the diagonal to remove
 uninformative signals. Will work only for 1H-13C HSQC spectra.
 }
 \examples{
+resetEnv()
 Example<-mrbin(silent=TRUE,
          parameters=list(dimension="2D",binwidth2D=1,binheight=4,cropHSQC="No",PCA="No",
-         PQNScaling="No",noiseRemoval="No",removeSolvent="No",verbose=TRUE,
+         PQNScaling="No",noiseRemoval="No",removeSolvent="No",verbose=TRUE,tryParallel=FALSE,
          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
 cropNMR()
 }

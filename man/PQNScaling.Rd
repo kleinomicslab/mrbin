@@ -5,17 +5,19 @@
 \title{A function for PQN scaling.}
 \usage{
 PQNScaling(
-  NMRdata = NULL,
+  NMRdata,
   ignoreGlucose = "Yes",
   dimension = "1D",
   ppmNames = "borders",
   sugarArea = c(5.4, 3.35, 72, 100),
   minimumFeatures = 40,
-  showHist = FALSE
+  showHist = FALSE,
+  verbose = TRUE,
+  errorsAsWarnings = FALSE
 )
 }
 \arguments{
-\item{NMRdata}{A matrix containing NMR data. Columns=frequencies,rows=samples}
+\item{NMRdata}{A matrix containing NMR data or an mrbin object. Columns=frequencies,rows=samples}
 
 \item{ignoreGlucose}{A character value ("Yes" or "No")}
 
@@ -28,9 +30,13 @@ PQNScaling(
 \item{minimumFeatures}{A numeric value defining minimum feature number used}
 
 \item{showHist}{A logical value, default is FALSE}
+
+\item{verbose}{Should a summary be printed?}
+
+\item{errorsAsWarnings}{If TRUE, errors will be turned into warnings. Should be used with care, as errors indicate undocumented changes to the data.}
 }
 \value{
-NMRdata An invisible matrix containing scaled NMR data.
+An invisible matrix or mrbin object containing scaled NMR data.
 }
 \description{
 This function performs PQN scaling. To further exclude unreliable noise, only
@@ -39,10 +45,10 @@ the sugar regions can be excluded to avoid a dominating effect of the
 multiple glucose signals.
 }
 \examples{
-mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-                    binwidth1D=0.05,PQNScaling="No",PCA="No",
+mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=FALSE,logTrafo="No",
                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                                 system.file("extdata/2/10/pdata/10",package="mrbin"),
                                 system.file("extdata/3/10/pdata/10",package="mrbin"))))
-PQNScaling()
+mrbinResults<-PQNScaling(mrbinResults)
 }

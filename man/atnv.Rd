@@ -4,15 +4,19 @@
 \alias{atnv}
 \title{A function replacing negative values.}
 \usage{
-atnv(NMRdata = NULL, noiseLevels = NULL)
+atnv(NMRdata, noiseLevels = NULL, verbose = TRUE, errorsAsWarnings = FALSE)
 }
 \arguments{
-\item{NMRdata}{A matrix containing NMR data. Columns=frequencies,rows=samples}
+\item{NMRdata}{A matrix or mrbin object containing NMR data. For matrix: columns=frequencies,rows=samples}
 
-\item{noiseLevels}{A vector}
+\item{noiseLevels}{A vector (can be omitted if NMRdata is an mrbin object)}
+
+\item{verbose}{Should a summary be displayed if NMRdata is an mrbin object}
+
+\item{errorsAsWarnings}{If TRUE, errors will be turned into warnings. Should be used with care, as errors indicate undocumented changes to the data.}
 }
 \value{
-NMRdata An invisible matrix containing NMR data without negative values.
+An invisible matrix or mrbin object containing NMR data without negative values.
 }
 \description{
 This function replaces (column-wise) negative values by a small positive
@@ -25,11 +29,9 @@ case it is smaller. If no noise data is available, the 1% percentile of all
 positive values in the data set is used as an estimate.
 It is recommended to us this function AFTER noise removal and other data
 clean-up methods, as it may alter (reduce) the noise level.
-If no NMR data and noise levels are provided as arguments, the function will
-use NMR data and noise levels from the global variables mrbin.env$bins and
-mrbin.env$mrbinTMP.
 }
 \examples{
+ resetEnv()
  Example<-mrbin(silent=TRUE,
                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.005,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,7.5,10,156),
@@ -39,6 +41,6 @@ mrbin.env$mrbinTMP.
                               system.file("extdata/3/10/pdata/10",package="mrbin"))
                    ))
  sum(Example$bins<=0)
- exampleNMRpositive<-atnv(NMRdata=Example$bins, noiseLevels=Example$parameters$noise_level)
+ exampleNMRpositive<-atnv(NMRdata=Example$bins, noiseLevels=Example$parameters$noise_level_adjusted)
  sum(exampleNMRpositive<=0)
 }

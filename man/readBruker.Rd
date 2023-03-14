@@ -8,7 +8,8 @@ readBruker(
   folder = NULL,
   dimension = NULL,
   onlyTitles = FALSE,
-  useAsNames = "Spectrum titles"
+  useAsNames = "Spectrum titles",
+  checkFiles = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ readBruker(
 \item{onlyTitles}{Read only spectrum titles, but no data. Defaults to FALSE}
 
 \item{useAsNames}{How should sample names be generated}
+
+\item{checkFiles}{Only check if the folder exists or contains NMR data. Defaults to FALSE}
 }
 \value{
 An (invisible) list containing spectral data and the spectrum name

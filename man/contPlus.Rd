@@ -4,7 +4,10 @@
 \alias{contPlus}
 \title{A function for changing plotNMR plots.}
 \usage{
-contPlus()
+contPlus(refreshPlot = TRUE)
+}
+\arguments{
+\item{refreshPlot}{Refresh plot automatically. Defaults to TRUE}
 }
 \value{
 {None}
@@ -14,7 +17,8 @@ This function increases the minimum contour level of the current 2D NMR
 spectrum plot.
 }
 \examples{
-readBruker(folder=system.file("extdata/1/12/pdata/10",package="mrbin"),dimension="2D")
+resetEnv()
+addToPlot(folder=system.file("extdata/1/12/pdata/10",package="mrbin"),dimension="2D")
 plotNMR()
 contPlus()
 }

@@ -10,7 +10,7 @@ printParameters()
 {None}
 }
 \description{
-This function reads parameters from the global variable mrbin.env$mrbinparam and
+This function reads parameters from the global variable mrbin.env$mrbin$parameters and
 prints the required R code for creating a data set to the screen.
 }
 \examples{

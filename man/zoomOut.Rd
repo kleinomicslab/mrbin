@@ -4,7 +4,14 @@
 \alias{zoomOut}
 \title{A function for changing plotNMR plots.}
 \usage{
-zoomOut()
+zoomOut(refreshPlot = TRUE, x = TRUE, y = TRUE)
+}
+\arguments{
+\item{refreshPlot}{Refresh plot automatically. Defaults to TRUE}
+
+\item{x}{Change x axis? Defaults to TRUE}
+
+\item{y}{Change y axis? Defaults to TRUE}
 }
 \value{
 {None}
@@ -14,7 +21,7 @@ This function zooms out from the plot region of the current NMR plot.
 }
 \examples{
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",noiseRemoval="No",trimZeros="No",
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=FALSE,
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
 plotNMR()

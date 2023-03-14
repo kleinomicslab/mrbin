@@ -4,10 +4,12 @@
 \alias{setParam}
 \title{A function setting parameters and checking for consistency.}
 \usage{
-setParam(parameters = NULL)
+setParam(parameters = NULL, metadata = NULL)
 }
 \arguments{
 \item{parameters}{List of parameters to be set}
+
+\item{metadata}{List of metadata to be set}
 }
 \value{
 {None}

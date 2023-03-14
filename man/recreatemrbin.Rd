@@ -15,8 +15,7 @@ recreatemrbin(filename = NULL)
 \description{
 This function reads parameters from a text file that was created during a
 previous run or mrbin(). After reading, the data can be recreated using
-mrbin(). File names in mrbin$param might need to be updated.
-using recreatemrbin().
+mrbin(). File names in $parameters might need to be updated.
 }
 \examples{
 # Insert full folder path and file name

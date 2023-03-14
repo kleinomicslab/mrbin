@@ -4,7 +4,7 @@
 \alias{zoom}
 \title{A function for changing plotNMR plots.}
 \usage{
-zoom(left = NULL, right = NULL, top = NULL, bottom = NULL)
+zoom(left = NULL, right = NULL, top = NULL, bottom = NULL, refreshPlot = TRUE)
 }
 \arguments{
 \item{left}{New left boundary}
@@ -14,6 +14,8 @@ zoom(left = NULL, right = NULL, top = NULL, bottom = NULL)
 \item{top}{New top boundary}
 
 \item{bottom}{New bottom boundary}
+
+\item{refreshPlot}{Refresh plot automatically. Defaults to TRUE}
 }
 \value{
 {None}
@@ -24,7 +26,7 @@ no arguments: zoom(). In this case the user will be asked for manual input.
 }
 \examples{
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",noiseRemoval="No",trimZeros="No",
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=FALSE,
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
 plotNMR()

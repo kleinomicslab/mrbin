@@ -4,7 +4,10 @@
 \alias{contMin}
 \title{A function for changing plotNMR plots.}
 \usage{
-contMin()
+contMin(refreshPlot = TRUE)
+}
+\arguments{
+\item{refreshPlot}{Refresh plot automatically. Defaults to TRUE}
 }
 \value{
 {None}
@@ -14,9 +17,10 @@ This function decreases the minimum contour level of the current 2D NMR
 spectrum plot.
 }
 \examples{
+resetEnv()
 mrbin(silent=TRUE,parameters=list(dimension="2D",binwidth2D=0.5,
          binheight=3,PQNScaling="No",referenceScaling="No",binRegion=c(4,3,60,65),
-         noiseRemoval="No",trimZeros="No",cropHSQC="No",
+         noiseRemoval="No",trimZeros="No",cropHSQC="No",tryParallel=FALSE,
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,saveFiles="No",
          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
 plotNMR()

@@ -4,18 +4,26 @@
 \alias{logTrafo}
 \title{A function for log transforming data.}
 \usage{
-logTrafo()
+logTrafo(mrbinResults, verbose = TRUE, errorsAsWarnings = FALSE)
+}
+\arguments{
+\item{mrbinResults}{An mrbin object}
+
+\item{verbose}{Should a summary be printed?}
+
+\item{errorsAsWarnings}{If TRUE, errors will be turned into warnings. Should be used with care, as errors indicate undocumented changes to the data.}
 }
 \value{
-{None}
+An invisible mrbin object
 }
 \description{
-This function simply log transforms. Will not work with negative data.
+This function performs logarithm transformation. Will not work with negative data.
 }
 \examples{
-mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
-                    binwidth1D=0.05,signal_to_noise1D=50, verbose=TRUE, PCA="No",
+resetEnv()
+mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
+                    binwidth1D=0.05,signal_to_noise1D=50,verbose=TRUE,PCA="No",tryParallel=FALSE,
                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                                 system.file("extdata/2/10/pdata/10",package="mrbin"))))
-logTrafo()
+mrbinResults<-logTrafo(mrbinResults)
 }

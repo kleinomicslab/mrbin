@@ -4,7 +4,7 @@
 \alias{mrbin}
 \title{A function setting the parameters and performing binning and data processing}
 \usage{
-mrbin(silent = FALSE, setDefault = FALSE, parameters = NULL)
+mrbin(silent = FALSE, setDefault = FALSE, parameters = NULL, metadata = NULL)
 }
 \arguments{
 \item{silent}{If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.}
@@ -12,9 +12,11 @@ mrbin(silent = FALSE, setDefault = FALSE, parameters = NULL)
 \item{setDefault}{If TRUE, all current parameters will be replaced by the default parameters (before loading any provided parameters sets). Defaults to FALSE.}
 
 \item{parameters}{Optional: A list of parameters, see examples for details. If omitted, the user will be asked through a series of question to set the parameters.}
+
+\item{metadata}{Optional: A list of metadata. If omitted, the user can add metadata after generating bin data.}
 }
 \value{
-An invisible list containing bins (data after processing), parameters, and factors
+An invisible object of type "mrbin" containing bins (data after processing), parameters, and factors
 }
 \description{
 This function guides the user through the set-up of parameters, starts binning
@@ -24,10 +26,12 @@ is requested and binning and data processing are performed silently.
 }
 \examples{
 # Set parameters in command line.
-mrbinExample<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-                binwidth1D=0.05,signal_to_noise1D=100,
-                NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                            system.file("extdata/2/10/pdata/10",package="mrbin"),
-                            system.file("extdata/3/10/pdata/10",package="mrbin")),
-                Factors=factor(c("Group A","Group A","Group B"))))
+mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(
+                dimension="1D",binwidth1D=0.01,tryParallel=FALSE,
+                signal_to_noise1D=25,noiseThreshold=0.75,
+                NMRfolders=c(
+                system.file("extdata/1/10/pdata/10",package="mrbin"),
+                system.file("extdata/2/10/pdata/10",package="mrbin"),
+                system.file("extdata/3/10/pdata/10",package="mrbin"))
+                ))
 }

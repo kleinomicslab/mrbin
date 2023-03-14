@@ -4,13 +4,22 @@
 \alias{mrbinrun}
 \title{A function performing all data read and processing steps.}
 \usage{
-mrbinrun()
+mrbinrun(createbins = TRUE, process = TRUE, mrbinResults = NULL, silent = TRUE)
+}
+\arguments{
+\item{createbins}{If TRUE, new bin data is generated}
+
+\item{process}{If TRUE, bin data is processed, e.g. by noise removal, atnv, etc.}
+
+\item{mrbinResults}{An mrbin object. Needs to be provided only if createbins is FALSE}
+
+\item{silent}{If set to FALSE, no new time calculation is performed}
 }
 \value{
-{None}
+An invisible mrbin object
 }
 \description{
-This function reads parameters from the global variable mrbin.env$mrbinparam and
+This function reads parameters from the global variable mrbin.env$mrbin$parameters and
 performs the following operations:
 Reading NMR files, creating bins, removing solvent area, removing additional
 user-defined areas, summing up bins that contain unstable peaks such as
@@ -20,9 +29,11 @@ PCA plot. Parameters are then saved in a text file. These can be recreated
 using recreatemrbin().
 }
 \examples{
-setParam(parameters=list(dimension="2D",binwidth2D=0.05,binheight=3,PQNScaling="No",
-         fixNegatives="No",logTrafo="No",signal_to_noise2D=20,
-         NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                      system.file("extdata/2/12/pdata/10",package="mrbin"))))
+resetEnv()
+setParam(parameters=list(dimension="2D",binwidth2D=0.1,binheight=5,
+   binRegion=c(8,1,15,140),PQNScaling="No",tryParallel=FALSE,
+   fixNegatives="No",logTrafo="No",signal_to_noise2D=10,solventRegion=c(5.5,4.2),
+   NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
+                system.file("extdata/2/12/pdata/10",package="mrbin"))))
 mrbinrun()
 }
