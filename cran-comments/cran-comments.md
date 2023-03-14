@@ -1,5 +1,105 @@
 ## Update
 
+This is an update (version 1.7.3). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 4.2.2
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.7.2). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.7.1). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.7.0). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.6.5). The maintainer email address has been updated in this version. Other changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.6.4). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.6.3). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.6.2). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.6.1). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.6.0). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 3.5.1
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
 This is an update (version 1.5.2). Changes to this version are minor and can be found in the NEWS.md file.
 
 ## Test environments
