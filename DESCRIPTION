@@ -1,24 +1,25 @@
 Package: mrbin
-Title: Magnetic Resonance Binning, Integration and Normalization
-Version: 1.5.2
+Title: Metabolomics Data Analysis Functions
+Version: 1.7.3
 Authors@R: 
     person(given = "Matthias",
            family = "Klein",
            role = c("aut", "cre"),
-           email = "klein.663@osu.edu",
+           email = "matthias.s.klein@gmx.net",
            comment = c(ORCID = "0000-0001-7455-5381"))
-Description: Nuclear Magnetic Resonance is widely used in Life Science
-    research. The package (<doi:10.1021/acs.jproteome.0c00684>) converts 1D 
-    or 2D data into a matrix of values suitable for further data analysis and
+Description: A collection of functions for processing and analyzing metabolite data. 
+    The namesake function mrbin() converts 1D 
+    or 2D Nuclear Magnetic Resonance data into a matrix of values suitable for further data analysis and
     performs basic processing steps in a reproducible way. Negative values, a
-    common issue in such data, are replaced by positive values. All used
+    common issue in such data, can be replaced by positive values (<doi:10.1021/acs.jproteome.0c00684>). All used
     parameters are stored in a readable text file and can be restored from that
-    file to enable exact reproduction of the data at a later time.
-Imports: grDevices, graphics, stats, utils
+    file to enable exact reproduction of the data at a later time. The function fia() ranks features according
+    to their impact on classifier models, especially artificial neural network models.
+Imports: grDevices, graphics, stats, utils, methods
 Depends: R (>= 2.10)
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.1.1
-Suggests: parallel
+RoxygenNote: 7.2.3
+Suggests: parallel, keras
 VignetteBuilder: utils
 URL: http://www.kleinomicslab.com/software/, https://github.com/kleinomicslab/mrbin

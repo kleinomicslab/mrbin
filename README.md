@@ -1,27 +1,26 @@
-# mrbin - Magnetic Resonance Binning, Integration and Normalization
+# mrbin - Metabolomics Data Analysis Functions
 
-Nuclear Magnetic Resonance (NMR) is widely used for metabolomics research. This 
-package uses spectral binning to convert 1D or 2D NMR data into a matrix of values 
-suitable for further data analysis and performs basic processing steps in a 
-reproducible way. Negative values, a common issue in NMR data, are replaced by 
-positive values. All used parameters are stored in a readable text file and can 
-be restored from that file to enable exact reproduction of the data at a later 
+This package is a collection of functions for processing and analyzing
+metabolomics data.
+
+The namesake function mrbin() uses spectral binning to convert 1D or 2D Nuclear
+Magnetic Resonance (NMR) data into a matrix of values
+suitable for further data analysis and performs basic processing steps in a
+reproducible way. Negative values, a common issue in NMR data, are replaced by
+positive values. All used parameters are stored in a readable text file and can
+be restored from that file to enable exact reproduction of the data at a later
 time.
 
-## Citation
-If you are using mrbin in a publication, please cite the following manuscript:
-Klein, M.S. (2021): Affine Transformation of Negative Values for NMR Metabolomics 
-Using the mrbin R Package. J. Proteome Res. 20(2):1397-1404, 
-DOI: 10.1021/acs.jproteome.0c00684
+The atnv algorithm for replacing negative values in NMR data sets can be
+employed using atnv().
 
-## Getting Started
+NMR plotting functions are found in mrplot().
 
-The main functions of this package are controlled via the mrbin() function. Most 
-other functions in the package will not usually be ever called by the user, but 
-serve internal purposes. Results returned include the final bin list and a set 
-of used parameters.
+Artificial Neural Network features can be analyzed using Feature Impact
+Assessment (FIA) using the function fia().
 
-### Installation
+
+## Installation
 
 To install  mrbin, please install the latest version of R first. Then install 
 the package as follows:
@@ -33,24 +32,14 @@ install.packages("mrbin")
 library("mrbin")
 ```
 
-You can get more help in the vignette file:
+You can find more details and examples in the vignette file:
 
 ```
 vignette("mrbin")
 ```
 
-#### Development Version
 
-To install the latest development version of mrbin from Github, use this code:
-
-```
-library(devtools)
-install_github("kleinomicslab/mrbin")
-```
-
-To be able to run devtools, you may need to install additional software.
-
-### Running
+## mrbin: Magnetic Resonance Binning, Integration and Normalization
 
 To use this package, you will need your NMR data in the Bruker file format 
 accessible on your computer. Please make sure your data is Fourier transformed, 
@@ -79,68 +68,26 @@ mrbinResults<-mrbin()
 
 This will start a series of questions that will guide you through the parameters to be used. 
 
-The sequence of data processing is as follows:
-
-* Gathering all parameters from user
-* Creating a set with coordinates of each bin 
-* Removing solvent region
-* Removing additional regions
-* Cropping of HSQC spectra to the region along the diagonal
-* Summing or merging regions containing peaks with unstable positions such as citric acid
-* Reading Bruker NMR data
-* Scaling to reference region
-* Binning 
-* Removal of bins containing mostly noise
-* PQN transformation
-* Replacement of negative values
-* Log transform
-* Plotting a quality control plot, including a PCA plot
-* Saving bins, parameters and the plot to the hard drive
-
-mrbin() also returns an (invisible) list containing three variables: 
-
+mrbin() returns an (invisible) mrbin object containing the following variables: 
 * bins: A matrix containing bin data for all samples, Depending on the option you chose, the data will be cleaned up and scaled.
 * parameters: A list containing all parameters used to create the bin matrix.
-* factors: A vector containing group names for all samples.
+* metadata: A list containing metadata, if provided.
+* transformations: A character vector containing information on the data transformation and scaling that has been performed, for example reference scaling, PQN, atnv, log transform, etc.
+* changeLog: A data.frame containing information on documented changes that were made to the data, including time stamps.
+* changeValues: A list containing control values, enabling verifying changes by checkmrbin(mrbinResults)
 
-Up to three files may be written to the chosen directory:
-* A .txt file containing all parameters. This file can be reloaded to R using recreatemrbin("filename"). This will enable reusing parameters used in a previous run and can help increase reproducibility.
-* A .csv file containing the bin data for use in other software tools.
-* A .pdf file containing quality control plots, including a PCA plot 
-
-### Recreating Data and Parameters
-In order to create reproducible results, mrbin will save the used parameters to a text file. Please keep this file. You may want to share this file in a data repository when publishing your findings.
-
-While it is fine to view the parameter text file in a text editor, please do not 
-change its contents, as this may break its formatting.
-
-
-In order to recreate a previous data set, or to reload previously used parameters, 
-use:
-
-```
-mrbin()
-```
-
-and select ""Reload from file" when asked "Set parameters or use existing 
-parameters?". This will restore all parameters that were previously used. If the 
-file was created using an older version of mrbin, this may cause inconsistencies. 
-Missing parameters will be added using standard parameters. Ideally, download the 
-older mrbin version at kleinomicslab.com and use the old version to recreated the 
-data in an exact way.
-
-Please be aware that bins will have to be recalculated, so the original NMR 
-spectra will have to be present to do this.
+Several files may be written to the chosen directory:
+* A .txt file containing all parameters and potential warning messages from the mrbin run. This file can be reloaded to R using recreatemrbin("filename"). This will enable reusing parameters used in a previous run and can help increase reproducibility.
+* A .Rdata file containing the generated mrbin data object.
+* A .pdf file containing quality control plots of the raw binned data
+* A .pdf file containing quality control plots of the processed binned data
+* A .pdf file containing preview plots of the chosen signal-to-noise levels of selected spectra
 
 ### Submitting Parameters at the Command Line
 Parameters can be submitted at the command line, using the following syntax:
 
 ```
-mrbin(silent=TRUE,
-     setDefault=FALSE,
-     parameters=list(verbose=TRUE,
-             dimension="1D",
-             binMethod="Rectangular bins",
+mrbin(parameters=list(dimension="1D",
              binwidth1D=.01,
              referenceScaling="Yes",
              removeSolvent="Yes",
@@ -159,47 +106,41 @@ mrbin(silent=TRUE,
 
 This will set up all parameters and run all steps without asking for user input.
 
-When setting silent=FALSE, the user will be guided through the user input 
-questionnaire to make adjustments to the parameters.
+## atnv: Affine Transformation of Negative Values
 
-### Affine Transformation of Negative Values
+Please find details on the atnv algorithm in vignette("mrbin").
 
-The function atnv replaces (column-wise) negative values by a small positive
-number. The number is calculated as an affine transformation to the range of
-the lowest positive number to 0,01*the lowest positive number (of this
-column). Ranks stay unchanged. Positive numbers are not altered.
-If sample-wise noise levels are available, the median noise level of samples
-with negative values is calculated and replaces the lowest positive number in
-case it is smaller. If no noise data is available, the 1% percentile of all
-positive values in the data set is used as an estimate.
-It is recommended to use this function AFTER noise removal and other data
-clean-up methods, as it may alter (reduce) the noise level of the binned data.
-If no NMR data and noise levels are provided as arguments, the function will
-use NMR data and noise levels from the global variables mrbin.env$bins and
-mrbin.env$mrbinTMP.
 
-To use own data:
-```
-atnv(NMRdataMatrix,noiseLevelVector)
-```
-To use current mrbin data, use the following syntax. This requires data loaded 
-using mrbin(). This is usually not necessary as it is included in the mrbin work 
-flow.
-```
-atnv()
-```
+## fia: Feature Impact Assessment
+
+Please find details on the fia algorithm in vignette("mrbin").
+
 
 ## Known Issues
 
+
+### Firewall Warnings
+If parallel computing is turned on and the package parallel is installed,
+mrbin will try to use the socket approach for computing. This requires
+establishing network connections to the local cluster, which might
+trigger the firewall. It is safe to unblock these connections.
+
 ### Pop-Up Windows
-mrbin is set up to ask for user input through pop-up windows. This requires 
-graphics support, otherwise the use input will be asked through command line 
+mrbin is set up to ask for user input through pop-up windows. This requires
+graphics support, otherwise the user input will be asked through command line
 menus, which is less user friendly but still offers the full functionality.
 
 ### Apple/Mac Computers And RStudio
-In some cases, running mrbin from within RStudio on Apple computers will not 
-generate pop-up windows. To enable pop-up windows, it might be helpful to install 
+In some cases, running mrbin from within RStudio on Apple computers will not
+generate pop-up windows. To enable pop-up windows, it might be helpful to install
 the newest version of xquartz from https://www.xquartz.org.
+
+### Spectra are Missing
+If a Bruker spectrum is not shown during browsing, please make sure a file
+with filename title is present in the PROCNO folder of that spectrum. You
+can create a title file by opening the spectrum in Bruker Topspin, selecting
+the Title tab, entering a title and clicking the disk symbol for saving.
+
 
 ## Built With
 
@@ -210,6 +151,13 @@ the newest version of xquartz from https://www.xquartz.org.
 ## Authors
 
 * **Matthias S. Klein** - [KleinOmicsLab](https://github.com/kleinomicslab/)
+
+
+## Citation
+If you are using mrbin in a publication, please cite the following manuscript:
+Klein, M.S. (2021): Affine Transformation of Negative Values for NMR Metabolomics 
+Using the mrbin R Package. J. Proteome Res. 20(2):1397-1404, 
+DOI: 10.1021/acs.jproteome.0c00684
 
 
 ## License

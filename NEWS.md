@@ -1,5 +1,94 @@
 # mrbin News
 
+## Version 1.7.3
+
+* mrbin: Warnings are now displayed during binning
+* mrbin: New warnings if spectra differ in field strength, pulse program, solvent, or number of scans. This could cause inconsistent data
+* mrbin: Some acquisition parameters such as p1 pulse ength are now saved in parameters$AcquPars
+* mrbin: Small potential bugs fixed in spectrum selection step
+* mrbin: Bugfix: In rare cases the preview of features after noise removal was incorrect, this is now fixed
+* fia: Predictions now show less output (using verbose=0 within the predict function)
+* fia: Memory usage improvements. If using package keras, consider using kerasClearMemory=2 for massive memory and speed improvements
+* fia: Parameter innerLoop is now default at 300 (was 100) to increase quality of results. This increases calculation times. 
+
+
+## Version 1.7.2
+
+* In setNoiseLevels() there is now a preview of the number of bins left for noise thresholds between 0.05 and 1
+* Renaming of duplicated spectrum names was improved, this also fixed a rare bug that could cause mrbin to get stuck while binning
+* Previews of all spectra can now be reviewed while running mrbin() to identify quality issues
+* Speed improvements in 2D plots by reducing the number of displayed data points
+* plotResults() will now show a preview of spectral region evens if no spectral data has been loaded before. This is useful when using mrbin objects that have been previously created
+* Small improvements to documentations and vignette
+
+
+## Version 1.7.1
+
+* Bug fix: annotatemrbin() sometimes added extra commas in metabolite annotations, this has been fixed
+* Bug fix: checkmrbin(), in rare cases, erroneously flagged unstated changes to an unchanged mrbin object. This was caused by numeric instabilities and has now been fixed
+* Bug fix: mrbin() did not properly add metadata to the result object, if added at the command line. This is now fixed
+* New functions setDilutionFactors() and dilutionCorrection() for individual dilution correction
+* Variable metaboliteIdentities in metadata was changed to matrix (was data.frame)
+* printParameters() now omits empty (NULL, "", nrow==0) variables, but prints non-empty metadata now
+* New function unitVarianceScaling()
+
+
+## Version 1.7.0
+
+* mrbin: results are now returned as an object of the new class "mrbin", containing bin data, metadata, and change logs. These objects should only be changed using functions from this package. Individual edits can be performed using editmrbin()
+* mrbin: Noise levels are now visually shown for a few spectra to help pick reasonable signal-to-noise levels
+* mrbin: Warnings during binning now cause a pop-up message to give users the chance to review and fix data issues such as phase, reference, and baseline errors
+* mrbin: PCA plots do no longer show group memberships during the data processing phase. To display color-coded groups, add metadata using mrbinResults<-metadatamrbin(mrbinResults) and then use plotPCA(mrbinResults)
+* mrbin: Changes to mrbin objects are now logged in $changeLog to ensure workflow reproducibility. Undocumented changes can be identified using checkmrbin(mrbinResults)
+* mrbin: New functionality to annotate mrbin data with molecule identities was added
+* mrbin: Improvements in memory usage to better handle large data sets. If more than 5000 bins are created, these will not be plotted in the output plot.
+* mrbin: The variable noise_level was moved to parameters list in mrbin environment
+* mrbin: Bug fix: Excluding the sugar area during PQN could not be turned off within mrbin, this is now fixed
+* mrbin: Users will no longer be asked whether to use parallel, previews and hints, these will be always used now unless turned off by manually setting the respective parameters
+* mrbin: Time estimates are now being displayed before and during binning
+
+
+## Version 1.6.5
+
+* New output of fia function: scoresIndividual shows fia score for each tested sample
+* Speed improvements in the fia function
+
+
+
+## Version 1.6.4
+
+* Minor changes in calculations in the fia function. Features of lowest impact now are assigned a (large) FIA score instead of an NA value
+
+
+## Version 1.6.3
+
+* Small bug fixes in the fia function
+* Small bug fixes in the mrplot function
+
+
+## Version 1.6.2
+
+* New function fia for analyzing predictive metabolomics models
+* Small bug fixes in the mrplot function
+
+
+## Version 1.6.1
+
+* Small bug fixes in the mrplot function
+
+
+## Version 1.6.0
+
+* Bin intensities are now pseudo-integrals (mean of data points times range (1D), or times area (2D)). So far, intensities were the mean of data points in the bin range. For simple rectangular bins, results are identical apart from a scaling factor, so most data analysis methods will give identical results. To enforce the old behavior, use mrbin(parameters=list(useMeanIntensityForBins=TRUE))
+* Multiple spectra are now shown in previews to visualize sample-to-sample variability 
+* PCA plots: When using more groups than available symbols (from pch), letter are now used to mark the groups. This also removes the warning messages generated in these cases.
+* Reading spectra without title does no longer create an error in readBruker(), however, such spectra are still not shown in the spectrum browser as they are usually not of interest
+* Before binning, folder list is checked to find missing folders. This is to avoid long calculation that end with a "could not open file" error. This uses the new readBruker() parameter checkFiles.
+* Speed improvements for displaying and saving the final results plot 
+* New plotting function mrplot()
+* RStudio plotting issue solved: Plots are now refreshed so the current plot is displayed timely
+
+
 ## Version 1.5.2
 
 * Speed improvements for 1D spectra
