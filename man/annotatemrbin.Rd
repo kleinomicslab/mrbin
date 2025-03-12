@@ -4,10 +4,36 @@
 \alias{annotatemrbin}
 \title{A function for annotating mrbin objects.}
 \usage{
-annotatemrbin(mrbinObject)
+annotatemrbin(
+  mrbinObject,
+  annotate = TRUE,
+  metaboliteIdentities = NULL,
+  add = FALSE,
+  hideChemicalShift = FALSE,
+  hideTentativeIds = FALSE,
+  confirmationRthreshold = 0.6,
+  confirmationPthreshold = 5e-06,
+  checkBaselineCorrelation = TRUE
+)
 }
 \arguments{
 \item{mrbinObject}{An mrbin object}
+
+\item{annotate}{If FALSE, the mrbin object will not be changed.}
+
+\item{metaboliteIdentities}{A numeric 4-column matrix or the file path for a .csv file containing such a matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names. If provided, this will overwrite any current metaboliteIdentities matrix present in the mrbin object. If missing, data currently attached to the mrbin object (if any) will be used.}
+
+\item{add}{Should the new metabolite list be added to an existing list, or replace the current list?}
+
+\item{hideChemicalShift}{Should the chemical shift (bin borders) of an identified metabolite be removed, leaving only the metabolite id, or should both be shown? Showing both helps in identifying signals of interest, but hiding the chmical shift might make better plots.}
+
+\item{hideTentativeIds}{Should the identities of tentative ids be omitted for clarity?}
+
+\item{confirmationRthreshold}{A threshold to define the r-value cutoff to confirm an annotation}
+
+\item{confirmationPthreshold}{A threshold to define the p-value cutoff to confirm an annotation}
+
+\item{checkBaselineCorrelation}{Should correlation to baseline be compared to confirm an annotation}
 }
 \value{
 An (invisible) mrbin object
@@ -16,20 +42,21 @@ An (invisible) mrbin object
 This function annotates an mrbin object and returns it with updated $annotations vector
 }
 \examples{
- mrbinObject<-mrbin(silent=TRUE,
+ results<-mrbin(silent=TRUE,
                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=FALSE,
-                   NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-                              system.file("extdata/3/10/pdata/10",package="mrbin"))),
-                   metadata=list(metaboliteIdentities=matrix(c(
-                   1.346,1.324,21,23,
-                   3.052,3.043,30.5,33.5,
-                   4.066,4.059,57,59.5
-                   ),ncol=4,byrow=TRUE,dimnames=list(
-                   c("Lactate","Creatinine","Creatinine"),NULL))))
-mrbinObject<-annotatemrbin(mrbinObject)
-mrbinObject$metadata$annotations[125:135]
-plotPCA(mrbinObject,loadings=TRUE)
+                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
+                   NMRfolders=c(system.file("extdata/3/10/pdata/10",package="mrbin"),
+                              system.file("extdata/2/10/pdata/10",package="mrbin"),
+                              system.file("extdata/1/10/pdata/10",package="mrbin"))))
+metaboliteIdentities=matrix(c(1.346,1.324,21,23,
+                              4.12,4.1,70.8578,71.653,
+                              3.052,3.043,30.5,33.5,
+                              4.066,4.059,57,59.5),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine")
+results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
+results$metadata$annotations[125:135]
+plotPCA(results,loadings=TRUE)
 }

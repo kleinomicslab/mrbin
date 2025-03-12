@@ -18,7 +18,7 @@ This function moves right the plot region of the current NMR plot.
 \examples{
 resetEnv()
 mrbin(silent=TRUE,parameters=list(dimension="1D",binwidth1D=.5,
-         noiseRemoval="No",trimZeros="No",tryParallel=FALSE,
+         noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
          PQNScaling="No",saveFiles="No",referenceScaling="No",
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))

@@ -20,7 +20,7 @@ spectrum plot.
 resetEnv()
 mrbin(silent=TRUE,parameters=list(dimension="2D",binwidth2D=0.5,
          binheight=3,PQNScaling="No",referenceScaling="No",binRegion=c(4,3,60,65),
-         noiseRemoval="No",trimZeros="No",cropHSQC="No",tryParallel=FALSE,
+         noiseRemoval="No",trimZeros="No",cropHSQC="No",tryParallel=TRUE,
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,saveFiles="No",
          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
 plotNMR()

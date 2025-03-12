@@ -33,11 +33,12 @@ An invisible prcomp result object
 This function performs PCA, then plots PC1 and PC2.
 }
 \examples{
-mrbinResults<-mrbin(silent=TRUE,setDefault=FALSE,parameters=list(dimension="2D",
+results<-mrbin(silent=TRUE,setDefault=FALSE,parameters=list(dimension="2D",
     binRegion=c(8,1,15,140),binwidth2D=0.1,binheight=4,solventRegion=c(5.5,4.2),
-    PQNScaling="No",noiseRemoval="Yes",trimZeros="Yes",tryParallel=FALSE,
+    PQNScaling="No",noiseRemoval="Yes",trimZeros="Yes",tryParallel=TRUE,
     fixNegatives="No",logTrafo="No",PCA="No",signal_to_noise2D=10,
     NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                 system.file("extdata/2/12/pdata/10",package="mrbin"))))
-plotPCA(mrbinResults)
+                 system.file("extdata/2/12/pdata/10",package="mrbin"),
+                 system.file("extdata/3/12/pdata/10",package="mrbin"))))
+plotPCA(results)
 }

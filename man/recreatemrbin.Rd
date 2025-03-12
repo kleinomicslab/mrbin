@@ -4,10 +4,12 @@
 \alias{recreatemrbin}
 \title{A function recreating parameters from previous runs.}
 \usage{
-recreatemrbin(filename = NULL)
+recreatemrbin(filename = NULL, graphics = TRUE)
 }
 \arguments{
 \item{filename}{File path/name of the mrbin parameter file to be loaded}
+
+\item{graphics}{Controls whether pop-up windows are shown for selections. Defaults to TRUE.}
 }
 \value{
 {None}

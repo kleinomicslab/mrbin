@@ -4,7 +4,13 @@
 \alias{mrbinrun}
 \title{A function performing all data read and processing steps.}
 \usage{
-mrbinrun(createbins = TRUE, process = TRUE, mrbinResults = NULL, silent = TRUE)
+mrbinrun(
+  createbins = TRUE,
+  process = TRUE,
+  mrbinResults = NULL,
+  silent = TRUE,
+  graphics = TRUE
+)
 }
 \arguments{
 \item{createbins}{If TRUE, new bin data is generated}
@@ -14,6 +20,8 @@ mrbinrun(createbins = TRUE, process = TRUE, mrbinResults = NULL, silent = TRUE)
 \item{mrbinResults}{An mrbin object. Needs to be provided only if createbins is FALSE}
 
 \item{silent}{If set to FALSE, no new time calculation is performed}
+
+\item{graphics}{Controls whether pop-up windows are shown for selections. Defaults to TRUE.}
 }
 \value{
 An invisible mrbin object
@@ -31,9 +39,10 @@ using recreatemrbin().
 \examples{
 resetEnv()
 setParam(parameters=list(dimension="2D",binwidth2D=0.1,binheight=5,
-   binRegion=c(8,1,15,140),PQNScaling="No",tryParallel=FALSE,
+   binRegion=c(8,1,15,140),PQNScaling="No",tryParallel=TRUE,useAsNames="Spectrum titles",
    fixNegatives="No",logTrafo="No",signal_to_noise2D=10,solventRegion=c(5.5,4.2),
    NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                system.file("extdata/2/12/pdata/10",package="mrbin"))))
-mrbinrun()
+                system.file("extdata/2/12/pdata/10",package="mrbin"),
+                system.file("extdata/3/12/pdata/10",package="mrbin"))))
+results<-mrbinrun()
 }

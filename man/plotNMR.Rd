@@ -7,7 +7,9 @@
 plotNMR(
   region = NULL,
   rectangleRegions = NULL,
-  rectangleColors = c("green", "orange", "blue", "red", "yellow", "gray", "purple"),
+  rectangleColors = c("darkseagreen3", "orange", "blue", "red", "yellow", "gray",
+    "purple"),
+  density = NULL,
   rectangleFront = FALSE,
   polygonRegion = NULL,
   color = NULL,
@@ -15,19 +17,31 @@ plotNMR(
   showGrid = FALSE,
   manualScale = TRUE,
   plotTitle = "",
+  title = NULL,
+  titleCounter = NULL,
+  hideNegative = FALSE,
   restrictToRange = FALSE,
   currentSpectrumOriginal = NULL,
+  spectrumTMP = NULL,
+  renewSpectrum = TRUE,
+  cex.axis = 0.7,
   perspective = FALSE,
   noise = NULL,
-  dimension = NULL
+  dimension = NULL,
+  plotDelay = 0.1,
+  lwd = 1,
+  background = NULL,
+  ...
 )
 }
 \arguments{
-\item{region}{A vector defining the plot region (left, right, top, bottom)}
+\item{region}{A vector defining the plot region (left, right, top, bottom) or "all" for the whole spectrum}
 
 \item{rectangleRegions}{A 4-column matrix defining areas where to plot rectangles}
 
 \item{rectangleColors}{Define colors for the rectangles}
+
+\item{density}{Shading lines for the rectangles}
 
 \item{rectangleFront}{Plot rectangles in front of spectrum rather than in background (only 2D)}
 
@@ -43,18 +57,38 @@ plotNMR(
 
 \item{plotTitle}{Defines the main title of the plot}
 
+\item{title}{Display the spectrum title in plot, defaults to NULL}
+
+\item{titleCounter}{Count of the spectrum title for positioning in plot, defaults to NULL}
+
+\item{hideNegative}{Should negative parts of the 2D spectrum be hidden? Defaults to FALSE}
+
 \item{restrictToRange}{Restrict plot area to range of available data points. Defaults to FALSE}
 
 \item{currentSpectrumOriginal}{Optional spectral data. If omitted, data from the environment variables is used}
+
+\item{spectrumTMP}{A size-reduced spectrum for quicker plotting. Defaults to NULL}
+
+\item{renewSpectrum}{Should a new size-reduced spectrum for quicker plotting be calculated, or can the old one be used? Default: TRUE}
+
+\item{cex.axis}{Font size of axis tick labels.}
 
 \item{perspective}{If TRUE, a perspective plot will be displayed for 2D data instead of the regular topographic view}
 
 \item{noise}{If provided, a line or plane at this level will be added to the plot to indicate noise level}
 
 \item{dimension}{"1D' or "2D". If not provided, this will be deduced from the data}
+
+\item{plotDelay}{Add a small delay in seconds to force RStudio to update plots}
+
+\item{lwd}{Line width, defaults to 1}
+
+\item{background}{Background color, defaults to NULL (no background fill, usually results in a white background)}
+
+\item{...}{Additional graphical parameters that will be passed to the functions plot, lines, and/or contour}
 }
 \value{
-{None}
+An (invisible) dimension-reduced spectrum, either a matrix or a vector
 }
 \description{
 This function plots the current NMR spectrum. If no parameters are provided, parameters
@@ -65,7 +99,7 @@ For 2D data use additionally: contMin(), contPlus(), up(), down()
 }
 \examples{
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=FALSE,
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
 plotNMR()

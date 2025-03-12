@@ -4,10 +4,12 @@
 \alias{setCurrentSpectrum}
 \title{A function for interactively setting the current spectrum.}
 \usage{
-setCurrentSpectrum(spectrumNumber = NULL)
+setCurrentSpectrum(spectrumNumber = NULL, graphics = TRUE)
 }
 \arguments{
 \item{spectrumNumber}{If provided, this number will be used; defaults to NULL}
+
+\item{graphics}{Controls whether pop-up windows are shown for selections. Defaults to TRUE.}
 }
 \value{
 {None}

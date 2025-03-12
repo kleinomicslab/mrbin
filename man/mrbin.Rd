@@ -4,7 +4,13 @@
 \alias{mrbin}
 \title{A function setting the parameters and performing binning and data processing}
 \usage{
-mrbin(silent = FALSE, setDefault = FALSE, parameters = NULL, metadata = NULL)
+mrbin(
+  silent = FALSE,
+  setDefault = FALSE,
+  parameters = NULL,
+  metadata = NULL,
+  graphics = TRUE
+)
 }
 \arguments{
 \item{silent}{If TRUE, the user will be asked no questions and binning and data analysis will run according to the current parameters. Defaults to FALSE.}
@@ -14,6 +20,8 @@ mrbin(silent = FALSE, setDefault = FALSE, parameters = NULL, metadata = NULL)
 \item{parameters}{Optional: A list of parameters, see examples for details. If omitted, the user will be asked through a series of question to set the parameters.}
 
 \item{metadata}{Optional: A list of metadata. If omitted, the user can add metadata after generating bin data.}
+
+\item{graphics}{Controls whether pop-up windows are shown for selections. Defaults to TRUE.}
 }
 \value{
 An invisible object of type "mrbin" containing bins (data after processing), parameters, and factors
@@ -26,9 +34,9 @@ is requested and binning and data processing are performed silently.
 }
 \examples{
 # Set parameters in command line.
-mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(
-                dimension="1D",binwidth1D=0.01,tryParallel=FALSE,
-                signal_to_noise1D=25,noiseThreshold=0.75,
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(
+                dimension="1D",binwidth1D=0.01,tryParallel=TRUE,
+                signal_to_noise1D=25,noiseThreshold=0.75,useAsNames="Spectrum titles",
                 NMRfolders=c(
                 system.file("extdata/1/10/pdata/10",package="mrbin"),
                 system.file("extdata/2/10/pdata/10",package="mrbin"),

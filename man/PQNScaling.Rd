@@ -45,10 +45,10 @@ the sugar regions can be excluded to avoid a dominating effect of the
 multiple glucose signals.
 }
 \examples{
-mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-                    binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=FALSE,logTrafo="No",
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+                    binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                                 system.file("extdata/2/10/pdata/10",package="mrbin"),
                                 system.file("extdata/3/10/pdata/10",package="mrbin"))))
-mrbinResults<-PQNScaling(mrbinResults)
+results<-PQNScaling(results)
 }

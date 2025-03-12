@@ -8,7 +8,8 @@ setDilutionFactors(
   mrbinObject,
   dilutionFactors = NULL,
   errorsAsWarnings = FALSE,
-  alwaysShowOptionKeep = FALSE
+  alwaysShowOptionKeep = FALSE,
+  graphics = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ setDilutionFactors(
 \item{errorsAsWarnings}{If TRUE, errors will be turned into warnings. Should be used with care, as errors indicate undocumented changes to the data.}
 
 \item{alwaysShowOptionKeep}{If TRUE, you will be asked to keep current values even if they do not match the current dataset.}
+
+\item{graphics}{Controls whether pop-up windows are shown for selections. Defaults to TRUE.}
 }
 \value{
 An invisible mrbin object
@@ -27,13 +30,13 @@ An invisible mrbin object
 This function edits the dilution factors of an mrbin object but does not change the bin data.
 }
 \examples{
- mrbinObject<-mrbin(silent=TRUE,
+ results<-mrbin(silent=TRUE,
                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=FALSE,
+                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
                               system.file("extdata/3/10/pdata/10",package="mrbin"))
                    ))
- mrbinObject<-setDilutionFactors(mrbinObject,dilutionFactors=c(1.5,2))
+ results<-setDilutionFactors(results,dilutionFactors=c(1.5,2))
 }

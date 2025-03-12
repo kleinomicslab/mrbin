@@ -17,10 +17,10 @@ This function removes zero-values bins. These might be created during removal of
 solvent and additional areas, or at the edges of the spectrum.
 }
 \examples{
-mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
                     binwidth1D=0.05,signal_to_noise1D=50, verbose=TRUE, PCA="No",
-                      trimZeros="No",tryParallel=FALSE,
+                      trimZeros="No",tryParallel=TRUE,
                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                                 system.file("extdata/2/10/pdata/10",package="mrbin"))))
-mrbinResults<-trimZeros(mrbinResults)
+results<-trimZeros(results)
 }

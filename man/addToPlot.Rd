@@ -9,7 +9,8 @@ addToPlot(
   dimension = "1D",
   NMRvendor = "Bruker",
   useAsNames = "Folder names",
-  add = TRUE
+  add = TRUE,
+  omitCurrent = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ addToPlot(
 \item{useAsNames}{How should sample names be generated}
 
 \item{add}{Add spectra to existing list, or replace existing spectra. Default is TRUE}
+
+\item{omitCurrent}{Omit the "current spectrum" spot and start filling the additional lists immediately. Default is FALSE}
 }
 \value{
 {none}

@@ -8,7 +8,8 @@ removeSpectrum(
   mrbinResults = NULL,
   spectra = NULL,
   verbose = TRUE,
-  errorsAsWarnings = FALSE
+  errorsAsWarnings = FALSE,
+  graphics = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ removeSpectrum(
 \item{verbose}{Should a summary be printed?}
 
 \item{errorsAsWarnings}{If TRUE, errors will be turned into warnings. Should be used with care, as errors indicate undocumented changes to the data.}
+
+\item{graphics}{Controls whether pop-up windows are shown for selections. Defaults to TRUE.}
 }
 \value{
 An invisible mrbin object (only if an mrbin object was provided)
@@ -28,12 +31,12 @@ This function lets the user pick spectra from a list for removal from data
 analysis.
 }
 \examples{
-mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-         binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=FALSE,logTrafo="No",
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+         binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
          noiseRemoval="No",
          NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                       system.file("extdata/2/10/pdata/10",package="mrbin"),
                       system.file("extdata/3/10/pdata/10",package="mrbin"))))
-mrbinResults<-removeSpectrum(mrbinResults,
+results<-removeSpectrum(results,
  spectra=c(system.file("extdata/2/10/pdata/10",package="mrbin")))
 }

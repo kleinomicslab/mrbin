@@ -8,7 +8,8 @@ setNoiseLevels(
   mrbinObject,
   plotOnly = FALSE,
   showSpectrumPreview = NULL,
-  silent = FALSE
+  silent = FALSE,
+  graphics = TRUE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ setNoiseLevels(
 \item{showSpectrumPreview}{Should plots be shown? If not provided, this value will be taken from the mrbin object parameters}
 
 \item{silent}{If set to TRUE, plots will not be shown but might still be saved}
+
+\item{graphics}{Controls whether pop-up windows are shown for selections. Defaults to TRUE.}
 }
 \value{
 An invisible mrbin object
@@ -28,13 +31,13 @@ This function reads parameters from the global variable mrbin.env$mrbin$paramete
 plots exemplary spectra and respective noise levels. Plots will be saved if saveFiles is set to "Yes".
 }
 \examples{
- mrbinObject<-mrbin(silent=TRUE,
+ results<-mrbin(silent=TRUE,
                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=FALSE,
+                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
                               system.file("extdata/3/10/pdata/10",package="mrbin"))
                    ))
- mrbinObject<-setNoiseLevels(mrbinObject,plotOnly=TRUE)
+ results<-setNoiseLevels(results,plotOnly=TRUE)
 }

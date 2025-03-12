@@ -21,9 +21,9 @@ This function performs logarithm transformation. Will not work with negative dat
 }
 \examples{
 resetEnv()
-mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
-                    binwidth1D=0.05,signal_to_noise1D=50,verbose=TRUE,PCA="No",tryParallel=FALSE,
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
+                    binwidth1D=0.05,signal_to_noise1D=50,verbose=TRUE,PCA="No",tryParallel=TRUE,
                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                                 system.file("extdata/2/10/pdata/10",package="mrbin"))))
-mrbinResults<-logTrafo(mrbinResults)
+results<-logTrafo(results)
 }

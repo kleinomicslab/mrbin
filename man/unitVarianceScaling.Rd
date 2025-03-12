@@ -22,10 +22,10 @@ bin has variance 1 and mean 0. This is
 rarely necessary, but might be advantageous, e.g. in artificial neural networks.
 }
 \examples{
-mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-         binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=FALSE,logTrafo="No",
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+         binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
          NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                       system.file("extdata/2/10/pdata/10",package="mrbin"),
                       system.file("extdata/3/10/pdata/10",package="mrbin"))))
-mrbinResults<-unitVarianceScaling(mrbinResults)
+results<-unitVarianceScaling(results)
 }

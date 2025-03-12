@@ -22,11 +22,11 @@ through different sample volumes used, or for different sample weights. All bin
 values of one sample are multiplied by the corresponding dilution factor.
 }
 \examples{
-mrbinResults<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-         binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=FALSE,logTrafo="No",
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
+         binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
          NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                       system.file("extdata/2/10/pdata/10",package="mrbin"),
                       system.file("extdata/3/10/pdata/10",package="mrbin"))),
          metadata=list(dilutionFactors=c(.75,1,.5)))
-mrbinResults<-dilutionCorrection(mrbinResults)
+results<-dilutionCorrection(results)
 }
