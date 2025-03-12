@@ -1,10 +1,48 @@
 # mrbin News
 
+## Version 1.9.0
+
+* mrbin: Nicer and speedier plots
+* mrbin: Improved bin annotation system
+* mrplot: A vector of mrbin bin names can now be provided to mrplot and the bin positions will be highlighted
+* mrplot: Small bugfixes
+* mrbin: Small bugfixes
+* mrbin: Clarifications of prompts and reply options
+* mrbin: Clarifications in the vignette
+* mrheatmap: New function for heatmaps
+* examples: A new data set was included for better example results
+
+
+## Version 1.8.0
+
+* mrbin: Speed improvements
+* mrbin: Pop-up windows for list selection can now be turned off using graphics=FALSE 
+* plotNMR: Improvements for quicker plot display - For full spectra, only a subset of the data points is plotted
+* mrplot: Improved plot manipulation, e.g. zooming in/out, moving left/right
+* mrplot: Added options for adjusting the plot, e.g. setting a background color
+* mrplot: Small bug fixes
+* mrbin: Small bug fixes and clarifications of prompts and reply options
+
+
+## Version 1.7.5
+
+* mrbin: Bug fixes especially for plots in (Mac) RStudio
+* mrbin: The number of bins left after trimming zero-value bins was displayed incorrectly during an mrbin run, this is now fixed
+* mrbin: All function examples now use parallel computing by default for consistency
+* mrbin: Small bug fixes and clarifications of prompts and reply options
+* mrbin: Bin data is now additionally saved as a csv file to disk (again)
+
+
+## Version 1.7.4
+
+* mrbin: Bugfixes especially for plots in (Mac) RStudio
+
+
 ## Version 1.7.3
 
 * mrbin: Warnings are now displayed during binning
 * mrbin: New warnings if spectra differ in field strength, pulse program, solvent, or number of scans. This could cause inconsistent data
-* mrbin: Some acquisition parameters such as p1 pulse ength are now saved in parameters$AcquPars
+* mrbin: Some acquisition parameters such as p1 pulse length are now saved in parameters$AcquPars
 * mrbin: Small potential bugs fixed in spectrum selection step
 * mrbin: Bugfix: In rare cases the preview of features after noise removal was incorrect, this is now fixed
 * fia: Predictions now show less output (using verbose=0 within the predict function)

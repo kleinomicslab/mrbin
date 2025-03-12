@@ -1,6 +1,6 @@
 Package: mrbin
 Title: Metabolomics Data Analysis Functions
-Version: 1.7.3
+Version: 1.9.0
 Authors@R: 
     person(given = "Matthias",
            family = "Klein",
@@ -19,7 +19,7 @@ Imports: grDevices, graphics, stats, utils, methods
 Depends: R (>= 2.10)
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Suggests: parallel, keras
 VignetteBuilder: utils
-URL: http://www.kleinomicslab.com/software/, https://github.com/kleinomicslab/mrbin
+URL: https://github.com/kleinomicslab/mrbin
