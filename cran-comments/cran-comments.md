@@ -1,5 +1,43 @@
 ## Update
 
+This is an update (version 1.9.0). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 11, R 4.2.2
+* Local Linux, Ubuntu 24.04.1 LTS, R 4.4.2
+
+
+## Update
+
+This is an update (version 1.8.0). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 11, R 4.2.2
+* Local Linux, Ubuntu 24.04.1 LTS, R 4.4.2
+
+
+## Update
+
+This is an update (version 1.7.5). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 4.2.2
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
+This is an update (version 1.7.4). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 10 install, R 4.2.2
+* Windows, using devtools::check_win_devel()
+* Linux, using devtools::check_rhub()
+
+
+## Update
+
 This is an update (version 1.7.3). Changes to this version are minor and can be found in the NEWS.md file.
 
 ## Test environments
