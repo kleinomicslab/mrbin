@@ -21,7 +21,7 @@
 
 \title{mrbin}
 \author{Matthias S. Klein}
-\date{Version 1.7.3}
+\date{Version 1.9.0}
 \maketitle
 \tableofcontents
 \pagebreak
@@ -42,23 +42,6 @@ employed using atnv().\\
 NMR plotting functions are found in mrplot().\\
 Artificial Neural Network features can be analyzed using Feature Impact
 Assessment (FIA) using the function fia().\\
-
-\subsection{Installation}
-
-To install  mrbin, please install the latest version of R first. Then install
-mrbin.\\
-
-To install the latest stable version of mrbin from CRAN:
-
-<<eval=FALSE>>=
-install.packages("mrbin")
-@
-
-After installation, load the package as follows:
-
-<<>>=
-library(mrbin)
-@
 
 \section{mrbin: Magnetic Resonance Binning, Integration and Normalization}
 
@@ -97,8 +80,11 @@ mrbin will also show you preview plots for these parameters during the run.\\
 
 You can start mrbin using the following code:\\
 
+<<>>=
+library(mrbin)
+@
 <<eval=FALSE>>=
-mrbinResults<-mrbin()
+results<-mrbin()
 @
 
 This will start a series of questions that will guide you through the parameters to be used.\\
@@ -111,7 +97,7 @@ mrbin() returns an (invisible) object of type mrbin, containing the following va
   \item metadata: A list containing metadata, if provided.
   \item transformations: A character vector containing information on the data transformation and scaling that has been performed, for example reference scaling, PQN, atnv, log transform, etc.
   \item changeLog: A data.frame containing information on documented changes that were made to the data, including time stamps.
-  \item changeValues: A list containing control values, enabling verifying changes by checkmrbin(mrbinResults)
+  \item changeValues: A list containing control values, enabling verifying changes by checkmrbin(results)
 \end{itemize}
 
 Please be aware that the generated bin values are calculated as the average
@@ -165,7 +151,7 @@ mode, as data issues might be missed.\\
 The following example provides parameters for analyzing a 1D data set.\\
 
 <<eval=FALSE>>=
-mrbinResults<-mrbin(parameters=list(dimension="1D",
+results<-mrbin(parameters=list(dimension="1D",
              binwidth1D=.02,
              referenceScaling="Yes",
              removeSolvent="Yes",
@@ -176,6 +162,7 @@ mrbinResults<-mrbin(parameters=list(dimension="1D",
              PQNScaling="No",
              fixNegatives="No",
              logTrafo="No",
+             useAsNames="Spectrum titles",
              NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                           system.file("extdata/2/10/pdata/10",package="mrbin"),
                           system.file("extdata/3/10/pdata/10",package="mrbin"))
@@ -183,7 +170,7 @@ mrbinResults<-mrbin(parameters=list(dimension="1D",
 @
 
 <<fig=TRUE,pdf=FALSE,png=TRUE,echo=FALSE>>=
-mrbinResults<-mrbin(silent=TRUE,#this suppresses all interactive prompts
+results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
      setDefault=FALSE,
      parameters=list(verbose=TRUE,
              dimension="1D",
@@ -197,6 +184,7 @@ mrbinResults<-mrbin(silent=TRUE,#this suppresses all interactive prompts
              PQNScaling="No",
              fixNegatives="No",
              logTrafo="No",
+			 useAsNames="Spectrum titles",
              NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
                           system.file("extdata/2/10/pdata/10",package="mrbin"),
                           system.file("extdata/3/10/pdata/10",package="mrbin"))
@@ -209,18 +197,17 @@ Approximate signal-to-noise ratios (SNR) will be shown for up to three selected
 spectra:\\
 
 <<fig=TRUE,echo=FALSE,hide=FALSE, pdf=FALSE, png=TRUE>>=
-setNoiseLevels(mrbinResults,plotOnly=TRUE)
+setNoiseLevels(results,plotOnly=TRUE)
 @
 
 ~\\
 
 In the example shown above, spectral data from the mrbin package is used. To
-use your own data, change
-the folder names to the full folder names holding the files "1r" (or "2rr" for
-2D data) as follows:
+use your own data, change the folder names to the full names of the folders 
+containing the files "1r" (or "2rr" for 2D data) as follows:
 
 <<eval=FALSE>>=
-mrbinResults<-mrbin(parameters=list(
+results<-mrbin(parameters=list(
    NMRfolders=c("C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_1/10/pdata/10",
              "C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_2/10/pdata/10",
              "C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_3/10/pdata/10")
@@ -244,7 +231,7 @@ below:\\
 Set signal-to-noise ratios (SNR) interactively:
 
 <<eval=FALSE>>=
-mrbinResults<-setNoiseLevels(mrbinResults)
+results<-setNoiseLevels(results)
 @
 
 To remove noise signals using the newly defined SNR levels, use removeNoise().
@@ -257,13 +244,13 @@ Noise removal needs to be performed
 before any other scaling or transformation that changes bin values.
 
 <<eval=FALSE>>=
-mrbinResults<-removeNoise(mrbinResults)
+results<-removeNoise(results)
 @
 
 Remove negative values by atnv scaling (see below for details):
 
 <<eval=FALSE>>=
-mrbinResults<-atnv(mrbinResults)
+results<-atnv(results)
 @
 
 Correction for individual dilutions. Use if sample volumes or sample weights
@@ -271,15 +258,15 @@ were not identical for all samples. The bin value of a sample will be multiplied
 by the respective dilution factor:
 
 <<eval=FALSE>>=
-mrbinResults<-setDilutionFactors(mrbinResults)
-mrbinResults<-dilutionCorrection(mrbinResults)
+results<-setDilutionFactors(results)
+results<-dilutionCorrection(results)
 @
 
 Probabilistic Quotient Normalization (PQN) scaling, this is similar, but better,
 than scaling to the total sum. Use for urine or tissue extracts:
 
 <<eval=FALSE>>=
-mrbinResults<-PQNScaling(mrbinResults)
+results<-PQNScaling(results)
 @
 
 Logarithm transform to make data more normal. Data will no longer be linearly
@@ -287,7 +274,7 @@ correlated to molecular concentration but rather represent fold changes. This
 might only work after atnv transform due to negative values:
 
 <<eval=FALSE>>=
-mrbinResults<-logTrafo(mrbinResults)
+results<-logTrafo(results)
 @
 
 Scaling to unit variance. This is rarely necessary, but might be advantageous,
@@ -295,22 +282,22 @@ e.g. for use in artificial neural networks. Data will no longer be linearly
 correlated to molecular concentration:
 
 <<eval=FALSE>>=
-mrbinResults<-unitVarianceScaling(mrbinResults)
+results<-unitVarianceScaling(results)
 @
 
 Plot results:
 
 <<eval=FALSE>>=
-plotResults(mrbinResults)
+plotResults(results)
 @
 
 Removing a spectrum from the dataset. This should not be done after noise
 removal, PQN scaling, unit variance scaling, or atnv, as these methods employ
 data from all samples in the dataset. Only removing a sample before invoking
-any of these methods will guarantee correct data transformations.
+any of these methods will ensure reproducible data transformations.
 
 <<eval=FALSE>>=
-mrbinResults<-removeSpectrum(mrbinResults)
+results<-removeSpectrum(results)
 @
 
 
@@ -319,7 +306,7 @@ You can add or edit metadata, including metabolite identities, for an mrbin
 object as follows:
 
 <<eval=FALSE>>=
-mrbinResults<-metadatamrbin(mrbinResults)
+results<-metadatamrbin(results)
 @
 
 If you choose "edit" for any of the categories, an editor window may open. After
@@ -329,7 +316,7 @@ Make sure to keep the opening and closing quotation marks.\\
 Alternatively, you can edit metadata fields in the command line:
 
 <<>>=
-mrbinResults<-metadatamrbin(mrbinResults,metadata=list(
+results<-metadatamrbin(results,metadata=list(
   projectTitle="Test project",
   factors=factor(c("Control","Control","Treatment"))))
 @
@@ -338,32 +325,33 @@ If you choose to define treatment groups in this step, you can plot a PCA
 with color coded group information as follows:
 
 <<fig=TRUE, pdf=FALSE, png=TRUE>>=
-plotPCA(mrbinResults)
+plotPCA(results)
 @
 
 The results can be annotated with potential metabolite identities using the command
 metadatamrbin(), or in the command line as follows. Left, right, top, and bottom
-borders of the metabolite signal need to provided as a matrix, along with a
-vector of metabolite names. The provided data will then be used to annotate the
+borders of the metabolite signal need to provided as a matrix, along with metabolite 
+names. The provided data will then be used to annotate the
 bins of the dataset. Bins might be assigned to multiple metabolites if they
 cover the areas of several potential signals.
 
 <<>>=
-mrbinResults<-editmetabolitesmrbin(mrbinResults,borders=matrix(c(
-      1.346,1.324,21,23,
-      3.052,3.043,30.5,33.5,
-      4.066,4.059,57,59.5
-    ),ncol=4,byrow=TRUE),metabolitenames=c(
-    "Lactate",
-    "Creatinine",
-    "Creatinine"
-    ))
+#Annotate the dataset with signal identities
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              4.12,4.1,70.8578,71.653,
+                              3.052,3.043,30.5,33.5,
+                              4.066,4.059,57,59.5,
+                              5.7,6.0,0,150),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine",
+	"Creatinine","Urea")
+results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 @
 
 The loadings plot of the PCA can be displayed as follows:
 
 <<fig=TRUE, pdf=FALSE, png=TRUE>>=
-plotPCA(mrbinResults,loadings=TRUE,annotate=TRUE)
+plotPCA(results,loadings=TRUE,annotate=TRUE)
 @
 
 
@@ -375,9 +363,9 @@ wish to perform other edits, please do so using the command editmrbin(), as in
 the following example:
 
 <<eval=FALSE>>=
-mrbinResults<-editmrbin(
-  mrbinResults,
-  bins=mrbinResults$bins,#omit this line if no changes are made to bins
+results<-editmrbin(
+  results,
+  bins=results$bins,#omit this line if no changes are made to bins
   parameters=list(noiseThreshold=0.75),
   metadata=list(projectTitle="Test project"),
   comment="Changed title and noise parameters",
@@ -388,14 +376,14 @@ mrbinResults<-editmrbin(
 To see the change log, use:
 
 <<eval=FALSE>>=
-mrbinResults$changeLog
+results$changeLog
 @
 
 To see a summary of scalings and transformations, and check for undocumented
 edits to the data, use:
 
 <<echo=TRUE,hide=FALSE,results=tex>>=
-checkmrbin(mrbinResults)
+checkmrbin(results)
 @
 
 
@@ -404,7 +392,7 @@ checkmrbin(mrbinResults)
 The following example provides parameters for analyzing a 2D data set.\\
 
 <<echo=TRUE,eval=FALSE>>=
-mrbinResults2D<-mrbin(setDefault=TRUE,parameters=list(dimension="2D",
+results2D<-mrbin(setDefault=TRUE,parameters=list(dimension="2D",
                binwidth2D=0.3,
                binheight=4,
                removeSolvent="Yes",
@@ -415,13 +403,14 @@ mrbinResults2D<-mrbin(setDefault=TRUE,parameters=list(dimension="2D",
                PQNScaling="No",
                fixNegatives="No",
                logTrafo="No",
+			   useAsNames="Spectrum titles",
                NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
                        system.file("extdata/2/12/pdata/10",package="mrbin"),
                        system.file("extdata/3/12/pdata/10",package="mrbin"))
                ))
 @
 <<fig=TRUE, pdf=FALSE, png=TRUE,echo=FALSE>>=
-mrbinResults2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
+results2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
      setDefault=TRUE,
      parameters=list(verbose=TRUE,
                dimension="2D",
@@ -435,6 +424,7 @@ mrbinResults2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
                PQNScaling="No",
                fixNegatives="No",
                logTrafo="No",
+			   useAsNames="Spectrum titles",
                NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
                        system.file("extdata/2/12/pdata/10",package="mrbin"),
                        system.file("extdata/3/12/pdata/10",package="mrbin"))
@@ -442,16 +432,16 @@ mrbinResults2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
 @
 
 ~\\
-The used approximate signal-to-noise levels will be visually plotted and saved
-for up to three selected spectra:\\
+The approximate signal-to-noise levels are plotted 
+for up to three selected spectra. This plot will also be saved as a pdf file.\\
 
 <<fig=TRUE,echo=FALSE,hide=FALSE, pdf=FALSE, png=TRUE>>=
-setNoiseLevels(mrbinResults2D,plotOnly=TRUE)
+setNoiseLevels(results2D,plotOnly=TRUE)
 @
 
 ~\\
 
-The binned NMR data can be found in mrbinResults\$bins. This numeric matrix contains
+The binned NMR data can be found in results\$bins. This numeric matrix contains
 bins in columns and samples in rows, and can be directly used for further data
 analysis.\\
 
@@ -468,7 +458,7 @@ Column names include left and right borders or each bin separated by commas. For
 You can edit metadata fields in the command line:
 
 <<>>=
-mrbinResults2D<-metadatamrbin(mrbinResults,metadata=list(
+results2D<-metadatamrbin(results2D,metadata=list(
   projectTitle="Test project",
   factors=factor(c("Control","Control","Treatment"))))
 @
@@ -477,28 +467,29 @@ If you define treatment groups in this step, you can plot a PCA
 with color coded group information as follows:
 
 <<fig=TRUE, pdf=FALSE, png=TRUE>>=
-plotPCA(mrbinResults2D)
+plotPCA(results2D)
 @
 
 The results can be annotated with potential metabolite identities using the command
 metadatamrbin(), or in the command line as follows:
 
 <<>>=
-mrbinResults2D<-editmetabolitesmrbin(mrbinResults2D,borders=matrix(c(
-      1.346,1.324,21,23,
-      3.052,3.043,30.5,33.5,
-      4.066,4.059,57,59.5
-    ),ncol=4,byrow=TRUE),metabolitenames=c(
-    "Lactate",
-    "Creatinine",
-    "Creatinine"
-    ))
+#Annotate the dataset with signal identities
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              4.12,4.1,70.8578,71.653,
+                              3.052,3.043,30.5,33.5,
+                              4.066,4.059,57,59.5,
+                              5.7,6.0,0,150),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine",
+	"Creatinine","Urea")
+results2D<-annotatemrbin(results2D,metaboliteIdentities=metaboliteIdentities)
 @
 
 The loadings plot of the PCA can be displayed as follows:
 
 <<fig=TRUE, pdf=FALSE, png=TRUE>>=
-plotPCA(mrbinResults2D,loadings=TRUE,annotate=TRUE)
+plotPCA(results2D,loadings=TRUE,annotate=TRUE)
 @
 
 
@@ -551,7 +542,7 @@ In order to recreate a previous data set, or to reload previously used
 parameters, use:
 
 <<eval=FALSE>>=
-mrbinResults<-mrbin()
+results<-mrbin()
 @
 
 and select ""Reload from file" when asked "Set parameters or use existing
@@ -630,11 +621,112 @@ Most convenient is using the mrplot function, which is menu-based:
 mrplot()
 @
 
-In mrplot, multiple spectra shown overlaid. If both 1D and 2D spectra are added,
+In the mrplot menu, spectra can be added or removed, the view can be zoomed in 
+or out, and intensities can be changed. If multiple spectra are added to a plot, 
+they are shown overlaid. If both 1D and 2D spectra are added,
 both are shown in region-matched plots, e.g. for metabolite identification
 purposes.\\
 
-To use the more basic commands, you need to first load one NMR spectrum:
+Other options are as follows:
+
+It is possible and convenient to highlight peaks of interest, this will show a 
+gray line including the chemical shift value in ppm. If two peaks are highlighted, 
+the distance is shown in Hz. This can be used to determine coupling constants.\\
+
+You can also provide a list of mrbin bin names for highlighting. For example, this 
+could be the names of significant bins from a statistical analysis. The areas 
+of these bins will be shown in green. This can be used to aid in identifying 
+unknown signals.\\
+
+The areas of known metabolites can be shown using a peak identification file, or a 
+matrix containing the same information.\\
+
+In case of using a file, provide the full 
+file path for a .csv file containing such a matrix, the first columns containing 
+metabolite names, and the first row being a header. Each row belongs to one unique 
+metabolite signal (left, right, top, bottom borders). Row names are metabolite 
+names.\\
+
+In case of a matrix, this should be a 4-column matrix where each row belongs to 
+one unique metabolite signal (left, 
+right, top, bottom borders). Row names are metabolite names.\\
+
+Areas of known metabolites are shown in the plot as red shaded boxes. This 
+is useful for identification of unknown peaks.\\
+
+Parameters and folder names can passed to mrplot on the command line, as follows:\\
+
+<<fig=TRUE, pdf=FALSE, png=TRUE>>=
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              4.12,4.1,70.8578,71.653,
+                              3.052,3.043,30.5,33.5,
+                              4.066,4.059,57,59.5,
+                              2.582,2.479,46,49,
+                              2.737,2.634,46,49),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine","Creatinine",
+        "Citrate","Citrate")
+mrplot(folders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
+                 system.file("extdata/1/10/pdata/10",package="mrbin"),
+                 system.file("extdata/2/10/pdata/10",package="mrbin"),
+                 system.file("extdata/3/10/pdata/10",package="mrbin")),
+       dimensions=c("2D","1D","1D","1D"),
+	   zoom=c(2.8,2.4,20,60),
+       highlight=c(2.564,2.537),
+       binlist=c("2.725,2.675","2.575,2.525"),
+       annotate=TRUE,metaboliteIdentities=metaboliteIdentities,
+       plotTitle="Significant Bins",intensity1D=24,hideMenu=TRUE)
+@
+
+\section{Heatmap Plots}
+Heatmaps are a convenient way to visualize data of significant bins. You can create 
+heatmaps from mrbin objects and a list of significant bins as follows:\\
+
+<<fig=TRUE, pdf=FALSE, png=TRUE>>=
+# First create NMR bin data, then plot some differential bins.
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(verbose=FALSE,
+                dimension="1D",binwidth1D=0.01,PCA="No",
+				showSpectrumPreview="No",
+                signal_to_noise1D=25,noiseThreshold=0.75,
+				useAsNames="Spectrum titles",
+                NMRfolders=c(
+                system.file("extdata/1/10/pdata/10",package="mrbin"),
+                system.file("extdata/2/10/pdata/10",package="mrbin"),
+                system.file("extdata/3/10/pdata/10",package="mrbin"))
+                ))
+metadata<-c(0,0,1)
+#Find significant signals
+pvalues<-rep(NA,ncol(results$bins))
+names(pvalues)<-colnames(results$bins)
+for(i in 1:ncol(results$bins)){
+	model<-stats::lm(intensity~treatment, 
+     data=data.frame(intensity=results$bins[,i],treatment=metadata))
+	pvalues[i]<-stats::anova(model)$"Pr(>F)"[1]
+}
+significantBins<-names(sort(pvalues)[1:30]) 
+#Annotate the dataset with signal identities
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              4.12,4.1,70.8578,71.653,
+                              3.052,3.043,30.5,33.5,
+                              4.066,4.059,57,59.5,
+                              5.7,6.0,0,150),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine",
+	"Creatinine","Urea")
+results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
+mrheatmap(results=results,
+    binlist=significantBins,annotate=TRUE,
+    main="Significant signals",closeDevice=FALSE)
+@
+
+
+\section{Basic Plotting Commands}
+
+Instead of using the convenient mrplot() function, basic NMR plotting commands 
+can be accessed from the command line. In most cases, it is preferable to use the 
+mrplot command as detailed above.\\
+
+To use the basic plotting commands, you need to first load one NMR spectrum:
 
 <<eval=FALSE>>=
 readBruker(dimension="1D",
@@ -695,7 +787,7 @@ is different, the function name has to be provided in the parameter
 functionNamePredict. Please make sure to have loaded all required packages
 before starting fia().\\
 
-As an example, we will a logit model instead of ANN, as ANN training would
+As an example, we will use a logit model instead of ANN, as ANN training would
 require additional programs to be installed.
 
 <<eval=FALSE>>=
@@ -721,25 +813,38 @@ fiaresults$scores
 
 \section{Known Issues}
 
-\subsection{Firewall Warnings}
-If parallel computing is turned on and the package parallel is installed,
-mrbin will try to use the socket approach for computing. This requires
-establishing network connections to the local cluster, which might
-trigger the firewall. It is safe to unblock these connections.\\
+\subsection{Linux tcl Issues}
+In rare cases, the following error (or similar) might occur while navigating 
+pop-up selections in mrbin or mrplot: 
 
-\subsection{Pop-Up Windows}
-mrbin is set up to ask for user input through pop-up windows. This requires
-graphics support, otherwise the user input will be asked through command line
-menus, which is less user friendly but still offers the full functionality.\\
+tcl grab failed: window not viewable.\\
 
-\subsection{Apple/Mac Computers And RStudio}
-In some cases, running mrbin from within RStudio on Apple computers will not
+This issue seems to be related to tcl handling of select.list pop-up windows.
+It can potentially be avoided by avoiding double-clicking inside the pop-up 
+windows, instead selecting the desired option with a single click and then clicking 
+OK. To stop the error message from occurring, try to close all plot windows 
+and pop-up windows. It might be helpful to create a new plot window, e.g. by 
+example(mrbin), and then closing the new plot window.
+To avoid pop-up windows altogether, use mrbin(graphics=FALSE). 
+
+\subsection{Pop-up Windows Missing on Apple Computers, RStudio}
+In some cases, running mrbin on Apple computers and/or within RStudio will not
 generate pop-up windows. To enable pop-up windows, it might be helpful to install
 the newest version of xquartz from https://www.xquartz.org.\\
 
+\subsection{Pop-Up Windows}
+mrbin is set up to ask for user input through pop-up windows. This requires
+graphics support. If graphics support is not enabled on your system, user 
+input will be asked through command line prompts, which offers the full functionality.\\
+
+\subsection{Firewall Warnings}
+mrbin will try to use the socket approach for parallel computing. This requires
+establishing network connections to the local cluster, which might
+trigger the firewall. It is safe to unblock these connections.\\
+
 \subsection{Spectra are Missing}
 If a Bruker spectrum is not shown during browsing, please make sure a file
-with filename title is present in the PROCNO folder of that spectrum. You
+named title is present in the PROCNO folder of that spectrum. You
 can create a title file by opening the spectrum in Bruker Topspin, selecting
 the Title tab, entering a title and clicking the disk symbol for saving.\\
 
