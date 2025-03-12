@@ -21,7 +21,7 @@
 
 \title{mrbin}
 \author{Matthias S. Klein}
-\date{Version 1.7.3}
+\date{Version 1.8.0}
 \maketitle
 \tableofcontents
 \pagebreak
