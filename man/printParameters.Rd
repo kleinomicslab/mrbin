@@ -4,10 +4,13 @@
 \alias{printParameters}
 \title{A function for printing parameters to the screen.}
 \usage{
-printParameters()
+printParameters(verbose = TRUE)
+}
+\arguments{
+\item{verbose}{Should the code be shown on the screen?}
 }
 \value{
-{None}
+An invisible character string
 }
 \description{
 This function reads parameters from the global variable mrbin.env$mrbin$parameters and

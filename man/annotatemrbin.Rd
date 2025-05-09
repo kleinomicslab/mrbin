@@ -25,7 +25,7 @@ annotatemrbin(
 
 \item{add}{Should the new metabolite list be added to an existing list, or replace the current list?}
 
-\item{hideChemicalShift}{Should the chemical shift (bin borders) of an identified metabolite be removed, leaving only the metabolite id, or should both be shown? Showing both helps in identifying signals of interest, but hiding the chmical shift might make better plots.}
+\item{hideChemicalShift}{Should the chemical shift (bin borders) of an identified metabolite be removed, leaving only the metabolite id, or should both be shown? Showing both helps in identifying signals of interest, but hiding the chemical shift might make better plots.}
 
 \item{hideTentativeIds}{Should the identities of tentative ids be omitted for clarity?}
 
@@ -50,12 +50,13 @@ This function annotates an mrbin object and returns it with updated $annotations
                    NMRfolders=c(system.file("extdata/3/10/pdata/10",package="mrbin"),
                               system.file("extdata/2/10/pdata/10",package="mrbin"),
                               system.file("extdata/1/10/pdata/10",package="mrbin"))))
-metaboliteIdentities=matrix(c(1.346,1.324,21,23,
-                              4.12,4.1,70.8578,71.653,
-                              3.052,3.043,30.5,33.5,
-                              4.066,4.059,57,59.5),
-                   ncol=4,byrow=TRUE)
+metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
+                              4.12,4.1,70.8578,71.653,1,1,
+                              3.052,3.043,30.5,33.5,1,1,
+                              4.066,4.059,57,59.5,1,1),
+                   ncol=6,byrow=TRUE)
 rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine")
+colnames(metaboliteIdentities)=c("left","right","top","bottom","usePeak1D","usePeak2D")
 results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 results$metadata$annotations[125:135]
 plotPCA(results,loadings=TRUE)

@@ -9,7 +9,9 @@ plotMultiNMR(
   rectangleRegions = NULL,
   rectangleColors = c("darkseagreen3", "orange", "blue", "red", "yellow", "gray",
     "purple"),
+  rectangleColors2D = NULL,
   density = NULL,
+  angles = 35,
   cex.axis = 0.7,
   rectangleFront = FALSE,
   correctOffset2D = TRUE,
@@ -40,7 +42,11 @@ plotMultiNMR(
 
 \item{rectangleColors}{Define colors for the rectangles}
 
+\item{rectangleColors2D}{Define colors for rectangles in 2D spectra. If NULL, defaults to the same as rectangleColors}
+
 \item{density}{Shading lines for the rectangles}
+
+\item{angles}{Angles of shading lines for the rectangles}
 
 \item{cex.axis}{Font size of axis tick labels.}
 

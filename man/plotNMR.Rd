@@ -9,7 +9,9 @@ plotNMR(
   rectangleRegions = NULL,
   rectangleColors = c("darkseagreen3", "orange", "blue", "red", "yellow", "gray",
     "purple"),
+  rectangleColors2D = NULL,
   density = NULL,
+  angles = 35,
   rectangleFront = FALSE,
   polygonRegion = NULL,
   color = NULL,
@@ -41,7 +43,11 @@ plotNMR(
 
 \item{rectangleColors}{Define colors for the rectangles}
 
+\item{rectangleColors2D}{Define colors for rectangles in 2D spectra. If NULL, defaults to the same as rectangleColors}
+
 \item{density}{Shading lines for the rectangles}
+
+\item{angles}{Angles of shading lines for the rectangles}
 
 \item{rectangleFront}{Plot rectangles in front of spectrum rather than in background (only 2D)}
 

@@ -21,7 +21,7 @@ editmetabolitesmrbin(
 
 \item{add}{Should the new metabolite list be added to an existing list, or replace the current list?}
 
-\item{ids}{A matrix of potential metabolite identities. This has to be a 4-column matrix with columns indicating left, right, top, bottom. Rownames are metabolite names. If this matrix is not provided, borders and metabolitenames have to be provided.}
+\item{ids}{A matrix of potential metabolite identities. This has to be a matrix with columns indicating left, right, top, bottom. Rownames are metabolite names. If this matrix is not provided, borders and metabolitenames have to be provided.}
 }
 \value{
 An (invisible) mrbin object
