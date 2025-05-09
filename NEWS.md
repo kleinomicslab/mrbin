@@ -1,5 +1,12 @@
 # mrbin News
 
+## Version 1.9.1
+
+* mrbin: Small bugfixes
+* mrbin: Better error handling in parallel mode
+* mrbin: Noise levels per peak and sample are no longer saved in the output files to save storage and make viewing the files easier
+* mrbin: An additional output file will be written, containing R code to regenerate the data set
+
 ## Version 1.9.0
 
 * mrbin: Nicer and speedier plots

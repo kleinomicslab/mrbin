@@ -1,6 +1,6 @@
 Package: mrbin
 Title: Metabolomics Data Analysis Functions
-Version: 1.9.0
+Version: 1.9.1
 Authors@R: 
     person(given = "Matthias",
            family = "Klein",
