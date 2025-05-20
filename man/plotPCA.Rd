@@ -10,7 +10,8 @@ plotPCA(
   loadings = FALSE,
   legendPosition = "bottomleft",
   annotate = TRUE,
-  verbose = TRUE
+  verbose = TRUE,
+  xpd = NA
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ plotPCA(
 \item{annotate}{Should loadings be annotated with metabolite identities, if available in $metadata?}
 
 \item{verbose}{Should a summary be displayed?}
+
+\item{xpd}{Should labels be clipped to the plot region (TRUE) or exceed to margins (NA)}
 }
 \value{
 An invisible prcomp result object
