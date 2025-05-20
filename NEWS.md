@@ -1,5 +1,16 @@
 # mrbin News
 
+## Version 1.9.2
+
+* mrplot: Bug fixed that prevented mrplot to be started in some cases
+* mrbin: Time is now also saved as part of file name
+* mrbin: If no file names is chosen, a standard file name is generated
+* mrbin, plotPCA: Sample and bin labels are now no longer clipped but extend into the figure margin
+* mrbin: Preview plots now again include PCA loadings plots
+* mrbin: Small bugfixes
+* mrbin: When loading a previously saved data set, the variable will now be named "results" instead of "mrbinResults2"
+
+
 ## Version 1.9.1
 
 * mrbin: Small bugfixes
