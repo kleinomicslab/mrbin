@@ -38,7 +38,7 @@ NULL
 #' \donttest{ .onAttach() }
 
 .onAttach <- function(libname, pkgname){
-    packageStartupMessage("mrbin 1.9.1\nFor instructions and examples, please type: vignette('mrbin')")
+    packageStartupMessage("mrbin 1.9.2\nFor instructions and examples, please type: vignette('mrbin')")
 }
 
 
@@ -2034,7 +2034,8 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
                      }
                      parentFolder<-selectList
                    }
-				   filenameTMPpreselect<-paste("mrbin_",gsub(":","-",gsub(" ","_",Sys.Date())),sep="")
+				   filenameTMPpreselect<-paste("mrbin_",gsub(":","-",gsub(" ","_",#Sys.Date()
+						Sys.time())),sep="")
                    filenameTMP<-utils::select.list(c(filenameTMPpreselect,"Change..."),preselect=filenameTMPpreselect,
                                title ="Output file name: ",graphics=graphics)
                    if(length(filenameTMP)==0){stopTMP<-TRUE}else{
@@ -2415,6 +2416,16 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
   graphics=TRUE){
   defineGroups<-FALSE
   if(!is.null(mrbin.env$mrbin$parameters$NMRfolders)){
+	if(mrbin.env$mrbin$parameters$saveFiles=="Yes"&is.null(mrbin.env$mrbin$parameters$outputFileName)){
+		#mrbin.env$mrbin<-editmrbin(mrbinObject=mrbin.env$mrbin,functionName="mrbin::mrbinrun",
+        #              versionNumber=as.character(utils::packageVersion("mrbin")),
+        #              parameters=list(outputFileName=
+			mrbin.env$mrbin$parameters$outputFileName<-
+						paste("mrbin_",gsub(":","-",gsub(" ","_",#Sys.Date()
+						Sys.time())),sep="")
+		#				),verbose=FALSE)
+		
+	}
     if(createbins){
       mrbin.env$mrbinTMP$scaleFactorTMP1<-NULL
       mrbin.env$mrbinTMP$scaleFactorTMP2<-NULL
@@ -2575,16 +2586,16 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
 			 functionName="mrbin::mrbinrun",
 			 versionNumber=as.character(utils::packageVersion("mrbin")),
 			 parameters=list(createCode=createCodeTMP),verbose=FALSE)
-		mrbinResults2<-editmrbin(mrbinObject=mrbinResults,
+		results<-editmrbin(mrbinObject=mrbinResults,
 			 functionName="mrbin::mrbinrun",
 			 versionNumber=as.character(utils::packageVersion("mrbin")),
 			 parameters=list(noise_level=NULL,binRegions=NULL),#to save memory and disk space
 			 verbose=FALSE)
 		if(mrbinResults$parameters$saveFiles=="Yes"){
-			save(mrbinResults2,file=paste(mrbinResults2$parameters$outputFileName,".Rdata",sep=""))
-			parametersTMP<-mrbinResults2$parameters
+			save(results,file=paste(results$parameters$outputFileName,".Rdata",sep=""))
+			parametersTMP<-results$parameters
 			dput(parametersTMP,file=paste(mrbinResults$parameters$outputFileName,".txt",sep=""))
-			cat(mrbinResults2$parameters$createCode,file=paste(mrbinResults$parameters$outputFileName,"Code.R",sep=""))
+			cat(results$parameters$createCode,file=paste(mrbinResults$parameters$outputFileName,"Code.R",sep=""))
 			utils::write.csv(mrbinResults$bins,file=paste(mrbinResults$parameters$outputFileName,"bins.csv",sep=""))
 		}
 	}
@@ -5286,6 +5297,7 @@ unitVarianceScaling<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
 #' @param legendPosition Where should the legend be plotted, Defaults to "left", other options include "top", "topright", etc.
 #' @param annotate Should loadings be annotated with metabolite identities, if available in $metadata?
 #' @param verbose Should a summary be displayed?
+#' @param xpd Should labels be clipped to the plot region (TRUE) or exceed to margins (NA)
 #' @return An invisible prcomp result object
 #' @export
 #' @examples
@@ -5298,7 +5310,7 @@ unitVarianceScaling<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
 #'                  system.file("extdata/3/12/pdata/10",package="mrbin"))))
 #' plotPCA(results)
 plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="bottomleft",
- annotate=TRUE,verbose=TRUE){
+ annotate=TRUE,verbose=TRUE,xpd=NA){
  PCA<-NULL
  if(!is.null(mrbinResults$bins)){
     checkmrbin(mrbinResults,verbose=verbose)
@@ -5363,7 +5375,7 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
         topFeatures<-order(PCA$rotation[,1]^2+PCA$rotation[,2]^2,
           decreasing=TRUE)[1:min(nrow(PCA$rotation),50)]
         graphics::text(PCA$rotation[topFeatures,],labels=rownames(PCA$rotation)[topFeatures]
-                       ,pos=4,cex=.65)
+                       ,pos=4,cex=.65,xpd=xpd)
       } else {
         graphics::plot(PCA$x
              ,xlim=xlimTMP,
@@ -5378,7 +5390,7 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
 	    if(annotate){
           graphics::text(PCA$x,labels=paste(substr(rownames(PCA$x),1,
             mrbinResults$parameters$PCAtitlelength)),pos=3,cex=.65,
-               col=colorPalette[PCAFactors])
+               col=colorPalette[PCAFactors],xpd=xpd)
 		}
           if(defineGroups) graphics::legend(legendPosition,
                   legend=levels(FactorsTMP),
@@ -5429,7 +5441,8 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
     oldpar<-graphics::par("mar","mfrow","mgp")
     on.exit(graphics::par(oldpar))
     devAskNewPage(ask = FALSE)
-    graphics::par(bg="white",mfrow=c(2,2),mar=c(2.1,2,2,0.5))
+    #graphics::par(bg="white",mfrow=c(2,2),mar=c(2.1,2,2,0.5))
+    graphics::par(bg="white",mfrow=c(2,3),mar=c(2.1,2,2,0.5))
     #Spectrum and bin region plot
 	#To save memory: avoid plotting thousand of small rectangles. Saving as pdf might take a long time.
     #This might happen when no or little noise removal was used
@@ -5493,8 +5506,6 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
           manualScale=FALSE,maxPlots=2,plotTitle=mainTitle,restrictToRange=TRUE,
           dimension=mrbinResults$parameters$dimension,enableSplit=FALSE)
     }
-	#PCA plot
-    plotPCA(mrbinResults,defineGroups=defineGroups,loadings=FALSE,verbose=FALSE)
 	#QC boxplots
 	graphics::par(mar=c(4.1,1.1,2.5,0.5))
     axisCex1<-.1
@@ -5506,15 +5517,20 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
     if(nrow(mrbinResults$bins)<25) axisCex2<-.4
     if(nrow(mrbinResults$bins)<15) axisCex2<-.7
     graphics::boxplot(mrbinResults$bins[,1:min(ncol(mrbinResults$bins),5000)],
-	  main="Intensities (bin-wise)",yaxt="n",
+	  main="Intensity boxplot bin-wise",yaxt="n",
       xlab="",ylab="",boxwex=1,ask=FALSE,xaxt="n")
     graphics::axis(2,cex.axis=.7,tck=-0.0075,mgp=c(0,0.1,0))
     graphics::axis(1,las=2,tck=-0.0075,mgp=c(0,0.1,0),cex.axis=axisCex1,at=1:ncol(mrbinResults$bins),labels=colnames(mrbinResults$bins))
-    graphics::boxplot(t(mrbinResults$bins),main="Intensities (sample-wise)",
+    graphics::boxplot(t(mrbinResults$bins),main="Intensity boxplot sample-wise",
       xlab="",ylab="",boxwex=1,ask=FALSE,xaxt="n",yaxt="n")
     graphics::axis(2,cex.axis=.7,tck=-0.0075,mgp=c(0,0.1,0))
     graphics::axis(1,las=2,tck=-0.0075,mgp=c(0,0.1,0),cex.axis=axisCex2,at=1:nrow(mrbinResults$bins),
       labels=substr(rownames(mrbinResults$bins),1,mrbinResults$parameters$PCAtitlelength))
+
+	#PCA plots
+    plotPCA(mrbinResults,defineGroups=defineGroups,loadings=FALSE,verbose=FALSE)
+    plotPCA(mrbinResults,defineGroups=defineGroups,loadings=TRUE,verbose=FALSE)
+
     utils::flush.console()
     #Finish plot
 	plotRecordingTMP<-grDevices::recordPlot()
@@ -8442,7 +8458,12 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,dimensions=NULL,intensity1D=NULL,
 			colnames(rectangleRegionsTMP)[1]<-paste(distanceTMP,"Hz",sep="")
 	   }
 	  }
-	  anglesTMP<-rep(annotateAngles,ceiling(nrow(metaboliteIdentities)/length(annotateAngles)))[1:nrow(metaboliteIdentities)]
+	  anglesTMP<-annotateAngles
+	  if(!is.null(metaboliteIdentities)){
+		if(nrow(metaboliteIdentities)>0){
+			anglesTMP<-rep(annotateAngles,ceiling(nrow(metaboliteIdentities)/length(annotateAngles)))[1:nrow(metaboliteIdentities)]
+		}
+	  }
 	  if(renewSpectrumTMP<2){
  	    renewSpectrum<-FALSE
 	  } else {
