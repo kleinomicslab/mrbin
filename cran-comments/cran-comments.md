@@ -1,5 +1,14 @@
 ## Update
 
+This is an update (version 1.9.2). Changes to this version are minor and can be found in the NEWS.md file.
+
+## Test environments
+* local Windows 11, R 4.2.2
+* Local Linux, Ubuntu 24.04.1 LTS, R 4.4.2
+
+
+## Update
+
 This is an update (version 1.9.1). Changes to this version are minor and can be found in the NEWS.md file.
 
 ## Test environments
