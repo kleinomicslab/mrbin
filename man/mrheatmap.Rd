@@ -69,13 +69,11 @@ for(i in 1:ncol(results$bins)){
 }
 significantBins<-names(sort(pvalues)[1:30]) 
 metaboliteIdentities=matrix(c(1.346,1.324,21,23,
-                              4.12,4.1,70.8578,71.653,
                               3.052,3.043,30.5,33.5,
-                              4.066,4.059,57,59.5,
                               5.7,6.0,0,150),
                    ncol=4,byrow=TRUE)
 #Annotate the dataset with signal identities
-rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine","Urea")
+rownames(metaboliteIdentities)=c("Lactate","Creatinine","Urea")
 results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 mrheatmap(results=results,
     binlist=significantBins,annotate=TRUE,

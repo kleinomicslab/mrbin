@@ -10,10 +10,12 @@ annotatemrbin(
   metaboliteIdentities = NULL,
   add = FALSE,
   hideChemicalShift = FALSE,
-  hideTentativeIds = FALSE,
+  hideTentativeIds = TRUE,
   confirmationRthreshold = 0.6,
   confirmationPthreshold = 5e-06,
-  checkBaselineCorrelation = TRUE
+  uniqueBins = TRUE,
+  checkBaselineCorrelation = TRUE,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -33,7 +35,11 @@ annotatemrbin(
 
 \item{confirmationPthreshold}{A threshold to define the p-value cutoff to confirm an annotation}
 
+\item{uniqueBins}{Should each bin be uniquely assigned to only one molecule?}
+
 \item{checkBaselineCorrelation}{Should correlation to baseline be compared to confirm an annotation}
+
+\item{verbose}{Should outputs be shown or suppressed?}
 }
 \value{
 An (invisible) mrbin object
@@ -51,11 +57,9 @@ This function annotates an mrbin object and returns it with updated $annotations
                               system.file("extdata/2/10/pdata/10",package="mrbin"),
                               system.file("extdata/1/10/pdata/10",package="mrbin"))))
 metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
-                              4.12,4.1,70.8578,71.653,1,1,
-                              3.052,3.043,30.5,33.5,1,1,
-                              4.066,4.059,57,59.5,1,1),
+                              3.052,3.043,30.5,33.5,1,1),
                    ncol=6,byrow=TRUE)
-rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine")
+rownames(metaboliteIdentities)=c("Lactate","Creatinine")
 colnames(metaboliteIdentities)=c("left","right","top","bottom","usePeak1D","usePeak2D")
 results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 results$metadata$annotations[125:135]
