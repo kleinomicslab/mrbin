@@ -1,4 +1,4 @@
-,left,right,top,bottom,usePeak1D,usePeak2D,peakName,multiplicity,nuclei,coupling,comment
+metabolite,left,right,top,bottom,usePeak1D,usePeak2D,peakName,multiplicity,nuclei,coupling,comment
 Lactate,1.346,1.324,21,23.2154,1,1,C3H3A/B/C,D,3,7,
 Lactate,4.12,4.1,70.8578,71.653,1,1,C2H2,Q,1,6.9,
 Creatinine,3.053,3.043,30.5,34.2,1,1,C5 H6A/H6B/H6C,S,3,,
