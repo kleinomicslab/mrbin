@@ -14,15 +14,20 @@
 \addtolength{\evensidemargin}{-.875in}
 \addtolength{\textwidth}{1.75in}
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{xleftmargin=2em,frame=single}
-\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em,frame=single}
-
+\DefineVerbatimEnvironment{Soutput}{BVerbatim}{frame=none}
 
 \begin{document}
-
 \title{mrbin}
 \author{Matthias S. Klein}
-\date{Version 1.9.2}
+\date{}
+
 \maketitle
+\begin{center}
+<<echo=FALSE>>=
+	cat(paste("Version",as.character(utils::packageVersion("mrbin"))))
+@
+\end{center}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em,frame=single}
 \tableofcontents
 \pagebreak
 
@@ -87,7 +92,83 @@ library(mrbin)
 results<-mrbin()
 @
 
-This will start a series of questions that will guide you through the parameters to be used.\\
+This will start a series of questions that will guide you through the parameters 
+to be used. Preview plots will help adjusting parameters to the current 
+dataset and allow for spoting any inconsistencies in the spectral data.\\
+
+<<echo=FALSE>>=
+results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
+     setDefault=FALSE,
+     parameters=list(verbose=FALSE,
+             dimension="1D",
+             binwidth1D=.02,
+             referenceScaling="Yes",
+             removeSolvent="Yes",
+             solventRegion=c(4.95,4.65),
+             noiseRemoval="Yes",
+             signal_to_noise1D=35,
+             noiseThreshold=0.75,
+             PQNScaling="No",
+             fixNegatives="No",
+             logTrafo="No",
+			 PCA="No",
+			 useAsNames="Spectrum titles",
+             NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                          system.file("extdata/2/10/pdata/10",package="mrbin"),
+                          system.file("extdata/3/10/pdata/10",package="mrbin"))
+     ))
+@
+
+If noise removal is used, preview plots of the signal-to-noise ratios (SNR) of selected spectra
+are provided to help chose an SNR level matching the used data. Please note
+that the visual representation of SNR levels is approximate, as
+noise removal is performed on the binned data, but not on the raw spectra. To
+achieve a satisfactory preview of SNR levels, each spectrum is scaled in a way
+so its peak heights are equivalent to the respective bin value. The median of these
+ratios is used as a scaling factor for the whole spectrum.\\
+
+<<fig=TRUE,echo=FALSE,hide=FALSE, pdf=FALSE, png=TRUE>>=
+setNoiseLevels(results,plotOnly=TRUE)
+@
+
+~\\
+
+
+Please be aware that the calculated bin values can be viewed as pseudo-integrals 
+of the contained signals. This is because the generated bin values are calculated 
+as the average value
+of all data points within each bin, multiplied by the area of the bin. This
+avoids the issue of different numbers of data points within a bin in different
+spectra, and corrects for bins that are different in their size.\\
+
+After finishing, a summary is displayed in the console. In addition, several 
+plots are shown. 
+The output plots allow for reviewing data quality. Please note that any negative 
+values are not shown in the boxplots for clarity. Any negative values still remain 
+in the dataset, though.\\:\\
+
+<<fig=TRUE,pdf=FALSE,png=TRUE,echo=FALSE>>=
+results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
+     setDefault=FALSE,
+     parameters=list(verbose=TRUE,
+             dimension="1D",
+             binwidth1D=.02,
+             referenceScaling="Yes",
+             removeSolvent="Yes",
+             solventRegion=c(4.95,4.65),
+             noiseRemoval="Yes",
+             signal_to_noise1D=35,
+             noiseThreshold=0.75,
+             PQNScaling="No",
+             fixNegatives="No",
+             logTrafo="No",
+			 PCA="Yes",
+			 useAsNames="Spectrum titles",
+             NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
+                          system.file("extdata/2/10/pdata/10",package="mrbin"),
+                          system.file("extdata/3/10/pdata/10",package="mrbin"))
+     ))
+@
 
 mrbin() returns an (invisible) object of type mrbin, containing the following variables:
 
@@ -100,14 +181,7 @@ mrbin() returns an (invisible) object of type mrbin, containing the following va
   \item changeValues: A list containing control values, enabling verifying changes by checkmrbin(results)
 \end{itemize}
 
-Please be aware that the generated bin values are calculated as the average
-value
-of all data points within each bin, multiplied by the area of the bin. This
-avoids the issue of different numbers of data points within a bin in different
-spectra, and corrects for bins that are different in their size. Therefore,
-the bin intensities can be viewed as pseudo-integrals of the contained signals.\\
-
-Several files may be written to the chosen directory:
+If saving to disk is selected, several files will be written to the chosen directory:
 
 \begin{itemize}
   \item A .Rdata file containing the generated mrbin data object
@@ -117,24 +191,15 @@ Several files may be written to the chosen directory:
   \item A .txt file containing all parameters and potential warning messages from the mrbin run. This file can be reloaded to mrbin to recreate a dataset for reproducibility
 \end{itemize}
 
-The generated quality control plots show four panels:
+The generated quality control plots show the following panels:
 
 \begin{itemize}
   \item Previews of a few selected spectra, overlaid with the areas of the bins
     generated (in green) to make sure all peaks of interest are covered
-  \item Boxplots of bin intensities per bin (feature) to aid in spotting data quality issues
-  \item Boxplots of bin intensities per sample to aid in spotting data quality issues
-  \item A PCA plot of the generated bin data to aid in spotting data quality issues
+  \item PCA scores and loadings plots of the generated bin data to aid in spotting data quality issues
+  \item Boxplots of bin intensities per bin (feature) to aid in spotting data quality issues. Please note that for the purpose of these boxplots only, any negative values are not shown
+  \item Boxplots of bin intensities per sample to aid in spotting data quality issues. Please note that for the purpose of these boxplots only, any negative values are not shown
 \end{itemize}
-
-The preview plots of the signal-to-noise ratios (SNR) of selected spectra
-are provided to help chose an SNR level matching the used data. Please note
-that the visual representation of SNR levels is approximate, as
-noise removal is performed on the binned data, but not on the raw spectra. To
-achieve a satisfactory preview of SNR levels, each spectrum is scaled in a way
-so its peak heights are equivalent to the respective bin value. The median of these
-ratios is used as a scaling factor for the whole spectrum.\\
-
 
 
 \subsection{Setting Parameters at the Command Line}
@@ -169,49 +234,15 @@ results<-mrbin(parameters=list(dimension="1D",
      ))
 @
 
-<<fig=TRUE,pdf=FALSE,png=TRUE,echo=FALSE>>=
-results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
-     setDefault=FALSE,
-     parameters=list(verbose=TRUE,
-             dimension="1D",
-             binwidth1D=.02,
-             referenceScaling="Yes",
-             removeSolvent="Yes",
-             solventRegion=c(4.95,4.65),
-             noiseRemoval="Yes",
-             signal_to_noise1D=35,
-             noiseThreshold=0.75,
-             PQNScaling="No",
-             fixNegatives="No",
-             logTrafo="No",
-			 useAsNames="Spectrum titles",
-             NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                          system.file("extdata/2/10/pdata/10",package="mrbin"),
-                          system.file("extdata/3/10/pdata/10",package="mrbin"))
-     ))
-@
-
-~\\
-
-Approximate signal-to-noise ratios (SNR) will be shown for up to three selected
-spectra:\\
-
-<<fig=TRUE,echo=FALSE,hide=FALSE, pdf=FALSE, png=TRUE>>=
-setNoiseLevels(results,plotOnly=TRUE)
-@
-
-~\\
-
-In the example shown above, spectral data from the mrbin package is used. To
+In the example shown above, spectra from the mrbin package are used. To
 use your own data, change the folder names to the full names of the folders 
-containing the files "1r" (or "2rr" for 2D data) as follows:
+containing the files "1r" (or "2rr" for 2D data) as follows (Please note that 
+on Windows computers, backward slashes need to be replaced by forward slashes):
 
 <<eval=FALSE>>=
-results<-mrbin(parameters=list(
-   NMRfolders=c("C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_1/10/pdata/10",
-             "C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_2/10/pdata/10",
-             "C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_3/10/pdata/10")
-   ))
+   NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/sample_1/10/pdata/10",
+             "C:/Bruker/TopSpin/data/guest/nmr/sample_2/10/pdata/10",
+             "C:/Bruker/TopSpin/data/guest/nmr/sample_3/10/pdata/10")
 @
 
 \subsection{Processing of mrbin Objects}
@@ -338,17 +369,14 @@ cover the areas of several potential signals.
 <<>>=
 #Annotate the dataset with signal identities
 metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
-                              4.12,4.1,70.8578,71.653,
                               3.052,3.043,30.5,33.5,
-                              4.066,4.059,57,59.5,
                               5.7,6.0,0,150),
                    ncol=4,byrow=TRUE)
-rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine",
-	"Creatinine","Urea")
+rownames(metaboliteIdentities)<-c("Lactate","Creatinine","Urea")
 results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 @
 
-The loadings plot of the PCA can be displayed as follows:
+The annotated loadings plot of the PCA can be displayed as follows:
 
 <<fig=TRUE, pdf=FALSE, png=TRUE>>=
 plotPCA(results,loadings=TRUE,annotate=TRUE)
@@ -476,13 +504,10 @@ metadatamrbin(), or in the command line as follows:
 <<>>=
 #Annotate the dataset with signal identities
 metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
-                              4.12,4.1,70.8578,71.653,
                               3.052,3.043,30.5,33.5,
-                              4.066,4.059,57,59.5,
                               5.7,6.0,0,150),
                    ncol=4,byrow=TRUE)
-rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine",
-	"Creatinine","Urea")
+rownames(metaboliteIdentities)<-c("Lactate","Creatinine","Urea")
 results2D<-annotatemrbin(results2D,metaboliteIdentities=metaboliteIdentities)
 @
 
@@ -706,13 +731,10 @@ for(i in 1:ncol(results$bins)){
 significantBins<-names(sort(pvalues)[1:30]) 
 #Annotate the dataset with signal identities
 metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
-                              4.12,4.1,70.8578,71.653,
                               3.052,3.043,30.5,33.5,
-                              4.066,4.059,57,59.5,
                               5.7,6.0,0,150),
                    ncol=4,byrow=TRUE)
-rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine",
-	"Creatinine","Urea")
+rownames(metaboliteIdentities)<-c("Lactate","Creatinine","Urea")
 results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 mrheatmap(results=results,
     binlist=significantBins,annotate=TRUE,
