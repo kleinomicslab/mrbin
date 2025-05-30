@@ -38,7 +38,8 @@ NULL
 #' \donttest{ .onAttach() }
 
 .onAttach <- function(libname, pkgname){
-    packageStartupMessage("mrbin 1.9.2\nFor instructions and examples, please type: vignette('mrbin')")
+    packageStartupMessage(paste("mrbin ",as.character(utils::packageVersion("mrbin")),# 1.9.3
+	"\nFor instructions and examples, please type: vignette('mrbin')",sep=""))
 }
 
 
@@ -578,7 +579,8 @@ resetEnv<-function(){
                "noiseRemoval","noiseThreshold","dilutionCorrection","PQNScaling",
                "fixNegatives","logTrafo","unitVarianceScaling","PQNminimumFeatures",
                "PQNIgnoreSugarArea","PQNsugarArea","saveFiles","useAsNames","outputFileName",
-               "PCAtitlelength","PCA","tryParallel","NMRfolders"
+               "PCAtitlelength","PCA",#"tryParallel",
+			   "NMRfolders","annotate"
                ),mrbin.env)
     assign("requiredParam1D",c(
                "binwidth1D","reference1D","signal_to_noise1D","noiseRange1d",
@@ -2534,7 +2536,8 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
       if(mrbinResults$parameters$PQNScaling=="Yes") mrbinResults<-PQNScaling(mrbinResults,verbose=FALSE)
       if(mrbinResults$parameters$logTrafo=="Yes") mrbinResults<-logTrafo(mrbinResults,verbose=FALSE)
       if(mrbinResults$parameters$unitVarianceScaling=="Yes") mrbinResults<-unitVarianceScaling(mrbinResults,verbose=FALSE)
-      if(mrbinResults$parameters$verbose){
+      if(!is.null(mrbinResults$parameters$annotate)) mrbinResults<-annotatemrbin(mrbinResults,annotate=mrbinResults$parameters$annotate,verbose=FALSE)
+	  if(mrbinResults$parameters$verbose){
          message("done.\n", appendLF = FALSE)
          utils::flush.console()
       }
@@ -5442,7 +5445,10 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
     on.exit(graphics::par(oldpar))
     devAskNewPage(ask = FALSE)
     #graphics::par(bg="white",mfrow=c(2,2),mar=c(2.1,2,2,0.5))
-    graphics::par(bg="white",mfrow=c(2,3),mar=c(2.1,2,2,0.5))
+    graphics::par(bg="white",#mfrow=c(2,3),
+		mar=c(2.1,2,2,0.5))
+	graphics::layout(matrix(c(1,2,3,4,4,4,5,5,5), 3, 3, byrow = T)) 
+
     #Spectrum and bin region plot
 	#To save memory: avoid plotting thousand of small rectangles. Saving as pdf might take a long time.
     #This might happen when no or little noise removal was used
@@ -5506,8 +5512,12 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
           manualScale=FALSE,maxPlots=2,plotTitle=mainTitle,restrictToRange=TRUE,
           dimension=mrbinResults$parameters$dimension,enableSplit=FALSE)
     }
+	#PCA plots
+    plotPCA(mrbinResults,defineGroups=defineGroups,loadings=FALSE,verbose=FALSE)
+    plotPCA(mrbinResults,defineGroups=defineGroups,loadings=TRUE,verbose=FALSE)
+
 	#QC boxplots
-	graphics::par(mar=c(4.1,1.1,2.5,0.5))
+	graphics::par(mar=c(2.3,1.1,2,0.5))
     axisCex1<-.1
     if(ncol(mrbinResults$bins)<100) axisCex1<-.25
     if(ncol(mrbinResults$bins)<25) axisCex1<-.4
@@ -5516,20 +5526,22 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
     if(nrow(mrbinResults$bins)<100) axisCex2<-.25
     if(nrow(mrbinResults$bins)<25) axisCex2<-.4
     if(nrow(mrbinResults$bins)<15) axisCex2<-.7
-    graphics::boxplot(mrbinResults$bins[,1:min(ncol(mrbinResults$bins),5000)],
-	  main="Intensity boxplot bin-wise",yaxt="n",
-      xlab="",ylab="",boxwex=1,ask=FALSE,xaxt="n")
+	binsTMP<-mrbinResults$bins
+	binsTMP[binsTMP<=0]<-NA
+    graphics::boxplot(binsTMP[,1:min(ncol(mrbinResults$bins),5000)],medlwd = 1,
+	  main="Bin-wise intensity boxplots",yaxt="n",
+      xlab="",ylab="",boxwex=.95,ask=FALSE,xaxt="n",log="y")
     graphics::axis(2,cex.axis=.7,tck=-0.0075,mgp=c(0,0.1,0))
     graphics::axis(1,las=2,tck=-0.0075,mgp=c(0,0.1,0),cex.axis=axisCex1,at=1:ncol(mrbinResults$bins),labels=colnames(mrbinResults$bins))
-    graphics::boxplot(t(mrbinResults$bins),main="Intensity boxplot sample-wise",
-      xlab="",ylab="",boxwex=1,ask=FALSE,xaxt="n",yaxt="n")
+	#sample-wise
+	graphics::par(mar=c(3.9,1.1,1.5,0.5))
+    graphics::boxplot(t(binsTMP),medlwd = 1,main="Sample-wise intensity boxplots",
+      xlab="",ylab="",boxwex=.95,ask=FALSE,xaxt="n",yaxt="n",log="y")
     graphics::axis(2,cex.axis=.7,tck=-0.0075,mgp=c(0,0.1,0))
     graphics::axis(1,las=2,tck=-0.0075,mgp=c(0,0.1,0),cex.axis=axisCex2,at=1:nrow(mrbinResults$bins),
       labels=substr(rownames(mrbinResults$bins),1,mrbinResults$parameters$PCAtitlelength))
 
-	#PCA plots
-    plotPCA(mrbinResults,defineGroups=defineGroups,loadings=FALSE,verbose=FALSE)
-    plotPCA(mrbinResults,defineGroups=defineGroups,loadings=TRUE,verbose=FALSE)
+
 
     utils::flush.console()
     #Finish plot
@@ -6957,6 +6969,7 @@ createmrbin<-function(){
                createCode="",#Code for recreating this dataset can be stored here
                warningMessages=NULL,
                errorsAsWarnings=FALSE,
+			   annotate=NULL,
                Factors=NULL,#for backward conpatibility
                defineGroups=NULL#to be removed in future versions
     ),
@@ -7251,7 +7264,9 @@ editmetabolitesmrbin<-function(mrbinObject,
 #' @param add Should the new metabolite list be added to an existing list, or replace the current list?
 #' @param confirmationPthreshold A threshold to define the p-value cutoff to confirm an annotation
 #' @param confirmationRthreshold A threshold to define the r-value cutoff to confirm an annotation
+#' @param uniqueBins Should each bin be uniquely assigned to only one molecule?
 #' @param checkBaselineCorrelation Should correlation to baseline be compared to confirm an annotation
+#' @param verbose Should outputs be shown or suppressed?
 #' @return An (invisible) mrbin object
 #' @export
 #' @examples
@@ -7264,11 +7279,9 @@ editmetabolitesmrbin<-function(mrbinObject,
 #'                               system.file("extdata/2/10/pdata/10",package="mrbin"),
 #'                               system.file("extdata/1/10/pdata/10",package="mrbin"))))
 #' metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
-#'                               4.12,4.1,70.8578,71.653,1,1,
-#'                               3.052,3.043,30.5,33.5,1,1,
-#'                               4.066,4.059,57,59.5,1,1),
+#'                               3.052,3.043,30.5,33.5,1,1),
 #'                    ncol=6,byrow=TRUE)
-#' rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine")
+#' rownames(metaboliteIdentities)=c("Lactate","Creatinine")
 #' colnames(metaboliteIdentities)=c("left","right","top","bottom","usePeak1D","usePeak2D")
 #' results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 #' results$metadata$annotations[125:135]
@@ -7276,9 +7289,10 @@ editmetabolitesmrbin<-function(mrbinObject,
 
 annotatemrbin<-function(mrbinObject,annotate=TRUE,
   metaboliteIdentities=NULL,add=FALSE,hideChemicalShift=FALSE,
-  hideTentativeIds=FALSE,confirmationRthreshold=.6,
-  confirmationPthreshold=5e-6,checkBaselineCorrelation=TRUE){#Define metabolite names
-
+  hideTentativeIds=TRUE,confirmationRthreshold=.6,confirmationPthreshold=5e-6,
+  uniqueBins=TRUE,checkBaselineCorrelation=TRUE,verbose=TRUE){#Define metabolite names
+  #if(is.null(annotate)) annotate<-mrbinObject$parameters$annotate
+  #if(is.null(annotate)) annotate<-TRUE
   if(is.character(annotate)){
     annotateTMP<-TRUE
 	additionalIdentities<-annotate
@@ -7345,6 +7359,7 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		annotationsTentative<-vector("list",nrow(mrbinObject$parameters$binRegions))
 		names(annotationsTentative)<-colnames(mrbinObject$bins)
 		annotationsConfirmed<-annotationsTentative
+		annotationsConfirmedUnique<-annotationsTentative
 		annotationsSinglePeaks<-annotationsTentative
 		metabolitesTMP<-list()#one entry for each metabolite to save which bins belong to it
 	    metNameListTMP<-NULL
@@ -7362,9 +7377,9 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 				#peaks marked for exclusion
 				if(metaboliteIdentities[i,5]==0){#0 means do not use
 					imetNameTMP2<-1
-					metNameTMP2<-paste(metNameTMP,"?_doNotUse_",sprintf("%03d",imetNameTMP2),sep="")
+					metNameTMP2<-paste(metNameTMP,"_doNotUse_",sprintf("%03d",imetNameTMP2),sep="")
 					while(metNameTMP2%in%metNameListTMP){
-						metNameTMP2<-paste(metNameTMP,"?_doNotUse_",
+						metNameTMP2<-paste(metNameTMP,"_doNotUse_",
 							sprintf("%03d",imetNameTMP2
 							#as.numeric(substr(metNameTMP2,nchar(metNameTMP2)-2,
 							#nchar(metNameTMP2)))+1
@@ -7519,8 +7534,15 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 								colnames(resultMatrixTMP)[significantTMP[,2]]))
 							for(iConfirmed in significantTMP2){
 								if(!(names(metabolitesTMP)[j]%in%annotationsConfirmed[[iConfirmed]])){
-									annotationsConfirmed[[iConfirmed]]<-c(annotationsConfirmed[[iConfirmed]],
-										names(metabolitesTMP)[j])
+									if(uniqueBins){#only save the FIRST hit in this case - if the list was ordered by abundance, this is the most likely hit
+										if(is.null(annotationsConfirmedUnique[[iConfirmed]])){
+											annotationsConfirmedUnique[[iConfirmed]]<-c(annotationsConfirmedUnique[[iConfirmed]],
+												names(metabolitesTMP)[j])
+										}
+									} #else {
+										annotationsConfirmed[[iConfirmed]]<-c(annotationsConfirmed[[iConfirmed]],
+											names(metabolitesTMP)[j])
+									#}
 								}
 							}
 						}
@@ -7544,6 +7566,17 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 				}
 			}
 		}
+		#Remove not-to-be-used annotations from the list of single-peak ids 
+		for(iannotationsSinglePeaks in 1:length(annotationsSinglePeaks)){
+			if(!is.null(annotationsSinglePeaks[[iannotationsSinglePeaks]])){
+				#for(jannotationsSinglePeaks in annotationsSinglePeaks[[iannotationsSinglePeaks]]){
+					if(sum(grepl("_doNotUse_",annotationsSinglePeaks[[iannotationsSinglePeaks]]))>0){
+					annotationsSinglePeaks[[iannotationsSinglePeaks]]<-annotationsSinglePeaks[[iannotationsSinglePeaks]][!
+					  grepl("_doNotUse_",annotationsSinglePeaks[[iannotationsSinglePeaks]])]
+					}
+				#}
+			}
+		}
 		#Remove all single-peak annotations from the list of tentative ids 
 		for(iannotationsSinglePeaks in 1:length(annotationsSinglePeaks)){
 			if(!is.null(annotationsSinglePeaks[[iannotationsSinglePeaks]])){
@@ -7559,8 +7592,14 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		#first add confirmed ids
 		for(i in 1:length(annotationsCharacter)){
 		  if(!is.null(annotationsConfirmed[[i]])){
-		    if(length(annotationsConfirmed[[i]])>0){
-				annotationsCharacter[i]<-paste(annotationsConfirmed[[i]],sep=", ",collapse=", ")
+			if(uniqueBins){
+				if(length(annotationsConfirmedUnique[[i]])>0){
+					annotationsCharacter[i]<-paste(annotationsConfirmedUnique[[i]],sep=", ",collapse=", ")
+				}
+			} else {
+				if(length(annotationsConfirmed[[i]])>0){
+					annotationsCharacter[i]<-paste(annotationsConfirmed[[i]],sep=", ",collapse=", ")
+				}
 			}
 		  }
 		  #then add single-peak ids with one question mark
@@ -7577,7 +7616,7 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 				}
 				if(length(indexTMP)>0){
 					annotationsCharacter[i]<-paste(annotationsCharacter[i],
-						paste(annotationsSinglePeaks[[i]][indexTMP],"?",sep="",collapse="?, "),
+						paste(annotationsSinglePeaks[[i]][indexTMP],"?",sep="",collapse=", "),#"Y",sep="",collapse="?, "),
 						sep="",collapse="")
 				}
 			}
@@ -7622,13 +7661,13 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		mrbinObject<-editmrbin(mrbinObject,functionName="mrbin::annotatemrbin",
 				versionNumber=as.character(utils::packageVersion("mrbin")),
 				metadata=list(annotations=trimws(annotations)),verbose=FALSE)
-		if(!is.null(additionalIdentities)){
+		if(verbose&!is.null(additionalIdentities)){
 			message(paste("Sample type: ",additionalIdentities
 			), appendLF = TRUE)
 		}
 		confirmedTMP<-#gsub("__internal__","",
 			unique(unlist(annotationsConfirmed))#)
-		if(length(confirmedTMP)>0){
+		if(verbose&length(confirmedTMP)>0){
 			message(paste(length(confirmedTMP),"metabolites were confirmed:\n",
 				paste(confirmedTMP,sep=", ",collapse=", ")
 				), appendLF = TRUE)
@@ -7638,7 +7677,7 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		if(length(grep("_doNotUse_",tentativeTMP))>0){
 			tentativeTMP<-tentativeTMP[-grep("_doNotUse_",tentativeTMP)]
 		}
-		if(length(tentativeTMP)>0){
+		if(verbose&length(tentativeTMP)>0){
 			message(paste(length(tentativeTMP),"tentatively identified (only 1 peak available):\n",
 				paste(tentativeTMP,sep=", ",collapse=", ")
 				), appendLF = TRUE)
@@ -9034,13 +9073,11 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,dimensions=NULL,intensity1D=NULL,
 #' }
 #' significantBins<-names(sort(pvalues)[1:30]) 
 #' metaboliteIdentities=matrix(c(1.346,1.324,21,23,
-#'                               4.12,4.1,70.8578,71.653,
 #'                               3.052,3.043,30.5,33.5,
-#'                               4.066,4.059,57,59.5,
 #'                               5.7,6.0,0,150),
 #'                    ncol=4,byrow=TRUE)
 #' #Annotate the dataset with signal identities
-#' rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine","Urea")
+#' rownames(metaboliteIdentities)=c("Lactate","Creatinine","Urea")
 #' results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 #' mrheatmap(results=results,
 #'     binlist=significantBins,annotate=TRUE,
