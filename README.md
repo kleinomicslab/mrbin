@@ -63,10 +63,10 @@ mrbin will also show you preview plots for these parameters during the run.
 You can start mrbin using the following code:
 
 ```
-mrbinResults<-mrbin()
+results<-mrbin()
 ```
 
-This will start a series of questions that will guide you through the parameters to be used. 
+This will start a series of questions that will guide you through the parameters to be used, including preview plots. 
 
 mrbin() returns an (invisible) mrbin object containing the following variables: 
 * bins: A matrix containing bin data for all samples, Depending on the option you chose, the data will be cleaned up and scaled.
@@ -79,6 +79,7 @@ mrbin() returns an (invisible) mrbin object containing the following variables:
 Several files may be written to the chosen directory:
 * A .txt file containing all parameters and potential warning messages from the mrbin run. This file can be reloaded to R using recreatemrbin("filename"). This will enable reusing parameters used in a previous run and can help increase reproducibility.
 * A .Rdata file containing the generated mrbin data object.
+* A .R text file containing R code to recreate and or load the data set.
 * A .pdf file containing quality control plots of the raw binned data
 * A .pdf file containing quality control plots of the processed binned data
 * A .pdf file containing preview plots of the chosen signal-to-noise levels of selected spectra
@@ -87,7 +88,7 @@ Several files may be written to the chosen directory:
 Parameters can be submitted at the command line, using the following syntax:
 
 ```
-mrbin(parameters=list(dimension="1D",
+results<-mrbin(parameters=list(dimension="1D",
              binwidth1D=.01,
              referenceScaling="Yes",
              removeSolvent="Yes",
@@ -97,14 +98,13 @@ mrbin(parameters=list(dimension="1D",
              PQNScaling="Yes",
              fixNegatives="Yes",
              logTrafo="Yes",
-             saveFiles="Yes",
              NMRfolders=c("C:/NMR/Sample01/1/pdata/1",
                           "C:/NMR/Sample19/1/pdata/1",
                           "C:/NMR/Sample61/1/pdata/1")
      ))
 ```
 
-This will set up all parameters and run all steps without asking for user input.
+Users will then be asked to adjust the parameters as above. Additional parameters are available, please see vignette("mrbin") for details.
 
 ## atnv: Affine Transformation of Negative Values
 
@@ -120,8 +120,7 @@ Please find details on the fia algorithm in vignette("mrbin").
 
 
 ### Firewall Warnings
-If parallel computing is turned on and the package parallel is installed,
-mrbin will try to use the socket approach for computing. This requires
+The function mrbin uses the socket approach for parallel computing. This requires
 establishing network connections to the local cluster, which might
 trigger the firewall. It is safe to unblock these connections.
 

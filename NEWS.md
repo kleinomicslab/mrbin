@@ -1,5 +1,13 @@
 # mrbin News
 
+## Version 1.9.3
+
+* mrbin: Improved plots
+* mrbin: Small bug fixes
+* annotatemrbin: Fixed a bug that stopped the function from working in some cases
+* annotatemrbin: New parameter uniqueBins
+* vignette: Package vignette improved
+
 ## Version 1.9.2
 
 * mrplot: Bug fixed that prevented mrplot to be started in some cases
