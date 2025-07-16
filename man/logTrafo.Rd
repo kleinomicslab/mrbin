@@ -20,10 +20,11 @@ An invisible mrbin object
 This function performs logarithm transformation. Will not work with negative data.
 }
 \examples{
-resetEnv()
+resetEnv()#clean up previous data from the package environment 
 results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
-                    binwidth1D=0.05,signal_to_noise1D=50,verbose=TRUE,PCA="No",tryParallel=TRUE,
-                    NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                                system.file("extdata/2/10/pdata/10",package="mrbin"))))
+    binwidth1D=0.05,signal_to_noise1D=50,verbose=TRUE,PCA="No",NMRvendor="mrbin",
+    example=TRUE,#only used for the package examples
+    NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+                 system.file("extdata/2.mr1",package="mrbin"))))
 results<-logTrafo(results)
 }

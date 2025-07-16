@@ -16,12 +16,14 @@ right(refreshPlot = TRUE)
 This function moves right the plot region of the current NMR plot.
 }
 \examples{
-resetEnv()
+resetEnv()#clean up previous data from the package environment 
 mrbin(silent=TRUE,parameters=list(dimension="1D",binwidth1D=.5,
-         noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+         noiseRemoval="No",trimZeros="No",
          PQNScaling="No",saveFiles="No",referenceScaling="No",
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+         NMRvendor="mrbin",
+         example=TRUE,#only used for the package examples
+         NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 plotNMR()
 zoomIn()
 right()

@@ -14,10 +14,11 @@ This function crops HSQC spectra to the region along the diagonal to remove
 uninformative signals. Will work only for 1H-13C HSQC spectra.
 }
 \examples{
-resetEnv()
+resetEnv()#clean up previous data from the package environment 
 results<-mrbin(silent=TRUE,
          parameters=list(dimension="2D",binwidth2D=1,binheight=4,cropHSQC="No",PCA="No",
-         PQNScaling="No",noiseRemoval="No",removeSolvent="No",verbose=TRUE,tryParallel=TRUE,
-         NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
+         PQNScaling="No",noiseRemoval="No",removeSolvent="No",verbose=TRUE,
+         example=TRUE,#only used for the package examples
+         NMRfolders=system.file("extdata/1.mr2",package="mrbin"),NMRvendor="mrbin"))
 cropNMR()
 }

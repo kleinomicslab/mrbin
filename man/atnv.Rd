@@ -31,16 +31,17 @@ It is recommended to us this function AFTER noise removal and other data
 clean-up methods, as it may alter (reduce) the noise level.
 }
 \examples{
- resetEnv()
- results<-mrbin(silent=TRUE,
+resetEnv()#clean up previous data from the package environment 
+results<-mrbin(silent=TRUE,
                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.005,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,7.5,10,156),
                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,
-                   NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-                              system.file("extdata/3/10/pdata/10",package="mrbin"))
+                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,NMRvendor="mrbin",
+                   example=TRUE,#only used for the package examples
+                   NMRfolders=c(system.file("extdata/2.mr1",package="mrbin"),
+                              system.file("extdata/3.mr1",package="mrbin"))
                    ))
- sum(results$bins<=0)
- exampleNMRpositive<-atnv(NMRdata=results$bins, noiseLevels=results$parameters$noise_level_adjusted)
- sum(exampleNMRpositive<=0)
+sum(results$bins<=0)
+exampleNMRpositive<-atnv(NMRdata=results$bins, noiseLevels=results$parameters$noise_level_adjusted)
+sum(exampleNMRpositive<=0)
 }

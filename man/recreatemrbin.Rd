@@ -20,6 +20,7 @@ previous run or mrbin(). After reading, the data can be recreated using
 mrbin(). File names in $parameters might need to be updated.
 }
 \examples{
+resetEnv()#clean up previous data from the package environment 
 # Insert full folder path and file name
 recreatemrbin(system.file("extdata/mrbin.txt",package="mrbin"))
 }

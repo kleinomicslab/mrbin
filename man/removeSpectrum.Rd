@@ -31,12 +31,14 @@ This function lets the user pick spectra from a list for removal from data
 analysis.
 }
 \examples{
+resetEnv()#clean up previous data from the package environment 
 results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-         binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
-         noiseRemoval="No",
-         NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                      system.file("extdata/2/10/pdata/10",package="mrbin"),
-                      system.file("extdata/3/10/pdata/10",package="mrbin"))))
+         binwidth1D=0.05,PQNScaling="No",PCA="No",logTrafo="No",
+         noiseRemoval="No",NMRvendor="mrbin",
+         example=TRUE,#only used for the package examples
+         NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+                      system.file("extdata/2.mr1",package="mrbin"),
+                      system.file("extdata/3.mr1",package="mrbin"))))
 results<-removeSpectrum(results,
- spectra=c(system.file("extdata/2/10/pdata/10",package="mrbin")))
+ spectra=c(system.file("extdata/2.mr1",package="mrbin")))
 }

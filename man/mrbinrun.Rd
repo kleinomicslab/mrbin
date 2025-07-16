@@ -37,12 +37,14 @@ PCA plot. Parameters are then saved in a text file. These can be recreated
 using recreatemrbin().
 }
 \examples{
-resetEnv()
+resetEnv()#clean up previous data from the package environment 
 setParam(parameters=list(dimension="2D",binwidth2D=0.1,binheight=5,
-   binRegion=c(8,1,15,140),PQNScaling="No",tryParallel=TRUE,useAsNames="Spectrum titles",
+   binRegion=c(8,1,15,140),PQNScaling="No",useAsNames="Spectrum titles",
    fixNegatives="No",logTrafo="No",signal_to_noise2D=10,solventRegion=c(5.5,4.2),
-   NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                system.file("extdata/2/12/pdata/10",package="mrbin"),
-                system.file("extdata/3/12/pdata/10",package="mrbin"))))
+   example=TRUE,#only used for the package examples
+   NMRfolders=c(system.file("extdata/1.mr2",package="mrbin"),
+                system.file("extdata/2.mr2",package="mrbin"),
+                system.file("extdata/3.mr2",package="mrbin")),
+   NMRvendor="mrbin"))
 results<-mrbinrun()
 }

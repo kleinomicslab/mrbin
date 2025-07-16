@@ -7,6 +7,7 @@
 mrplot(
   hideMenu = FALSE,
   folders = NULL,
+  NMRvendor = "Bruker",
   dimensions = NULL,
   intensity1D = NULL,
   zoom = NULL,
@@ -32,6 +33,8 @@ mrplot(
 \item{hideMenu}{Do not show the menu. Defaults to FALSE}
 
 \item{folders}{Optional vector of folder names of spectra to load. Defaults to NULL}
+
+\item{NMRvendor}{Optional value naming the format of spectra to load. Defaults to Bruker}
 
 \item{dimensions}{Optional vector dimensions of spectra to load. Defaults to NULL}
 
@@ -76,7 +79,7 @@ plot view and add spectra. Multiple spectra will be overlaid, and if both
 1D and 2D spectra are selected, they are shown in two plots with matched ranges.
 }
 \examples{
-resetEnv()
+resetEnv()#clean up previous data from the package environment 
 metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
                               4.12,4.1,70.8578,71.653,0,1,
                               3.052,3.043,30.5,33.5,1,1,
@@ -86,10 +89,12 @@ metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
                    ncol=6,byrow=TRUE)
 rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine","Citrate","Citrate")
 colnames(metaboliteIdentities)=c("left","right","top","bottom","usePeak1D","usePeak2D")
-mrplot(folders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                 system.file("extdata/1/10/pdata/10",package="mrbin"),
-                 system.file("extdata/2/10/pdata/10",package="mrbin"),
-                 system.file("extdata/3/10/pdata/10",package="mrbin")),
+mrplot(folders=c(system.file("extdata/1.mr2",package="mrbin"),
+                 system.file("extdata/1.mr1",package="mrbin"),
+                 system.file("extdata/2.mr1",package="mrbin"),
+                 system.file("extdata/3.mr1",package="mrbin")),
+       NMRvendor="mrbin",
+       example=TRUE,#only used for the package examples
        dimensions=c("2D","1D","1D","1D"),zoom=c(2.8,2.4,20,60),
        highlight=c(2.564,2.537),
        binlist=c("2.725,2.675","2.575,2.525"),

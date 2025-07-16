@@ -18,5 +18,6 @@ setParam(parameters = NULL, metadata = NULL)
 This function set parameters and checks parameters for consistency.
 }
 \examples{
+resetEnv()#clean up previous data from the package environment 
 setParam(parameters=list(dimension="1D"))
 }

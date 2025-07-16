@@ -34,12 +34,14 @@ is requested and binning and data processing are performed silently.
 }
 \examples{
 # Set parameters in command line.
+resetEnv()#clean up previous data from the package environment 
 results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(
-                dimension="1D",binwidth1D=0.01,tryParallel=TRUE,
+                dimension="1D",binwidth1D=0.01,
                 signal_to_noise1D=25,noiseThreshold=0.75,useAsNames="Spectrum titles",
-                NMRfolders=c(
-                system.file("extdata/1/10/pdata/10",package="mrbin"),
-                system.file("extdata/2/10/pdata/10",package="mrbin"),
-                system.file("extdata/3/10/pdata/10",package="mrbin"))
+                example=TRUE,#only used for the package examples
+                NMRvendor="mrbin",NMRfolders=c(
+                system.file("extdata/1.mr1",package="mrbin"),
+                system.file("extdata/2.mr1",package="mrbin"),
+                system.file("extdata/3.mr1",package="mrbin"))
                 ))
 }

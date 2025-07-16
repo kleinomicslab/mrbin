@@ -17,8 +17,8 @@ This function increases the minimum contour level of the current 2D NMR
 spectrum plot.
 }
 \examples{
-resetEnv()
-addToPlot(folder=system.file("extdata/1/12/pdata/10",package="mrbin"),dimension="2D")
+resetEnv()#clean up previous data from the package environment 
+addToPlot(folder=system.file("extdata/1.mr2",package="mrbin"),dimension="2D",NMRvendor="mrbin")
 plotNMR()
 contPlus()
 }

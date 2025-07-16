@@ -18,10 +18,13 @@ intPlus(dimension = "1D", refreshPlot = TRUE)
 This function increases the intensity of the current NMR spectrum plot.
 }
 \examples{
+resetEnv()#clean up previous data from the package environment 
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+         NMRvendor="mrbin",
+         example=TRUE,#only used for the package examples
+         NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 plotNMR()
 intPlus()
 }

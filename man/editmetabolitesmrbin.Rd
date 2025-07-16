@@ -30,15 +30,18 @@ An (invisible) mrbin object
 This function edits the metabolite list within an mrbin object and returns it
 }
 \examples{
- results<-mrbin(silent=TRUE,
+resetEnv()#clean up previous data from the package environment 
+results<-mrbin(silent=TRUE,
                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
-                   NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-                              system.file("extdata/3/10/pdata/10",package="mrbin"))
+                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,
+                   NMRvendor="mrbin",
+                   example=TRUE,#only used for the package examples
+                   NMRfolders=c(system.file("extdata/2.mr1",package="mrbin"),
+                              system.file("extdata/3.mr1",package="mrbin"))
                    ))
- results<-editmetabolitesmrbin(results,borders=matrix(c(
+results<-editmetabolitesmrbin(results,borders=matrix(c(
      1.346,1.324,
      4.12,4.1,
      3.052,3.043,

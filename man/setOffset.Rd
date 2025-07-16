@@ -16,5 +16,6 @@ setOffset(offsetValue = NULL)
 This function moves up or down the 1D plot region of the current NMR plot.
 }
 \examples{
+resetEnv()#clean up previous data from the package environment 
 setOffset(0)
 }

@@ -20,10 +20,13 @@ zoomIn(refreshPlot = TRUE, x = TRUE, y = TRUE)
 This function zooms into the plot region of the current NMR plot.
 }
 \examples{
+resetEnv()#clean up previous data from the package environment 
 mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-         PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+         PQNScaling="No",noiseRemoval="No",trimZeros="No",
          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-         NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+         NMRvendor="mrbin",
+         example=TRUE,#only used for the package examples
+         NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 plotNMR()
 zoomIn()
 }

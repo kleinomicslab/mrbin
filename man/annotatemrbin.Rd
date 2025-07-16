@@ -7,27 +7,39 @@
 annotatemrbin(
   mrbinObject,
   annotate = TRUE,
+  binwidth = 0.01,
+  binheight = 1,
+  dimension = "1D",
   metaboliteIdentities = NULL,
   add = FALSE,
   hideChemicalShift = FALSE,
+  tiers = 1:5,
   hideTentativeIds = TRUE,
-  confirmationRthreshold = 0.6,
-  confirmationPthreshold = 5e-06,
+  confirmationRthreshold = 0.7,
+  confirmationPthreshold = 1e-05,
   uniqueBins = TRUE,
-  checkBaselineCorrelation = TRUE,
+  checkBaselineCorrelation = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{mrbinObject}{An mrbin object}
+\item{mrbinObject}{An mrbin object or matrix of bin intensities. In case of a matrix, the row names can be in the format left border, right border ("1.22,1.21") or the center of the bin ("1.215"). In the latter case, the parameters binwidth (and binheight if required) should be chosen accordingly. For 2D data, this would be "1.22,1.21,35,36" or "1.215,35.5"}
 
 \item{annotate}{If FALSE, the mrbin object will not be changed.}
+
+\item{binwidth}{Full width of each bin. Will only be used if mrbinObject is a matrix}
+
+\item{binheight}{Full height of each bin. Will only be used if mrbinObject is a matrix and dimension is set to "2D"}
+
+\item{dimension}{Dimension of NMR data set, option are "1D" or "2D" (e.g. for HSQC data). Will only be used if mrbinObject is a matrix}
 
 \item{metaboliteIdentities}{A numeric 4-column matrix or the file path for a .csv file containing such a matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names. If provided, this will overwrite any current metaboliteIdentities matrix present in the mrbin object. If missing, data currently attached to the mrbin object (if any) will be used.}
 
 \item{add}{Should the new metabolite list be added to an existing list, or replace the current list?}
 
 \item{hideChemicalShift}{Should the chemical shift (bin borders) of an identified metabolite be removed, leaving only the metabolite id, or should both be shown? Showing both helps in identifying signals of interest, but hiding the chemical shift might make better plots.}
+
+\item{tiers}{Should all tiers (1 through 5) of identification be applied? .}
 
 \item{hideTentativeIds}{Should the identities of tentative ids be omitted for clarity?}
 
@@ -48,20 +60,23 @@ An (invisible) mrbin object
 This function annotates an mrbin object and returns it with updated $annotations vector
 }
 \examples{
- results<-mrbin(silent=TRUE,
+resetEnv()#clean up previous data from the package environment 
+results<-mrbin(silent=TRUE,
                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
-                   NMRfolders=c(system.file("extdata/3/10/pdata/10",package="mrbin"),
-                              system.file("extdata/2/10/pdata/10",package="mrbin"),
-                              system.file("extdata/1/10/pdata/10",package="mrbin"))))
+                   fixNegatives="No",logTrafo="No",noiseThreshold=.05,
+                   NMRvendor="mrbin",
+                   example=TRUE,#only used for the package examples
+                   NMRfolders=c(system.file("extdata/3.mr1",package="mrbin"),
+                              system.file("extdata/2.mr1",package="mrbin"),
+                              system.file("extdata/1.mr1",package="mrbin"))))
 metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
                               3.052,3.043,30.5,33.5,1,1),
                    ncol=6,byrow=TRUE)
 rownames(metaboliteIdentities)=c("Lactate","Creatinine")
 colnames(metaboliteIdentities)=c("left","right","top","bottom","usePeak1D","usePeak2D")
 results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
-results$metadata$annotations[125:135]
+results$metadata$annotations[150:160]
 plotPCA(results,loadings=TRUE)
 }

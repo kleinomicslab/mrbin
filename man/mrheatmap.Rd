@@ -48,15 +48,16 @@ mrheatmap(
 This function plots heatmaps based on rank order, using heatmap from the stats package
 }
 \examples{
-resetEnv()
+resetEnv()#clean up previous data from the package environment 
 # First create NMR bin data, then plot some differential bins.
 results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(verbose=FALSE,
                 dimension="1D",binwidth1D=0.01,PCA="No",showSpectrumPreview="No",
                 signal_to_noise1D=25,noiseThreshold=0.75,useAsNames="Spectrum titles",
-                NMRfolders=c(
-                system.file("extdata/1/10/pdata/10",package="mrbin"),
-                system.file("extdata/2/10/pdata/10",package="mrbin"),
-                system.file("extdata/3/10/pdata/10",package="mrbin"))
+                NMRvendor="mrbin",
+                example=TRUE,#only used for the package examples
+                NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+                system.file("extdata/2.mr1",package="mrbin"),
+                system.file("extdata/3.mr1",package="mrbin"))
                 ))
 metadata<-c(0,0,1)
 #Find significant signals

@@ -10,7 +10,7 @@ resetEnv()
 {None}
 }
 \description{
-This function resets the parameter variables.
+This function resets the parameter variables in the package environment.
 }
 \examples{
 resetEnv()
