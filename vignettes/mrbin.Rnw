@@ -94,7 +94,7 @@ results<-mrbin()
 
 This will start a series of questions that will guide you through the parameters 
 to be used. Preview plots will help adjusting parameters to the current 
-dataset and allow for spoting any inconsistencies in the spectral data.\\
+dataset and allow for spotting any inconsistencies in the spectral data.\\
 
 <<echo=FALSE>>=
 results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
@@ -111,11 +111,11 @@ results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
              PQNScaling="No",
              fixNegatives="No",
              logTrafo="No",
-			 PCA="No",
+			 PCA="No",NMRvendor="mrbin",
 			 useAsNames="Spectrum titles",
-             NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                          system.file("extdata/2/10/pdata/10",package="mrbin"),
-                          system.file("extdata/3/10/pdata/10",package="mrbin"))
+             NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+                          system.file("extdata/2.mr1",package="mrbin"),
+                          system.file("extdata/3.mr1",package="mrbin"))
      ))
 @
 
@@ -162,11 +162,11 @@ results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
              PQNScaling="No",
              fixNegatives="No",
              logTrafo="No",
-			 PCA="Yes",
+			 PCA="Yes",NMRvendor="mrbin",
 			 useAsNames="Spectrum titles",
-             NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                          system.file("extdata/2/10/pdata/10",package="mrbin"),
-                          system.file("extdata/3/10/pdata/10",package="mrbin"))
+             NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+                          system.file("extdata/2.mr1",package="mrbin"),
+                          system.file("extdata/3.mr1",package="mrbin"))
      ))
 @
 
@@ -226,11 +226,11 @@ results<-mrbin(parameters=list(dimension="1D",
              noiseThreshold=0.75,
              PQNScaling="No",
              fixNegatives="No",
-             logTrafo="No",
+             logTrafo="No",NMRvendor="mrbin",
              useAsNames="Spectrum titles",
-             NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                          system.file("extdata/2/10/pdata/10",package="mrbin"),
-                          system.file("extdata/3/10/pdata/10",package="mrbin"))
+             NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+                          "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+                          "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10")
      ))
 @
 
@@ -240,9 +240,9 @@ containing the files "1r" (or "2rr" for 2D data) as follows (Please note that
 on Windows computers, backward slashes need to be replaced by forward slashes):
 
 <<eval=FALSE>>=
-   NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/sample_1/10/pdata/10",
-             "C:/Bruker/TopSpin/data/guest/nmr/sample_2/10/pdata/10",
-             "C:/Bruker/TopSpin/data/guest/nmr/sample_3/10/pdata/10")
+   NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+             "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+             "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10")
 @
 
 \subsection{Processing of mrbin Objects}
@@ -431,11 +431,11 @@ results2D<-mrbin(setDefault=TRUE,parameters=list(dimension="2D",
                PQNScaling="No",
                fixNegatives="No",
                logTrafo="No",
-			   useAsNames="Spectrum titles",
-               NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                       system.file("extdata/2/12/pdata/10",package="mrbin"),
-                       system.file("extdata/3/12/pdata/10",package="mrbin"))
-               ))
+               useAsNames="Spectrum titles",
+               NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+                "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+                "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10"),
+               NMRvendor="mrbin"))
 @
 <<fig=TRUE, pdf=FALSE, png=TRUE,echo=FALSE>>=
 results2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
@@ -453,10 +453,10 @@ results2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
                fixNegatives="No",
                logTrafo="No",
 			   useAsNames="Spectrum titles",
-               NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                       system.file("extdata/2/12/pdata/10",package="mrbin"),
-                       system.file("extdata/3/12/pdata/10",package="mrbin"))
-               ))
+			   NMRfolders=c(system.file("extdata/1.mr2",package="mrbin"),
+			                system.file("extdata/2.mr2",package="mrbin"),
+			                system.file("extdata/3.mr2",package="mrbin")),
+			   NMRvendor="mrbin"))
 @
 
 ~\\
@@ -543,9 +543,9 @@ results <- mrbin(parameters=list(dimension="1D",binMethod="Custom bin list",
                          ),NULL)),
  referenceScaling="Yes",reference1D=c(0.03,-0.03),removeSolvent="No",
  noiseRemoval="No",PQNScaling="No",fixNegatives="Yes",logTrafo="No",
- NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-              system.file("extdata/2/10/pdata/10",package="mrbin"),
-              system.file("extdata/3/10/pdata/10",package="mrbin"))
+ NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+              "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+              "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10")
  ))
 @
 
@@ -691,10 +691,11 @@ metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
                    ncol=4,byrow=TRUE)
 rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine","Creatinine",
         "Citrate","Citrate")
-mrplot(folders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                 system.file("extdata/1/10/pdata/10",package="mrbin"),
-                 system.file("extdata/2/10/pdata/10",package="mrbin"),
-                 system.file("extdata/3/10/pdata/10",package="mrbin")),
+mrplot(folders=c(system.file("extdata/1.mr2",package="mrbin"),
+                 system.file("extdata/1.mr1",package="mrbin"),
+                 system.file("extdata/2.mr1",package="mrbin"),
+                 system.file("extdata/3.mr1",package="mrbin")),
+       NMRvendor="mrbin",#default is "Bruker"
        dimensions=c("2D","1D","1D","1D"),
 	   zoom=c(2.8,2.4,20,60),
        highlight=c(2.564,2.537),
@@ -714,10 +715,11 @@ results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(verbose=FALSE,
 				showSpectrumPreview="No",
                 signal_to_noise1D=25,noiseThreshold=0.75,
 				useAsNames="Spectrum titles",
+                NMRvendor="mrbin",#default is "Bruker"
                 NMRfolders=c(
-                system.file("extdata/1/10/pdata/10",package="mrbin"),
-                system.file("extdata/2/10/pdata/10",package="mrbin"),
-                system.file("extdata/3/10/pdata/10",package="mrbin"))
+                system.file("extdata/1.mr1",package="mrbin"),
+                system.file("extdata/2.mr1",package="mrbin"),
+                system.file("extdata/3.mr1",package="mrbin"))
                 ))
 metadata<-c(0,0,1)
 #Find significant signals
@@ -751,8 +753,7 @@ mrplot command as detailed above.\\
 To use the basic plotting commands, you need to first load one NMR spectrum:
 
 <<eval=FALSE>>=
-readBruker(dimension="1D",
-  folder=system.file("extdata/1/10/pdata/10",package="mrbin"))
+readBruker(dimension="1D",folder="C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10")
 plotNMR()
 @
 
@@ -760,8 +761,7 @@ The system.file command loads example data from the mrbin package. To use your
 own spectra, please adjust as follows:\\
 
 <<eval=FALSE>>=
-addToPlot(dimension="1D",
-  folder="C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_1/12/pdata/10")
+addToPlot(dimension="1D",folder="C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10")
 plotNMR()
 @
 
@@ -769,8 +769,8 @@ plotNMR()
 For 2D data, this code reads as follows:
 
 <<eval=FALSE>>=
-addToPlot(dimension="2D",
-  folder=system.file("extdata/1/12/pdata/10",package="mrbin"))
+addToPlot(dimension="2D",NMRvendor="mrbin",
+  folder="C:/Bruker/TopSpin/data/guest/nmr/1/12/pdata/10")
 plotNMR()
 @
 
