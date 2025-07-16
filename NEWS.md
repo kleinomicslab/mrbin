@@ -1,5 +1,13 @@
 # mrbin News
 
+## Version 1.9.4
+
+* mrbin: Small bug fixes and improvements
+* mrbin: New colors for boxes in plots for improved visibility
+* mrplot: Improved placing of labels on plots
+* mrbin: Spectra can now be loaded in an internal mrbin format to reduce the package's space requirements for example data
+ 
+
 ## Version 1.9.3
 
 * mrbin: Improved plots
@@ -7,6 +15,7 @@
 * annotatemrbin: Fixed a bug that stopped the function from working in some cases
 * annotatemrbin: New parameter uniqueBins
 * vignette: Package vignette improved
+
 
 ## Version 1.9.2
 
