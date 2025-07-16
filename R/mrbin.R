@@ -458,18 +458,19 @@ fia<-function(model,dataSet,factors,nSeed=6,numberOfSamples=100,
 #' @return An invisible matrix or mrbin object containing NMR data without negative values.
 #' @export
 #' @examples
-#'  resetEnv()
-#'  results<-mrbin(silent=TRUE,
+#' resetEnv()#clean up previous data from the package environment 
+#' results<-mrbin(silent=TRUE,
 #'                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
 #'                    binwidth1D=0.005,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,7.5,10,156),
 #'                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,
-#'                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                               system.file("extdata/3/10/pdata/10",package="mrbin"))
+#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/2.mr1",package="mrbin"),
+#'                               system.file("extdata/3.mr1",package="mrbin"))
 #'                    ))
-#'  sum(results$bins<=0)
-#'  exampleNMRpositive<-atnv(NMRdata=results$bins, noiseLevels=results$parameters$noise_level_adjusted)
-#'  sum(exampleNMRpositive<=0)
+#' sum(results$bins<=0)
+#' exampleNMRpositive<-atnv(NMRdata=results$bins, noiseLevels=results$parameters$noise_level_adjusted)
+#' sum(exampleNMRpositive<=0)
 
 atnv<-function(NMRdata,noiseLevels=NULL,verbose=TRUE,errorsAsWarnings=FALSE){
      NMRdata2<-NMRdata
@@ -533,7 +534,7 @@ atnv<-function(NMRdata,noiseLevels=NULL,verbose=TRUE,errorsAsWarnings=FALSE){
 
 #' A parameter resetting function
 #'
-#' This function resets the parameter variables.
+#' This function resets the parameter variables in the package environment.
 #' @return {None}
 #' @export
 #' @examples
@@ -568,6 +569,7 @@ resetEnv<-function(){
                additionalPlots2DMetadata=NULL,
                spectrumListPlotTMP=NULL,
                timeEstimate=0,
+			   example=FALSE,
                scaleFactorTMP1=NULL,
                scaleFactorTMP2=NULL,
                scaleFactorTMP3=NULL
@@ -579,8 +581,8 @@ resetEnv<-function(){
                "noiseRemoval","noiseThreshold","dilutionCorrection","PQNScaling",
                "fixNegatives","logTrafo","unitVarianceScaling","PQNminimumFeatures",
                "PQNIgnoreSugarArea","PQNsugarArea","saveFiles","useAsNames","outputFileName",
-               "PCAtitlelength","PCA",#"tryParallel",
-			   "NMRfolders","annotate"
+               "PCAtitlelength","PCA","annotate","NMRvendor",#"tryParallel",
+			   "NMRfolders"
                ),mrbin.env)
     assign("requiredParam1D",c(
                "binwidth1D","reference1D","signal_to_noise1D","noiseRange1d",
@@ -624,19 +626,33 @@ resetEnv<-function(){
 #' @export
 #' @examples
 #' # Set parameters in command line.
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(
-#'                 dimension="1D",binwidth1D=0.01,tryParallel=TRUE,
+#'                 dimension="1D",binwidth1D=0.01,
 #'                 signal_to_noise1D=25,noiseThreshold=0.75,useAsNames="Spectrum titles",
-#'                 NMRfolders=c(
-#'                 system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                 system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                 system.file("extdata/3/10/pdata/10",package="mrbin"))
+#'                 example=TRUE,#only used for the package examples
+#'                 NMRvendor="mrbin",NMRfolders=c(
+#'                 system.file("extdata/1.mr1",package="mrbin"),
+#'                 system.file("extdata/2.mr1",package="mrbin"),
+#'                 system.file("extdata/3.mr1",package="mrbin"))
 #'                 ))
 
 mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,graphics= TRUE){
  if(!exists("mrbin.env", mode="environment")) .onLoad()
  if(setDefault) resetEnv()
- if(!is.null(parameters)) setParam(parameters=parameters)
+ if(!is.null(parameters)){
+	setParam(parameters=parameters)
+ }
+ if(mrbin.env$mrbinTMP$example){
+	 if(!mrbin.env$mrbin$parameters$example){
+		 resetEnv()#reset environment
+		 if(!is.null(parameters)){#now add the provided parameters again
+			setParam(parameters=parameters)
+		 }
+	 }
+ }
+ mrbin.env$mrbinTMP$example<-mrbin.env$mrbin$parameters$example#save current status for next run
+ mrbin.env$mrbin$parameters$example<-FALSE#next time rest environment unless example=TRUE
  if(!is.null(metadata)) setParam(metadata=metadata)
  if(!is.null(mrbin.env$mrbin$parameters$Factors)){
    mrbin.env$mrbin$metadata$factors<-mrbin.env$mrbin$parameters$Factors  #for backward compatibility
@@ -811,6 +827,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
                   ipreviewTMP<-1
                   while(ipreviewTMP <=length(mrbin.env$mrbin$parameters$NMRfolders)){
                     mrbin.env$mrbinTMP$currentFolder<-mrbin.env$mrbin$parameters$NMRfolders[ipreviewTMP]
+					mrbin.env$mrbinTMP$NMRvendor<-mrbin.env$mrbin$parameters$NMRvendor
                     readNMR2()
                     plotTitleTMP<-mrbin.env$mrbinTMP$currentFolder
                     if(nchar(plotTitleTMP)>56) plotTitleTMP<-paste("...",substr(
@@ -1121,7 +1138,8 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
 			  par(bg="white")
 			  plotMultiNMR(region="all",
                     rectangleRegions=mrbin.env$mrbin$parameters$specialBinList,color=NULL,
-                    manualScale=FALSE,rectangleColors="darkseagreen3",maxPlots=2,
+                    manualScale=FALSE,rectangleColors="orange",#"darkseagreen3"
+					maxPlots=2,
                     plotTitle=paste("Bin regions\n",sep=""),restrictToRange=TRUE)
 			}
             adjbinRegionSelect<-utils::select.list(c("Create new bin list",keepbinRegionYes,
@@ -1429,7 +1447,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
                   if(mrbin.env$mrbin$parameters$showSpectrumPreview=="Yes"){
 				    try(dev.off(),silent=TRUE)
 					par(bg="white")
- 				    plotMultiNMR(region=c(mean1+6*range1,mean1-6*range1,-10,160),rectangleColors="darkseagreen3",
+ 				    plotMultiNMR(region=c(mean1+6*range1,mean1-6*range1,-10,160),rectangleColors="orange",#"darkseagreen3",
                           rectangleRegions=matrix(c(mrbin.env$mrbin$parameters$solventRegion[1],
                                                   mrbin.env$mrbin$parameters$solventRegion[2],-1000,1000),ncol=4),
                           color=NULL,manualScale=FALSE,restrictToRange=TRUE,maxPlots=2,
@@ -1714,7 +1732,8 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
 				    par(bg="white")
 				    plotMultiNMR(region="all",
                           rectangleRegions=mrbin.env$mrbin$parameters$sumBinList,color=NULL,
-                          manualScale=FALSE,rectangleColors="darkseagreen3",maxPlots=2,
+                          manualScale=FALSE,rectangleColors="orange",#"darkseagreen3",
+						  maxPlots=2,
                           plotTitle=paste("Summed areas\n",sep=""),restrictToRange=TRUE)
 				  }
                   sumBinListTMP<-utils::select.list(c("Create new list",preselectKeepTMP,"Edit current list","Go back")[keepbinRegionIndex],
@@ -2122,7 +2141,8 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
      #Check if files or folders exist first to avoid long waiting due to binning failure
      for(iCheckFiles in 1:length(mrbin.env$mrbin$parameters$NMRfolders)){
        readNMR(folder=mrbin.env$mrbin$parameters$NMRfolders[iCheckFiles],
-         dimension=mrbin.env$mrbin$parameters$dimension,checkFiles=TRUE)
+         dimension=mrbin.env$mrbin$parameters$dimension,checkFiles=TRUE,
+		 NMRvendor=mrbin.env$mrbin$parameters$NMRvendor)
      }
      mrbin.env$mrbin<-mrbinrun(createbins=TRUE,process=FALSE,silent=silent,graphics=graphics)
      if(mrbin.env$mrbin$parameters$verbose){
@@ -2405,13 +2425,15 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
 #' @return An invisible mrbin object
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' setParam(parameters=list(dimension="2D",binwidth2D=0.1,binheight=5,
-#'    binRegion=c(8,1,15,140),PQNScaling="No",tryParallel=TRUE,useAsNames="Spectrum titles",
+#'    binRegion=c(8,1,15,140),PQNScaling="No",useAsNames="Spectrum titles",
 #'    fixNegatives="No",logTrafo="No",signal_to_noise2D=10,solventRegion=c(5.5,4.2),
-#'    NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-#'                 system.file("extdata/2/12/pdata/10",package="mrbin"),
-#'                 system.file("extdata/3/12/pdata/10",package="mrbin"))))
+#'    example=TRUE,#only used for the package examples
+#'    NMRfolders=c(system.file("extdata/1.mr2",package="mrbin"),
+#'                 system.file("extdata/2.mr2",package="mrbin"),
+#'                 system.file("extdata/3.mr2",package="mrbin")),
+#'    NMRvendor="mrbin"))
 #' results<-mrbinrun()
 
 mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
@@ -2419,14 +2441,9 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
   defineGroups<-FALSE
   if(!is.null(mrbin.env$mrbin$parameters$NMRfolders)){
 	if(mrbin.env$mrbin$parameters$saveFiles=="Yes"&is.null(mrbin.env$mrbin$parameters$outputFileName)){
-		#mrbin.env$mrbin<-editmrbin(mrbinObject=mrbin.env$mrbin,functionName="mrbin::mrbinrun",
-        #              versionNumber=as.character(utils::packageVersion("mrbin")),
-        #              parameters=list(outputFileName=
 			mrbin.env$mrbin$parameters$outputFileName<-
-						paste("mrbin_",gsub(":","-",gsub(" ","_",#Sys.Date()
+						paste("mrbin_",gsub(":","-",gsub(" ","_",
 						Sys.time())),sep="")
-		#				),verbose=FALSE)
-		
 	}
     if(createbins){
       mrbin.env$mrbinTMP$scaleFactorTMP1<-NULL
@@ -2536,11 +2553,11 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
       if(mrbinResults$parameters$PQNScaling=="Yes") mrbinResults<-PQNScaling(mrbinResults,verbose=FALSE)
       if(mrbinResults$parameters$logTrafo=="Yes") mrbinResults<-logTrafo(mrbinResults,verbose=FALSE)
       if(mrbinResults$parameters$unitVarianceScaling=="Yes") mrbinResults<-unitVarianceScaling(mrbinResults,verbose=FALSE)
-      if(!is.null(mrbinResults$parameters$annotate)) mrbinResults<-annotatemrbin(mrbinResults,annotate=mrbinResults$parameters$annotate,verbose=FALSE)
 	  if(mrbinResults$parameters$verbose){
          message("done.\n", appendLF = FALSE)
          utils::flush.console()
       }
+
        resultOutputTMP<-c("\nNumber of spectra: ",nrow(mrbinResults$bins),"\n",
            "Number of bins at start: ",mrbinResults$parameters$numberOfFeaturesRaw,"\n")
        if(!is.null(mrbinResults$parameters$numberOfFeaturesAfterRemovingSolvent)&
@@ -2577,6 +2594,7 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
          message(resultOutputTMP, appendLF = FALSE)
          utils::flush.console()
        }
+      if(!is.null(mrbinResults$parameters$annotate)) mrbinResults<-annotatemrbin(mrbinResults,annotate=mrbinResults$parameters$annotate,verbose=TRUE)
     }
     if(mrbinResults$parameters$PCA=="Yes"){
       if(mrbin.env$mrbin$parameters$saveFiles=="Yes"|process|!silent){
@@ -2617,13 +2635,15 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
 #' @return An invisible mrbin object
 #' @export
 #' @examples
+#'  resetEnv()#clean up previous data from the package environment 
 #'  results<-mrbin(silent=TRUE,
 #'                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
 #'                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
 #'                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
-#'                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                               system.file("extdata/3/10/pdata/10",package="mrbin"))
+#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/2.mr1",package="mrbin"),
+#'                               system.file("extdata/3.mr1",package="mrbin"))
 #'                    ))
 #'  results<-setDilutionFactors(results,dilutionFactors=c(1.5,2))
 
@@ -2690,13 +2710,15 @@ setDilutionFactors<-function(mrbinObject,dilutionFactors=NULL,
 #' @return An invisible mrbin object
 #' @export
 #' @examples
+#'  resetEnv()#clean up previous data from the package environment 
 #'  results<-mrbin(silent=TRUE,
 #'                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
 #'                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
 #'                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
-#'                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                               system.file("extdata/3/10/pdata/10",package="mrbin"))
+#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/2.mr1",package="mrbin"),
+#'                               system.file("extdata/3.mr1",package="mrbin"))
 #'                    ))
 #'  results<-setNoiseLevels(results,plotOnly=TRUE)
 
@@ -3215,13 +3237,15 @@ setNoiseLevels<-function(mrbinObject,plotOnly=FALSE,
 #' @return An invisible mrbin object
 #' @export
 #' @examples
+#'  resetEnv()#clean up previous data from the package environment 
 #'  results<-mrbin(silent=TRUE,
 #'                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
 #'                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
 #'                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
-#'                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                               system.file("extdata/3/10/pdata/10",package="mrbin"))
+#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/2.mr1",package="mrbin"),
+#'                               system.file("extdata/3.mr1",package="mrbin"))
 #'                    ))
 #'  results<-metadatamrbin(results,metadata=list(projectTitle="Test project"))
 
@@ -3631,6 +3655,7 @@ printParameters<-function(verbose=TRUE){
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' # Insert full folder path and file name
 #' recreatemrbin(system.file("extdata/mrbin.txt",package="mrbin"))
 
@@ -3691,6 +3716,7 @@ recreatemrbin<-function(filename=NULL,graphics= TRUE){
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' setParam(parameters=list(dimension="1D"))
 
 setParam<-function(parameters=NULL,metadata=NULL){
@@ -3741,11 +3767,12 @@ setParam<-function(parameters=NULL,metadata=NULL){
 #' @return An invisible mrbin object
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
-#'                     binwidth1D=0.05,signal_to_noise1D=50,verbose=TRUE,PCA="No",tryParallel=TRUE,
-#'                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                                 system.file("extdata/2/10/pdata/10",package="mrbin"))))
+#'     binwidth1D=0.05,signal_to_noise1D=50,verbose=TRUE,PCA="No",NMRvendor="mrbin",
+#'     example=TRUE,#only used for the package examples
+#'     NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                  system.file("extdata/2.mr1",package="mrbin"))))
 #' results<-logTrafo(results)
 
 logTrafo<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
@@ -3815,14 +3842,16 @@ setCurrentSpectrum<-function(spectrumNumber=NULL,graphics= TRUE){
 #' @return An invisible mrbin object (only if an mrbin object was provided)
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-#'          binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
-#'          noiseRemoval="No",
-#'          NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                       system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                       system.file("extdata/3/10/pdata/10",package="mrbin"))))
+#'          binwidth1D=0.05,PQNScaling="No",PCA="No",logTrafo="No",
+#'          noiseRemoval="No",NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                       system.file("extdata/2.mr1",package="mrbin"),
+#'                       system.file("extdata/3.mr1",package="mrbin"))))
 #' results<-removeSpectrum(results,
-#'  spectra=c(system.file("extdata/2/10/pdata/10",package="mrbin")))
+#'  spectra=c(system.file("extdata/2.mr1",package="mrbin")))
 
 removeSpectrum<-function(mrbinResults=NULL,spectra=NULL,verbose=TRUE,errorsAsWarnings=FALSE,graphics= TRUE){
  if(!is.null(mrbinResults)){
@@ -4844,11 +4873,13 @@ removeAreas<-function(){#limits=c(4.75,4.95,-10,160)
 #' @return An invisible mrbin object
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D", logTrafo="No",
-#'                     binwidth1D=0.05,signal_to_noise1D=50, verbose=TRUE, PCA="No",
-#'                       trimZeros="No",tryParallel=TRUE,
-#'                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                                 system.file("extdata/2/10/pdata/10",package="mrbin"))))
+#'                    binwidth1D=0.05,signal_to_noise1D=50, verbose=TRUE, PCA="No",
+#'                    trimZeros="No",NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                                 system.file("extdata/2.mr1",package="mrbin"))))
 #' results<-trimZeros(results)
 
 trimZeros<-function(mrbinResults){
@@ -4887,12 +4918,15 @@ trimZeros<-function(mrbinResults){
 #' @return An invisible mrbin object
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-#'                     binwidth1D=0.05,noiseRemoval="No",PQNScaling="No",tryParallel=TRUE,
-#'                     fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                                 system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                                 system.file("extdata/3/10/pdata/10",package="mrbin"))))
+#'                    binwidth1D=0.05,noiseRemoval="No",PQNScaling="No",
+#'                    fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
+#'                    NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                                 system.file("extdata/2.mr1",package="mrbin"),
+#'                                 system.file("extdata/3.mr1",package="mrbin"))))
 #' results<-removeNoise(results)
 
 removeNoise<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){#remove noise peaks
@@ -5007,11 +5041,12 @@ checkBaseline<-function(NMRdata=NULL,dimension="1D",currentSpectrumName=NULL,
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,
 #'          parameters=list(dimension="2D",binwidth2D=1,binheight=4,cropHSQC="No",PCA="No",
-#'          PQNScaling="No",noiseRemoval="No",removeSolvent="No",verbose=TRUE,tryParallel=TRUE,
-#'          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
+#'          PQNScaling="No",noiseRemoval="No",removeSolvent="No",verbose=TRUE,
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr2",package="mrbin"),NMRvendor="mrbin"))
 #' cropNMR()
 
 cropNMR<-function(){
@@ -5057,11 +5092,14 @@ if(nrow(mrbin.env$mrbin$parameters$binRegions)>1){
 #' @return An invisible matrix or mrbin object containing scaled NMR data.
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-#'                     binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
-#'                     NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                                 system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                                 system.file("extdata/3/10/pdata/10",package="mrbin"))))
+#'                    binwidth1D=0.05,PQNScaling="No",PCA="No",logTrafo="No",
+#'                    NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                                 system.file("extdata/2.mr1",package="mrbin"),
+#'                                 system.file("extdata/3.mr1",package="mrbin"))))
 #' results<-PQNScaling(results)
 
 PQNScaling<-function(NMRdata,ignoreGlucose="Yes",dimension="1D",
@@ -5206,11 +5244,14 @@ PQNScaling<-function(NMRdata,ignoreGlucose="Yes",dimension="1D",
 #' @return An invisible mrbin object containing scaled NMR data.
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-#'          binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
-#'          NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                       system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                       system.file("extdata/3/10/pdata/10",package="mrbin"))),
+#'          binwidth1D=0.05,PQNScaling="No",PCA="No",logTrafo="No",
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                       system.file("extdata/2.mr1",package="mrbin"),
+#'                       system.file("extdata/3.mr1",package="mrbin"))),
 #'          metadata=list(dilutionFactors=c(.75,1,.5)))
 #' results<-dilutionCorrection(results)
 
@@ -5256,11 +5297,14 @@ dilutionCorrection<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
 #' @return An invisible mrbin object containing scaled NMR data.
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
-#'          binwidth1D=0.05,PQNScaling="No",PCA="No",tryParallel=TRUE,logTrafo="No",
-#'          NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                       system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                       system.file("extdata/3/10/pdata/10",package="mrbin"))))
+#'          binwidth1D=0.05,PQNScaling="No",PCA="No",logTrafo="No",
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                       system.file("extdata/2.mr1",package="mrbin"),
+#'                       system.file("extdata/3.mr1",package="mrbin"))))
 #' results<-unitVarianceScaling(results)
 
 unitVarianceScaling<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
@@ -5304,13 +5348,16 @@ unitVarianceScaling<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
 #' @return An invisible prcomp result object
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=FALSE,parameters=list(dimension="2D",
 #'     binRegion=c(8,1,15,140),binwidth2D=0.1,binheight=4,solventRegion=c(5.5,4.2),
-#'     PQNScaling="No",noiseRemoval="Yes",trimZeros="Yes",tryParallel=TRUE,
+#'     PQNScaling="No",noiseRemoval="Yes",trimZeros="Yes",
 #'     fixNegatives="No",logTrafo="No",PCA="No",signal_to_noise2D=10,
-#'     NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-#'                  system.file("extdata/2/12/pdata/10",package="mrbin"),
-#'                  system.file("extdata/3/12/pdata/10",package="mrbin"))))
+#'     example=TRUE,#only used for the package examples
+#'     NMRfolders=c(system.file("extdata/1.mr2",package="mrbin"),
+#'                  system.file("extdata/2.mr2",package="mrbin"),
+#'                  system.file("extdata/3.mr2",package="mrbin")),
+#'     NMRvendor="mrbin"))
 #' plotPCA(results)
 plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="bottomleft",
  annotate=TRUE,verbose=TRUE,xpd=NA){
@@ -5418,12 +5465,15 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' results<-mrbin(silent=TRUE,setDefault=FALSE,parameters=list(dimension="2D",
 #'     binRegion=c(8,1,15,140),binwidth2D=0.2,binheight=4,solventRegion=c(5.5,4.2),
-#'     PQNScaling="No",noiseRemoval="Yes",trimZeros="Yes",tryParallel=TRUE,
+#'     PQNScaling="No",noiseRemoval="Yes",trimZeros="Yes",
 #'     fixNegatives="No",logTrafo="No",PCA="No",signal_to_noise2D=10,
-#'     NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-#'                  system.file("extdata/2/12/pdata/10",package="mrbin"))))
+#'     example=TRUE,#only used for the package examples
+#'     NMRfolders=c(system.file("extdata/1.mr2",package="mrbin"),
+#'                  system.file("extdata/2.mr2",package="mrbin")),
+#'     NMRvendor="mrbin"))
 #' plotResults(results)
 
 plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
@@ -5502,13 +5552,15 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
     }
     if(mrbinResults$parameters$dimension=="1D"){
       plotMultiNMR(region=region,rectangleRegions=rectangleRegionsTMP,buffer=FALSE,
-          color=NULL,rectangleColors="darkseagreen3", rectangleFront=FALSE,
+          color=NULL,rectangleColors="orange",#"darkseagreen3", 
+		  rectangleFront=FALSE,
           manualScale=FALSE,maxPlots=2,plotTitle=mainTitle,restrictToRange=TRUE,
           dimension=mrbinResults$parameters$dimension,enableSplit=FALSE)
     }
     if(mrbinResults$parameters$dimension=="2D"){
       plotMultiNMR(rectangleRegions=rectangleRegionsTMP,buffer=FALSE,
-          color=NULL,rectangleColors="darkseagreen3", rectangleFront=FALSE,#TRUE,
+          color=NULL,rectangleColors="orange",#"darkseagreen3", 
+		  rectangleFront=FALSE,#TRUE,
           manualScale=FALSE,maxPlots=2,plotTitle=mainTitle,restrictToRange=TRUE,
           dimension=mrbinResults$parameters$dimension,enableSplit=FALSE)
     }
@@ -5590,10 +5642,12 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
 #' @return An (invisible) dimension-reduced spectrum, either a matrix or a vector
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
-#'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",
+#'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 
 plotNMR<-function(region=NULL,rectangleRegions=NULL,
@@ -6005,11 +6059,14 @@ plotNMR<-function(region=NULL,rectangleRegions=NULL,
                     col = rectangleColors, density=density,angle=angles,
 					border = rectangleColors)
   	      if(!is.null(rownames(rectangleRegions))){#display metabolite identities if provided
-		    graphics::text(x=rectangleRegions[,2],#apply(rectangleRegions[,1:2],1,mean), #
-		      y=0#apply(rectangleRegions[,3:4],1,mean)
-			  ,offset=.1,
+		    graphics::text(x=#rectangleRegions[,2],
+			  apply(rectangleRegions[,1:2],1,mean), 
+		      y=0+sin(1:nrow(rectangleRegions)*1.5)*abs(ymax-ymin)*.035,#create variable y-offsets (.05*y range) to reduce overlap
+			  #y=apply(rectangleRegions[,3:4],1,mean),
+			  #,offset=.1,
 		      labels=rownames(rectangleRegions),
-			  cex=.8,adj=c(-0.5,1),srt=90,#-35,
+			  cex=.75,adj=c(0.5,2.5),
+			  #srt=90,#-35,
 			  xpd=NA,
 			  col=rectangleColors)
 		  }
@@ -6071,10 +6128,13 @@ plotNMR<-function(region=NULL,rectangleRegions=NULL,
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 #' intPlus()
 
@@ -6096,10 +6156,13 @@ intPlus<-function(dimension="1D",refreshPlot=TRUE){#increase plot intensity
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 #' intMin()
 
@@ -6130,8 +6193,8 @@ intMin<-function(dimension="1D",refreshPlot=TRUE,value=NULL){#decrease plot inte
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
-#' addToPlot(folder=system.file("extdata/1/12/pdata/10",package="mrbin"),dimension="2D")
+#' resetEnv()#clean up previous data from the package environment 
+#' addToPlot(folder=system.file("extdata/1.mr2",package="mrbin"),dimension="2D",NMRvendor="mrbin")
 #' plotNMR()
 #' contPlus()
 
@@ -6148,12 +6211,14 @@ contPlus<-function(refreshPlot=TRUE){#decrease plot intensity
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,parameters=list(dimension="2D",binwidth2D=0.5,
 #'          binheight=3,PQNScaling="No",referenceScaling="No",binRegion=c(4,3,60,65),
-#'          noiseRemoval="No",trimZeros="No",cropHSQC="No",tryParallel=TRUE,
+#'          noiseRemoval="No",trimZeros="No",cropHSQC="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,saveFiles="No",
-#'          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr2",package="mrbin"),
+#'          NMRvendor="mrbin"))
 #' plotNMR()
 #' contMin()
 
@@ -6175,10 +6240,13 @@ contMin<-function(refreshPlot=TRUE){#decrease plot intensity
 #' @return An invisible value indicating if a change occurred
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 #' zoom(left=4.6,right=2,top=10,bottom=150)
 
@@ -6251,10 +6319,13 @@ zoom<-function(left=NULL,right=NULL,top=NULL,bottom=NULL,refreshPlot=TRUE,dimens
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 #' zoomIn()
 
@@ -6285,10 +6356,13 @@ zoomIn<-function(refreshPlot=TRUE,x=TRUE,y=TRUE){#Zoom into NMR spectrum plot
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 #' zoomIn()
 #' zoomOut()
@@ -6319,6 +6393,7 @@ zoomOut<-function(refreshPlot=TRUE,x=TRUE,y=TRUE){#Zoom out from NMR spectrum pl
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' setOffset(0)
 setOffset<-function(offsetValue=NULL){
   if(!is.null(offsetValue)){
@@ -6334,12 +6409,14 @@ setOffset<-function(offsetValue=NULL){
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,parameters=list(dimension="1D",binwidth1D=.5,
-#'          noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+#'          noiseRemoval="No",trimZeros="No",
 #'          PQNScaling="No",saveFiles="No",referenceScaling="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 #' zoomIn()
 #' left()
@@ -6360,12 +6437,14 @@ left<-function(refreshPlot=TRUE){
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,parameters=list(dimension="1D",binwidth1D=.5,
-#'          noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
+#'          noiseRemoval="No",trimZeros="No",
 #'          PQNScaling="No",saveFiles="No",referenceScaling="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotNMR()
 #' zoomIn()
 #' right()
@@ -6386,12 +6465,14 @@ right<-function(refreshPlot=TRUE){
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,parameters=list(dimension="2D",binwidth2D=0.5,
 #'          binheight=3,PQNScaling="No",referenceScaling="No",binRegion=c(4,3,60,65),
-#'          noiseRemoval="No",trimZeros="No",cropHSQC="No",tryParallel=TRUE,
+#'          noiseRemoval="No",trimZeros="No",cropHSQC="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,saveFiles="No",
-#'          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr2",package="mrbin"),
+#'          NMRvendor="mrbin"))
 #' plotNMR()
 #' zoomIn()
 #' down()
@@ -6412,12 +6493,14 @@ down<-function(refreshPlot=TRUE){
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,parameters=list(dimension="2D",binwidth2D=0.5,
 #'          binheight=3,PQNScaling="No",referenceScaling="No",binRegion=c(4,3,60,65),
-#'          noiseRemoval="No",trimZeros="No",cropHSQC="No",tryParallel=TRUE,
+#'          noiseRemoval="No",trimZeros="No",cropHSQC="No",
 #'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,saveFiles="No",
-#'          NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"))))
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr2",package="mrbin"),
+#'          NMRvendor="mrbin"))
 #' plotNMR()
 #' zoomIn()
 #' up()
@@ -6579,19 +6662,24 @@ binMultiNMR2<-function(folder=NULL,dimension="1D",
 
 readNMR<-function(folder=NULL,dimension=NULL,onlyTitles=FALSE,
           NMRvendor="Bruker",useAsNames="Spectrum titles",
-          checkFiles=FALSE#,readAcqus=FALSE
-          ){#Read NMR spectral data
- #if(!is.null(mrbin.env$mrbinTMP$currentFolder)){
+          checkFiles=FALSE){#Read NMR spectral data
   if(NMRvendor=="Bruker"){
       currentSpectrum<-readBruker(folder=folder,dimension=dimension,
                       onlyTitles=onlyTitles,useAsNames=useAsNames,
-                      checkFiles=checkFiles#,readAcqus=readAcqus
-                      )
+                      checkFiles=checkFiles)
   }  else {
-      stop(paste("No data import function defined for vendor ",NMRvendor,".\n",sep=""))
+	 if(NMRvendor=="mrbin"){
+		spectrum<-NULL
+		fileEnding<-NULL
+		#fileEnding<-".mr1"
+		#if(dimension=="2D") fileEnding<-".mr2"
+		load(paste(folder,fileEnding,sep=""))
+		currentSpectrum<-spectrum
+	 }  else {  
+		  stop(paste("No data import function defined for vendor ",NMRvendor,".\n",sep=""))
+	}
   }
   invisible(currentSpectrum)
- #}
 }
 
 #' A function for reading Bruker NMR spectra.
@@ -6767,11 +6855,13 @@ readBruker<-function(folder=NULL,dimension=NULL,onlyTitles=FALSE,
 #' @noRd
 #' @examples
 #' \donttest{
-#' resetEnv()
-#' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",tryParallel=TRUE,
+#'  resetEnv()#clean up previous data from the package environment 
+#'  mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",
 #'          referenceScaling="No",binwidth1D=0.05,PQNScaling="No",PCA="No",
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
-#' referenceScaling()
+#'          NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
+#'  referenceScaling()
 #' }
 
 referenceScaling<-function(NMRdata=NULL,reference1D=NULL,reference2D=NULL,dimension="1D"){
@@ -6939,7 +7029,7 @@ createmrbin<-function(){
                PCAtitlelength=8,
                createBins="Yes",
                useAsNames="Folder names",#"Folder names and EXPNO", "Spectrum titles"
-               NMRvendor="Bruker",#NMR vendor. Currently, only Bruker data is supported.
+               NMRvendor="Bruker",#NMR vendor. Currently, Bruker and internal mrbin formats are supported.
                useMeanIntensityForBins=FALSE,
                mrbinversionTracker=as.character(utils::packageVersion("mrbin")),
                previewRegion1D=c(1.5,1.15,16.5,27),
@@ -6966,6 +7056,7 @@ createmrbin<-function(){
                numberOfFeaturesAfterNoiseRemoval=NULL,
                numberOfFeaturesAfterCropping=NULL,
                tryParallel=TRUE,
+			   example=FALSE,#used so data from package examples does not get mixed with user data. If example data should be preserved, use mrbin(parameters=list(example=TRUE))
                createCode="",#Code for recreating this dataset can be stored here
                warningMessages=NULL,
                errorsAsWarnings=FALSE,
@@ -7202,15 +7293,18 @@ checkmrbin<-function(mrbinObject,verbose=TRUE,errorsAsWarnings=NULL){
 #' @return An (invisible) mrbin object
 #' @export
 #' @examples
-#'  results<-mrbin(silent=TRUE,
+#' resetEnv()#clean up previous data from the package environment 
+#' results<-mrbin(silent=TRUE,
 #'                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
 #'                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
 #'                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
-#'                    NMRfolders=c(system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                               system.file("extdata/3/10/pdata/10",package="mrbin"))
+#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,
+#'                    NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/2.mr1",package="mrbin"),
+#'                               system.file("extdata/3.mr1",package="mrbin"))
 #'                    ))
-#'  results<-editmetabolitesmrbin(results,borders=matrix(c(
+#' results<-editmetabolitesmrbin(results,borders=matrix(c(
 #'      1.346,1.324,
 #'      4.12,4.1,
 #'      3.052,3.043,
@@ -7256,10 +7350,14 @@ editmetabolitesmrbin<-function(mrbinObject,
 #' A function for annotating mrbin objects.
 #'
 #' This function annotates an mrbin object and returns it with updated $annotations vector
-#' @param mrbinObject An mrbin object
+#' @param mrbinObject An mrbin object or matrix of bin intensities. In case of a matrix, the row names can be in the format left border, right border ("1.22,1.21") or the center of the bin ("1.215"). In the latter case, the parameters binwidth (and binheight if required) should be chosen accordingly. For 2D data, this would be "1.22,1.21,35,36" or "1.215,35.5"
 #' @param annotate If FALSE, the mrbin object will not be changed.
 #' @param metaboliteIdentities A numeric 4-column matrix or the file path for a .csv file containing such a matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names. If provided, this will overwrite any current metaboliteIdentities matrix present in the mrbin object. If missing, data currently attached to the mrbin object (if any) will be used.
+#' @param binwidth Full width of each bin. Will only be used if mrbinObject is a matrix
+#' @param binheight Full height of each bin. Will only be used if mrbinObject is a matrix and dimension is set to "2D"
+#' @param dimension Dimension of NMR data set, option are "1D" or "2D" (e.g. for HSQC data). Will only be used if mrbinObject is a matrix
 #' @param hideChemicalShift Should the chemical shift (bin borders) of an identified metabolite be removed, leaving only the metabolite id, or should both be shown? Showing both helps in identifying signals of interest, but hiding the chemical shift might make better plots.
+#' @param tiers Should all tiers (1 through 5) of identification be applied? .
 #' @param hideTentativeIds Should the identities of tentative ids be omitted for clarity?
 #' @param add Should the new metabolite list be added to an existing list, or replace the current list?
 #' @param confirmationPthreshold A threshold to define the p-value cutoff to confirm an annotation
@@ -7270,29 +7368,82 @@ editmetabolitesmrbin<-function(mrbinObject,
 #' @return An (invisible) mrbin object
 #' @export
 #' @examples
-#'  results<-mrbin(silent=TRUE,
+#' resetEnv()#clean up previous data from the package environment 
+#' results<-mrbin(silent=TRUE,
 #'                    parameters=list(verbose=TRUE,dimension="1D",PQNScaling="No",
 #'                    binwidth1D=0.04,signal_to_noise1D=1,PCA="No",binRegion=c(9.5,0.5,10,156),
 #'                    saveFiles="No",referenceScaling="No",noiseRemoval="No",
-#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,tryParallel=TRUE,
-#'                    NMRfolders=c(system.file("extdata/3/10/pdata/10",package="mrbin"),
-#'                               system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                               system.file("extdata/1/10/pdata/10",package="mrbin"))))
+#'                    fixNegatives="No",logTrafo="No",noiseThreshold=.05,
+#'                    NMRvendor="mrbin",
+#'                    example=TRUE,#only used for the package examples
+#'                    NMRfolders=c(system.file("extdata/3.mr1",package="mrbin"),
+#'                               system.file("extdata/2.mr1",package="mrbin"),
+#'                               system.file("extdata/1.mr1",package="mrbin"))))
 #' metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
 #'                               3.052,3.043,30.5,33.5,1,1),
 #'                    ncol=6,byrow=TRUE)
 #' rownames(metaboliteIdentities)=c("Lactate","Creatinine")
 #' colnames(metaboliteIdentities)=c("left","right","top","bottom","usePeak1D","usePeak2D")
 #' results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
-#' results$metadata$annotations[125:135]
+#' results$metadata$annotations[150:160]
 #' plotPCA(results,loadings=TRUE)
 
-annotatemrbin<-function(mrbinObject,annotate=TRUE,
+annotatemrbin<-function(mrbinObject,annotate=TRUE,binwidth=.01,binheight=1,dimension="1D",
   metaboliteIdentities=NULL,add=FALSE,hideChemicalShift=FALSE,
-  hideTentativeIds=TRUE,confirmationRthreshold=.6,confirmationPthreshold=5e-6,
-  uniqueBins=TRUE,checkBaselineCorrelation=TRUE,verbose=TRUE){#Define metabolite names
-  #if(is.null(annotate)) annotate<-mrbinObject$parameters$annotate
-  #if(is.null(annotate)) annotate<-TRUE
+  tiers=1:5,hideTentativeIds=TRUE,confirmationRthreshold=.7,#.6
+  confirmationPthreshold=1e-5,#5e-6
+  uniqueBins=TRUE,checkBaselineCorrelation=FALSE,verbose=TRUE){#Define metabolite names
+  if(is.matrix(mrbinObject)){
+	#check feature names and adjust to left,right(,top,bottom)
+	if(dimension=="1D"){
+		if(length(strsplit(rownames(mrbinObject)[1,","]))==1){
+			#use binwidth
+			binRegions<-cbind(
+				as.numeric(rownames(mrbinObject))+binwidth/2,
+				as.numeric(rownames(mrbinObject))-binwidth/2,
+				matrix(NA,ncol=2,nrow=nrow(mrbinObject))
+				)
+		} else {
+			if(length(strsplit(rownames(mrbinObject)[1,","]))==2){
+				binRegions<-cbind(
+					matrix(unlist(strsplit(rownames(mrbinObject),",")),
+					ncol=2,byrow=TRUE),
+					matrix(NA,ncol=2,nrow=nrow(mrbinObject))
+					)
+			} else {
+				if(length(strsplit(rownames(mrbinObject)[1,","]))==4){#if 2D values were provided (not used in this case)
+					binRegions<-matrix(unlist(strsplit(rownames(mrbinObject),",")),
+						ncol=4,byrow=TRUE)
+				}
+			}
+		}
+	
+	} else {#2D
+		if(length(strsplit(rownames(mrbinObject)[1,","]))==2){
+			#use binwidth
+			binreginsTMP<-matrix(unlist(strsplit(rownames(mrbinObject),",")),
+				ncol=2,byrow=TRUE)
+			binRegions<-cbind(
+				as.numeric(binreginsTMP[,1])+binwidth/2,
+				as.numeric(binreginsTMP[,1])-binwidth/2,
+				as.numeric(binreginsTMP[,2])-binheight/2,
+				as.numeric(binreginsTMP[,2])+binheight/2
+				)		
+		} else {
+			if(length(strsplit(rownames(mrbinObject)[1,","]))==4){
+				binRegions<-matrix(unlist(strsplit(rownames(mrbinObject),",")),
+					ncol=4,byrow=TRUE)
+			}	
+		}
+	}
+	mrbinObjectTMP<-createmrbin()
+	mrbinObjectTMP<-editmrbin(mrbinObjectTMP,
+		bins=mrbinObject,
+		parameters=list(dimension=dimension,
+		binRegions=binRegions)
+		)
+	mrbinObject<-mrbinObjectTMP
+  }
   if(is.character(annotate)){
     annotateTMP<-TRUE
 	additionalIdentities<-annotate
@@ -7307,12 +7458,11 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		if(is.character(metaboliteIdentities)){#load from .csv file
 			filepathTMP<-metaboliteIdentities
 			metaboliteIdentitiesTMP<-utils::read.csv(filepathTMP,
-				header=TRUE)#,colClasses=c("character",rep("numeric",4)))	
+				header=TRUE)
 			metaboliteIdentities<-as.matrix(metaboliteIdentitiesTMP[,
 				c("left","right","top","bottom","usePeak1D","usePeak2D")#2:7
 				,drop=FALSE])
 			rownames(metaboliteIdentities)<-trimws(metaboliteIdentitiesTMP[,"metabolite"])#do not use drop=FALSE here - needs to be a vector 
-			#metaboliteIdentities<-metaboliteIdentities[,-1]	
 		}
 		mrbinObject<-editmetabolitesmrbin(mrbinObject,ids=metaboliteIdentities,add=add)
 	}
@@ -7320,13 +7470,13 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		metaboliteIdentities<-cbind(metaboliteIdentities,rep(1,nrow(metaboliteIdentities)),
 			rep(1,nrow(metaboliteIdentities)))
 	}
-	
-	  if(!is.null(additionalIdentities)){#read predefined metabolite ids from file and add them
-		#if(additionalIdentities %in% c("urine","milk","serum")){
-			#Mark these metabolites with name extensions _2 etc so they do not get mixed up
-			#with metabolites of the same name provided by the user
-			additionalIdentitiesTMP<-utils::read.csv(system.file(paste("extdata/data/",additionalIdentities,".csv",sep=""),
-			  package="mrbin"),header=TRUE)#,colClasses=c("character",rep("numeric",4)))
+	if(!is.null(additionalIdentities)){#read predefined metabolite ids from file and add them
+		#Mark these metabolites with name extensions _2 etc so they do not get mixed up
+		#with metabolites of the same name provided by the user
+		metaboliteIDs<-NULL
+		load(system.file("extdata/TMP/3ADE68B1.000",package="mrbin"))
+		if(additionalIdentities%in%names(metaboliteIDs)){
+			additionalIdentitiesTMP<-metaboliteIDs[[additionalIdentities]]
 			additionalIdentitiesTMP2<-as.matrix(additionalIdentitiesTMP[,
 				c("left","right","top","bottom","usePeak1D","usePeak2D")#2:7
 				,drop=FALSE])
@@ -7338,158 +7488,364 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 						rownames(additionalIdentitiesTMP2)[irownames],"_2",sep="")
 				}
 			}
-			#rownames(additionalIdentitiesTMP2)<-paste(additionalIdentitiesTMP[,1],"__internal__",sep="")  
-			#rownames(additionalIdentitiesTMP2)<-paste(rownames(additionalIdentitiesTMP2),"?",sep="")
 			metaboliteIdentities<-rbind(additionalIdentitiesTMP2,metaboliteIdentities)
-		#} else {
-		#	message(paste("The provided sample type is not valid:",additionalIdentities))
-		#}
-	  }
-	  if(nrow(metaboliteIdentities)>0){
-	    #This finds matches and estimates if the molecule is present by analyzing correlations of different peak of one metabolite
-	    #annotationsTentative = a list of lists, each bin has one list item. this item names potential identifications for the respective bin
+		} else {
+			message(paste("The provided sample type is not valid:",additionalIdentities))
+		}
+	}
+	if(nrow(metaboliteIdentities)>0){
+		usePeakID<-5
+		if(mrbinObject$parameters$dimension=="2D") usePeakID<-6
+		#This finds matches and estimates if the molecule is present by analyzing correlations of different peak of one metabolite
+	    #annotationsTiers = a list of lists of lists, each bin has one list item. this item names potential identifications for the respective bin
 	    #annotationsConfirmed = a list of lists, each bin has one list item. this item names confirmed identifications for the respective bin
 		#metabolitesTMP = a list of lists, each item is one unique metabolite. each subitem is one unique peak of this metabolite and contains all bins that fall within the peak range
 		#if multiple bins are assigned the same id:
 		#calculate Pearson correlation coefficients (p-value) for all of them
-		#"metaboliteName?" - no correlation was found
-		#"metaboliteName" - two peaks correlated to each other
-		#annotations<-rep("",nrow(mrbinObject$parameters$binRegions))
-		#names(annotations)<-colnames(mrbinObject$bins)
-		annotationsTentative<-vector("list",nrow(mrbinObject$parameters$binRegions))
-		names(annotationsTentative)<-colnames(mrbinObject$bins)
-		annotationsConfirmed<-annotationsTentative
-		annotationsConfirmedUnique<-annotationsTentative
-		annotationsSinglePeaks<-annotationsTentative
+		#no correlation was found/only one peak available, therefore the correlation analysis could not be performed (manual verififcation required)
+		#two peaks correlated to each other, ...
+		tierNames<-c("L1+","L1","L1-","L2","L3")
+		if(mrbinObject$parameters$dimension=="2D"){
+			tierNames<-c("L1++","L1+","L1","L1-","L2")
+		}
+ 		annotationsL1TMP<-vector("list",nrow(mrbinObject$parameters$binRegions))
+		names(annotationsL1TMP)<-colnames(mrbinObject$bins)
+		annotationsTiers<-list(
+			"1"=annotationsL1TMP,#L1+
+			"2"=annotationsL1TMP,#L1
+			"3"=annotationsL1TMP,#L1-
+			"4"=annotationsL1TMP,#L2
+			"5"=annotationsL1TMP#L3
+		)
 		metabolitesTMP<-list()#one entry for each metabolite to save which bins belong to it
-	    metNameListTMP<-NULL
-		if(mrbinObject$parameters$dimension=="1D"){
-			for(i in 1:nrow(metaboliteIdentities)){
-			  #find all bins that lie (fully or partially) within metabolite boundaries
-			  testTMP<-(mrbinObject$parameters$binRegions[,1]<=metaboliteIdentities[i,1]&
-						mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,2])|
-					   (mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,1]&
-						mrbinObject$parameters$binRegions[,2]>=metaboliteIdentities[i,2])|
-					   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,1]&
-						mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,2])
-			  if(sum(testTMP)>0){			   
-			    metNameTMP<-rownames(metaboliteIdentities)[i]
+		#metaboliteBinsTMP<-list()#one entry for each metabolite to save which bins belong to it
+	    metabolitesAllNamesTMP<-NULL
+		metNameListTMP<-NULL
+		i<-0
+		jTMP<-NULL
+		#first, find all metabolites and peaks, THEN do the math for each
+		
+		while(i<nrow(metaboliteIdentities)){
+			i<-i+1
+			metNameTMP<-rownames(metaboliteIdentities)[i]
+			metNameTMP0<-metNameTMP
+			if(mrbinObject$parameters$dimension=="1D"){
+				#find all bins that lie (fully or partially) within metabolite boundaries
+				testTMP<-which((mrbinObject$parameters$binRegions[,1]<=metaboliteIdentities[i,1]&
+							mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,2])|
+						   (mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,1]&
+							mrbinObject$parameters$binRegions[,2]>=metaboliteIdentities[i,2])|
+						   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,1]&
+							mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,2]))
+			}	
+			if(mrbinObject$parameters$dimension=="2D"){
+				testTMP<-which(((mrbinObject$parameters$binRegions[,1]<=metaboliteIdentities[i,1]&
+							mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,2])|
+						   (mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,1]&
+							mrbinObject$parameters$binRegions[,2]>=metaboliteIdentities[i,2])|
+						   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,1]&
+							mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,2]))&#2D
+						   ((mrbinObject$parameters$binRegions[,4]<=metaboliteIdentities[i,4]&
+							mrbinObject$parameters$binRegions[,4]>=metaboliteIdentities[i,3])|
+						   (mrbinObject$parameters$binRegions[,3]<=metaboliteIdentities[i,4]&
+							mrbinObject$parameters$binRegions[,3]>=metaboliteIdentities[i,3])|
+						   (mrbinObject$parameters$binRegions[,4]>=metaboliteIdentities[i,4]&
+							mrbinObject$parameters$binRegions[,3]<=metaboliteIdentities[i,3])))
+			}
+			if(length(testTMP)>0){
+				#save all bins of a metabolite
+				#if(!metNameTMP%in%names(metaboliteBinsTMP)){#if this metabolite was not found before, add it to the list
+				#	  metaboliteBinsTMP<-c(metaboliteBinsTMP,list(testTMP))
+				#	  names(metaboliteBinsTMP)[length(metaboliteBinsTMP)]<-metNameTMP
+				#	  
+				#} else {#metabolite was in list already, add a new peak
+				#	  metaboliteBinsTMP[[metNameTMP]]<-c(metaboliteBinsTMP[[metNameTMP]],list(listEntryTMP))
+				#}
 				#peaks marked for exclusion
-				if(metaboliteIdentities[i,5]==0){#0 means do not use
+				if(metaboliteIdentities[i,usePeakID]==0){#0 means do not use
 					imetNameTMP2<-1
 					metNameTMP2<-paste(metNameTMP,"_doNotUse_",sprintf("%03d",imetNameTMP2),sep="")
 					while(metNameTMP2%in%metNameListTMP){
-						metNameTMP2<-paste(metNameTMP,"_doNotUse_",
-							sprintf("%03d",imetNameTMP2
-							#as.numeric(substr(metNameTMP2,nchar(metNameTMP2)-2,
-							#nchar(metNameTMP2)))+1
-							),
-							sep="")
-							imetNameTMP2<-imetNameTMP2+1
-					}
-					metNameTMP<-metNameTMP2
-				}
-			    #Find out if there are multiple peaks for one metabolite
-			    metNameListTMP<-c(metNameListTMP,metNameTMP)
-			    peakNumberTMP<-sum(metNameListTMP==metNameTMP)#+1
-			    listEntryTMP<-which(testTMP)#use this to add to the growing list (add bin name or number)
-			    if(!metNameTMP%in%names(metabolitesTMP)){#if this metabolite was not found before, add it to the list
-			      metabolitesTMP<-c(metabolitesTMP,list(list(listEntryTMP)))
-				  names(metabolitesTMP)[length(metabolitesTMP)]<-metNameTMP
-				  names(metabolitesTMP[[metNameTMP]])[1]<-peakNumberTMP
-				  #metabolitesTMP[[metNameTMP]]<-list()
-			    } else {#metabolite was in list already, add a new peak
-			      metabolitesTMP[[metNameTMP]]<-c(metabolitesTMP[[metNameTMP]],list(listEntryTMP))
-			      names(metabolitesTMP[[metNameTMP]])[length(metabolitesTMP[[metNameTMP]])]<-peakNumberTMP
-			      #metabolitesTMP[[metNameTMP]]<-c(metabolitesTMP[[metNameTMP]],which(testTMP))#add bin name or number
-			    }
-			    for(j in which(testTMP)){
-				  if(is.null(annotationsTentative[[j]])){
-				    annotationsTentative[[j]]<-list(metNameTMP)
-				  } else {
-				    if(!(metNameTMP%in%annotationsTentative[[j]])){
-					 annotationsTentative[[j]]<-c(annotationsTentative[[j]],metNameTMP)
-					 #paste(annotations[j],metNameTMP,sep=", ")
-				  }
-				}
-			   }
-			  }
-			 #}
-			}
-		}
-		if(mrbinObject$parameters$dimension=="2D"){
-			for(i in 1:nrow(metaboliteIdentities)){
-			  testTMP<-((mrbinObject$parameters$binRegions[,1]<=metaboliteIdentities[i,1]&
-						mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,2])|
-					   (mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,1]&
-						mrbinObject$parameters$binRegions[,2]>=metaboliteIdentities[i,2])|
-					   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,1]&
-						mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,2]))&#2D
-					   ((mrbinObject$parameters$binRegions[,4]<=metaboliteIdentities[i,4]&
-						mrbinObject$parameters$binRegions[,4]>=metaboliteIdentities[i,3])|
-					   (mrbinObject$parameters$binRegions[,3]<=metaboliteIdentities[i,4]&
-						mrbinObject$parameters$binRegions[,3]>=metaboliteIdentities[i,3])|
-					   (mrbinObject$parameters$binRegions[,4]>=metaboliteIdentities[i,4]&
-						mrbinObject$parameters$binRegions[,3]<=metaboliteIdentities[i,3]))
-			  if(sum(testTMP)>0){
-				metNameTMP<-rownames(metaboliteIdentities)[i]
-				#peaks marked for exclusion
-				if(metaboliteIdentities[i,6]==0){#0 means do not use
-					imetNameTMP2<-1
-					metNameTMP2<-paste(metNameTMP,"?_doNotUse_",sprintf("%03d",imetNameTMP2),sep="")
-					while(metNameTMP2%in%metNameListTMP){
-						metNameTMP2<-paste(metNameTMP,"?_doNotUse_",
-							sprintf("%03d",imetNameTMP2
-							#as.numeric(substr(metNameTMP2,nchar(metNameTMP2)-2,
-							#nchar(metNameTMP2)))+1
-							),
-							sep="")
+						metNameTMP2<-paste(metNameTMP,"_doNotUse_",sprintf("%03d",imetNameTMP2),sep="")
 						imetNameTMP2<-imetNameTMP2+1
 					}
 					metNameTMP<-metNameTMP2
 				}
-			    #Find out if there are multiple peaks for one metabolite
-			    metNameListTMP<-c(metNameListTMP,metNameTMP)
-			    peakNumberTMP<-1+sum(metNameListTMP==metNameTMP)
-			    listEntryTMP<-which(testTMP)#use this to add to the growing list (add bin name or number)
-			    if(!metNameTMP%in%names(metabolitesTMP)){#if this metabolite was not found before, add it to the list
-			      metabolitesTMP<-c(metabolitesTMP,list(list(listEntryTMP)))
-				  names(metabolitesTMP)[length(metabolitesTMP)]<-metNameTMP
-				  names(metabolitesTMP[[metNameTMP]])[1]<-peakNumberTMP
-				  #metabolitesTMP[[metNameTMP]]<-list()
-			    } else {#metabolite was in list already, add a new peak
-			      metabolitesTMP[[metNameTMP]]<-c(metabolitesTMP[[metNameTMP]],list(listEntryTMP))
-			      names(metabolitesTMP[[metNameTMP]])[length(metabolitesTMP[[metNameTMP]])]<-peakNumberTMP
-			      #metabolitesTMP[[metNameTMP]]<-c(metabolitesTMP[[metNameTMP]],which(testTMP))#add bin name or number
-			    }
-				for(j in which(testTMP)){
-					if(is.null(annotationsTentative[[j]])){
-						annotationsTentative[[j]]<-list(metNameTMP)
-					} else {
-						if(!(metNameTMP%in%annotationsTentative[[j]])){
-							annotationsTentative[[j]]<-c(annotationsTentative[[j]],metNameTMP)
-						}
+				if(length(testTMP)>0){
+					#Find out if there are multiple peaks for one metabolite
+					metNameListTMP<-c(metNameListTMP,metNameTMP)
+					peakNumberTMP<-0+sum(metNameListTMP==metNameTMP)
+					listEntryTMP<-testTMP#use this to add to the growing list (add bin name or number)
+					if(!metNameTMP%in%names(metabolitesTMP)){#if this metabolite was not found before, add it to the list
+					  metabolitesAllNamesTMP<-c(metabolitesAllNamesTMP,metNameTMP)
+					  names(metabolitesAllNamesTMP)[length(metabolitesAllNamesTMP)]<-metNameTMP0
+					  metabolitesTMP<-c(metabolitesTMP,list(list(listEntryTMP)))
+					  names(metabolitesTMP)[length(metabolitesTMP)]<-metNameTMP
+					  names(metabolitesTMP[[metNameTMP]])[1]<-peakNumberTMP
+					} else {#metabolite was in list already, add a new peak
+					  metabolitesTMP[[metNameTMP]]<-c(metabolitesTMP[[metNameTMP]],list(listEntryTMP))
+					  additionTMP<-""
+					  if(metaboliteIdentities[i,usePeakID]==2) additionTMP<-"_uniquePeak"
+					  names(metabolitesTMP[[metNameTMP]])[length(metabolitesTMP[[metNameTMP]])]<-paste(peakNumberTMP,additionTMP,sep="")
 					}
+					#for(j in testTMP){
+					#	if(is.null(annotationsL2minus[[j]])){
+					#		annotationsL2minus[[j]]<-list(metNameTMP)
+					#	} else {
+					#		if(!(metNameTMP%in%annotationsL2minus[[j]])){
+					#			annotationsL2minus[[j]]<-c(annotationsL2minus[[j]],metNameTMP)
+					#		}
+					#	}
+					#}
 				}
-			  }
+			}
+			if(i==nrow(metaboliteIdentities)){#end of file or matrix
+				metNameTMPNext<-"end"
+			} else {
+				metNameTMPNext<-rownames(metaboliteIdentities)[i+1]
 			}
 		}
-		for(j in 1:length(metabolitesTMP)){#check every metabolite that was potentially found
-			if(length(metabolitesTMP[[j]])>1){#check only metabolites where at least 2 peaks were identified			
-				#find all possible pairs - peak1-peak2, peak1-peak3, etc.
-				for(i_peak1 in 1:(length(metabolitesTMP[[j]])-1)){
-					for(i_peak2 in (i_peak1+1):length(metabolitesTMP[[j]])){
-						colnamesTMP<-metabolitesTMP[[j]][[i_peak1]]
-						rownamesTMP<-metabolitesTMP[[j]][[i_peak2]]
-						#one bin might include 2 or more peaks of the same molecule. In this case, correlations 
-						#between one bin with itself need to be excluded (R=1, p=0)
-						#remove any duplicate entries from overlapping peak areas
-						for(irownamesTMP in 1:length(rownamesTMP)){
-							if(rownamesTMP[irownamesTMP] %in% colnamesTMP){
-								irownamesTMP<-irownamesTMP[-irownamesTMP]
+		#exclude bins that match multiple peaks of the same compund (only keep first hit)
+		for(j in 1:length(metabolitesTMP)){
+			if(length(metabolitesTMP[[j]])>1){
+				#deleteTMPj<-NULL
+				deleteTMPi<-NULL
+				for(jExcludeMultiple in 2:length(metabolitesTMP[[j]])){
+				  if(length(metabolitesTMP[[j]][[jExcludeMultiple]])>0){
+					for(iExcludeMultiple in 1:length(metabolitesTMP[[j]][[jExcludeMultiple]])){
+						if(metabolitesTMP[[j]][[jExcludeMultiple]][iExcludeMultiple] %in% 
+							unlist(metabolitesTMP[[j]][1:(jExcludeMultiple-1)])){
+							#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
+							#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
+							deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+						}
+					}
+					if(length(deleteTMPi)>0){
+						metabolitesTMP[[j]][[jExcludeMultiple]]<-
+							metabolitesTMP[[j]][[jExcludeMultiple]][-deleteTMPi]
+					}
+				  }
+				}
+				#now remove empty entries:
+				if(0 %in% lapply(metabolitesTMP[[j]],length)){
+					metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
+				}
+			}
+		}
+		metabolitesTMP0<-metabolitesTMP
+		#Estimate the baseline by averaging the 5% lowest bins after excluding bins of the current metabolite 
+		#baseline<-matrix(0,ncol=length(metabolitesTMP),nrow=nrow(mrbinObject$bins))
+		#for(j in 1:length(metabolitesTMP)){
+			#if(length(metabolitesTMP[[j]])>0){#check only metabolites where at least 1 peak was identified			
+		#		if(sum(1:ncol(mrbinObject$bins)%in%unique(unlist(metabolitesTMP[[j]])))>0){
+		#			if(sum(1:ncol(mrbinObject$bins)%in%unique(unlist(metabolitesTMP[[j]])))<ncol(mrbinObject$bins)){
+		#				binsTMP<-mrbinObject$bins[,!1:ncol(mrbinObject$bins)%in%unique(unlist(metabolitesTMP[[j]])),drop=FALSE]
+		#				#keep only lowest 5% (mean) bins
+		#				binsTMP<-binsTMP[,order(apply(binsTMP,2,mean))[1:ceiling(ncol(binsTMP)*.05)],drop=FALSE]
+		#				baseline[,j]<-apply(binsTMP,1,mean)
+		#			} else {
+						#baseline<-rep(0,nrow(mrbinObject$bins))
+						#message("Unexpected issue: All bins marked as",names(metabolitesTMP)[j])
+		#			}
+		#		} else {
+					#message("Baseline ",j," ",paste(unlist(metabolitesTMP[[j]]),sep=" ",collapse=", "))
+		#		}
+		#	}
+		#}
+		#now do the math
+		#Tier 1 (L1+)	
+		if(1 %in% tiers){		
+		  for(j in 1:length(metabolitesTMP)){
+			if(length(metabolitesTMP[[j]])>1){#check only metabolites where at least 1 peak was identified	
+				if(length(grep("_uniquePeak",names(metabolitesTMP[[j]])))>0){
+					#message("Unique peak found, ",j,", ",names(metabolitesTMP)[j],", ",names(metabolitesTMP[[j]]))
+					#Remove tier 1 bins 
+					#EXCEPT BINS of this metabolite
+					#deleteTMPj<-NULL
+					metabolitesTMP2<-metabolitesTMP
+					deleteTMPi<-NULL
+					for(jExcludeMultiple1 in 1:length(metabolitesTMP2[[j]])){
+					  if(length(metabolitesTMP2[[j]][[jExcludeMultiple1]])>0){
+						for(iExcludeMultiple in 1:length(metabolitesTMP2[[j]][[jExcludeMultiple1]])){
+							unlistTMP<-unlist(annotationsTiers[[1]])
+							if(names(metabolitesTMP2)[j]%in%unlistTMP){
+								unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
+							}
+							if(names(metabolitesTMP2[[j]][[jExcludeMultiple1]][iExcludeMultiple]) %in% 
+								names(unlistTMP)){
+								#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
+								#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
+								#message(names(metabolitesTMP)[j]," ",
+									#names(metabolitesTMP[[j]][[jExcludeMultiple]])[iExcludeMultiple]," ",
+								#	paste(names(unlistTMP),sep=" ", collapse=" ")," ",
+								#	paste(unlistTMP,sep=" ", collapse=" "))
+								deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
 							}
 						}
-						if(length(rownamesTMP)>0){
+					  	if(length(deleteTMPi)>0){
+							metabolitesTMP2[[j]][[jExcludeMultiple1]]<-
+								metabolitesTMP2[[j]][[jExcludeMultiple1]][-deleteTMPi]
+						}
+					  }
+					}				
+					if(0 %in% lapply(metabolitesTMP2[[j]],length)){#now remove empty entries:
+						metabolitesTMP2[[j]][which(lapply(metabolitesTMP2[[j]],length)==0)]<-NULL
+					}					
+					#re-check if _uniquePeaks is still there
+					if(length(metabolitesTMP2[[j]])>1&length(grep("_uniquePeak",names(metabolitesTMP2[[j]])))>0){
+						correlatedPeakBinsTMP<-vector("list",length(metabolitesTMP2[[j]]))
+						#find only pairs for unique peaks
+						for(i_peak1 in grep("_uniquePeak",names(metabolitesTMP2[[j]]))){
+							i_peak2TMP<-1:length(metabolitesTMP2[[j]])
+							i_peak2TMP<-i_peak2TMP[!i_peak2TMP==i_peak1]#remove the unique peak
+							#message("Unique peak found 2: ",i_peak1,", ",i_peak2TMP)
+							for(i_peak2 in i_peak2TMP){
+								colnamesTMP<-metabolitesTMP2[[j]][[i_peak1]]
+								rownamesTMP<-metabolitesTMP2[[j]][[i_peak2]]							
+								resultMatrixTMP<-matrix(1,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
+									),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
+									))#save p-values here
+								correlationMatrix<-matrix(0,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
+									),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
+									))#save correlation coefficients here
+								colnames(resultMatrixTMP)<-colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
+								rownames(resultMatrixTMP)<-rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
+								for(j_bin1 in 1:length(metabolitesTMP2[[j]][[i_peak1]])){
+									#calculate correlation between baseline and peak 1, bin j_bin1
+									#baselineCorr1<-stats::cor.test(mrbinObject$bins[,
+									#	  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
+										  #mrbinObject$parameters$
+									#	  baseline[,j])
+									for(j_bin2 in 1:length(metabolitesTMP2[[j]][[i_peak2]])){
+										#calculate correlation between baseline and peak 2
+										#baselineCorr2<-stats::cor.test(mrbinObject$bins[,
+										#	metabolitesTMP[[j]][[i_peak2]][j_bin2]],
+											#mrbinObject$parameters$
+										#	baseline[,j])
+										resultsCorTestTMP<-stats::cor.test(mrbinObject$bins[,
+										  metabolitesTMP2[[j]][[i_peak1]][j_bin1]],
+										  mrbinObject$bins[,
+										  metabolitesTMP2[[j]][[i_peak2]][j_bin2]])
+										resultMatrixTMP[j_bin2,j_bin1]<-resultsCorTestTMP$p.value
+										correlationMatrix[j_bin2,j_bin1]<-resultsCorTestTMP$estimate
+										#make sure the correlation is positive! 
+									}
+								}
+								#check for significance using p-value threshold
+								significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
+										correlationMatrix>confirmationRthreshold,arr.ind=TRUE)
+								#if(checkBaselineCorrelation){
+								#		significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
+								#			correlationMatrix>confirmationRthreshold#&(
+											#resultMatrixTMP<baselineCorr1$p.value&#p-value must be smaller than p-value of correlation to baseline
+											#resultMatrixTMP<baselineCorr2$p.value
+											#)&(
+											#correlationMatrix^2>baselineCorr1$estimate^2&#R must be greater than R of correlation to baseline
+											#correlationMatrix>baselineCorr2$estimate
+								#			),
+								#			arr.ind=TRUE)
+								#}
+								if(nrow(significantTMP)>0){
+									correlatedPeakBinsTMP[[i_peak1]]<-unique(c(correlatedPeakBinsTMP[[i_peak1]],
+										colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
+									correlatedPeakBinsTMP[[i_peak2]]<-unique(c(correlatedPeakBinsTMP[[i_peak2]],
+										rownames(resultMatrixTMP)[unique(significantTMP[,1])]))
+									significantTMP2<-as.numeric(c(rownames(resultMatrixTMP)[unique(significantTMP[,1])],
+												colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
+									for(iConfirmed in significantTMP2){
+										if(is.null(annotationsTiers[[1]][[iConfirmed]])){
+											annotationsTiers[[1]][[iConfirmed]]<-c(annotationsTiers[[1]][[iConfirmed]],
+												names(metabolitesTMP2)[j])
+										}
+									}
+								}
+	
+							}
+						}
+						#remove all bins of this significant peak that were NOT significant - these belong to another metabolite!
+						deleteNotIdentifiedTMP<-NULL
+						for(icorrelatedPeakBinsTMP in 1:length(correlatedPeakBinsTMP)){
+							if(length(correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]])>0){
+								#find remaining bins of this peak:
+								deleteNotIdentifiedTMP<-unique(c(deleteNotIdentifiedTMP,
+									setdiff(metabolitesTMP2[[j]][[icorrelatedPeakBinsTMP]],
+										correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]]
+								)))	
+							}
+						}
+						#now remove these from all instances of this metabolite:
+						namesMatchesTMP<-which(names(metabolitesAllNamesTMP)==
+							names(metabolitesAllNamesTMP)[j])
+						for(iMetaboliteTMP in namesMatchesTMP){
+							if(length(metabolitesTMP[[iMetaboliteTMP]])>0){
+								for(jMetaboliteTMP in 1:length(metabolitesTMP[[iMetaboliteTMP]])){
+									deleteListTMP<-metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]%in%
+										deleteNotIdentifiedTMP
+									if(sum(deleteListTMP)>0){
+										#this means some bins of this peak are in the to-delete list
+										metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]<-
+											metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]][-which(
+												deleteListTMP)]								
+									}
+								
+								}
+							}
+						}
+						if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
+							metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
+						}						
+					}
+				}
+			}
+		  }
+		}
+		#Tier 2 (L1)
+		if(2%in%tiers){
+		  for(j in 1:length(metabolitesTMP)){
+			if(length(metabolitesTMP[[j]])>2){#check if 3 peaks are available
+				#remove tier 1 and tier 2 bins
+				#EXCEPT BINS of this metabolite
+				#deleteTMPj<-NULL
+				#message(paste("Tier2, ",names(metabolitesTMP)[j]))
+				metabolitesTMP2<-metabolitesTMP
+				deleteTMPi<-NULL
+				for(jExcludeMultiple2 in 1:length(metabolitesTMP2[[j]])){
+				  if(length(metabolitesTMP2[[j]][[jExcludeMultiple2]])>0){
+					for(iExcludeMultiple in 1:length(metabolitesTMP2[[j]][[jExcludeMultiple2]])){
+						unlistTMP<-c(unlist(annotationsTiers[[1]]),
+							unlist(annotationsTiers[[2]]))
+						if(names(metabolitesTMP2)[j]%in%unlistTMP){
+							unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
+						}
+						if(names(metabolitesTMP2[[j]][[jExcludeMultiple2]][iExcludeMultiple]) %in% 
+							names(unlistTMP)
+							#c(names(unlist(annotationsTiers[[1]])),
+							#names(unlist(annotationsTiers[[2]])))
+							){
+							#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
+							#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
+							deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+						}
+					}
+				  	if(length(deleteTMPi)>0){
+						metabolitesTMP2[[j]][[jExcludeMultiple2]]<-
+							metabolitesTMP2[[j]][[jExcludeMultiple2]][-deleteTMPi]
+					}
+				  }
+				}
+				if(0 %in% lapply(metabolitesTMP2[[j]],length)){#now remove empty entries:
+					metabolitesTMP2[[j]][which(lapply(metabolitesTMP2[[j]],length)==0)]<-NULL
+				}						  
+				#re-check if 3 peaks are still available
+				if(length(metabolitesTMP2[[j]])>2){
+					correlatedPeakBinsTMP<-vector("list",length(metabolitesTMP2[[j]]))
+					#find all possible pairs - peak1-peak2, peak1-peak3, etc.
+					significantTMP2List<-vector("list",(length(metabolitesTMP2[[j]])))
+					for(i_peak1 in 1:(length(metabolitesTMP2[[j]])-1)){
+						significantTMP2List[[i_peak1]]<-vector("list",(length(metabolitesTMP2[[j]])))
+						for(i_peak2 in (i_peak1+1):length(metabolitesTMP2[[j]])){
+							colnamesTMP<-metabolitesTMP2[[j]][[i_peak1]]
+							rownamesTMP<-metabolitesTMP2[[j]][[i_peak2]]							
 							resultMatrixTMP<-matrix(1,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
 								),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
 								))#save p-values here
@@ -7498,21 +7854,22 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 								))#save correlation coefficients here
 							colnames(resultMatrixTMP)<-colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
 							rownames(resultMatrixTMP)<-rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-							#remove potential duplicates here or later?
-							for(j_bin1 in 1:length(metabolitesTMP[[j]][[i_peak1]])){
+							for(j_bin1 in 1:length(metabolitesTMP2[[j]][[i_peak1]])){
 								#calculate correlation between baseline and peak 1, bin j_bin1
-								baselineCorr1<-stats::cor.test(mrbinObject$bins[,
-									  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
-									  mrbinObject$parameters$baseline)
-								for(j_bin2 in 1:length(metabolitesTMP[[j]][[i_peak2]])){
+								#baselineCorr1<-stats::cor.test(mrbinObject$bins[,
+								#	  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
+									  #mrbinObject$parameters$
+								#	  baseline)
+								for(j_bin2 in 1:length(metabolitesTMP2[[j]][[i_peak2]])){
 									#calculate correlation between baseline and peak 2
-									baselineCorr2<-stats::cor.test(mrbinObject$bins[,
-										metabolitesTMP[[j]][[i_peak2]][j_bin2]],
-										mrbinObject$parameters$baseline)
+									#baselineCorr2<-stats::cor.test(mrbinObject$bins[,
+									#	metabolitesTMP[[j]][[i_peak2]][j_bin2]],
+										#mrbinObject$parameters$
+									#	baseline[,j])
 									resultsCorTestTMP<-stats::cor.test(mrbinObject$bins[,
-									  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
+									  metabolitesTMP2[[j]][[i_peak1]][j_bin1]],
 									  mrbinObject$bins[,
-									  metabolitesTMP[[j]][[i_peak2]][j_bin2]])
+									  metabolitesTMP2[[j]][[i_peak2]][j_bin2]])
 									resultMatrixTMP[j_bin2,j_bin1]<-resultsCorTestTMP$p.value
 									correlationMatrix[j_bin2,j_bin1]<-resultsCorTestTMP$estimate
 									#make sure the correlation is positive! 
@@ -7520,123 +7877,457 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 							}
 							#check for significance using p-value threshold
 							significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
-							    correlationMatrix>confirmationRthreshold,arr.ind=TRUE)
-							if(checkBaselineCorrelation){
-								significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
-									correlationMatrix>confirmationRthreshold&(
-									resultMatrixTMP<baselineCorr1$p.value&#p-value must be smaller than p-value of correlation to baseline
-									resultMatrixTMP<baselineCorr2$p.value)&(
-									correlationMatrix^2>baselineCorr1$estimate^2&#R must be greater than R of correlation to baseline
-									correlationMatrix^2>baselineCorr2$estimate^2),
-									arr.ind=TRUE)
-							}	
-							significantTMP2<-as.numeric(c(rownames(resultMatrixTMP)[significantTMP[,1]],
-								colnames(resultMatrixTMP)[significantTMP[,2]]))
-							for(iConfirmed in significantTMP2){
-								if(!(names(metabolitesTMP)[j]%in%annotationsConfirmed[[iConfirmed]])){
-									if(uniqueBins){#only save the FIRST hit in this case - if the list was ordered by abundance, this is the most likely hit
-										if(is.null(annotationsConfirmedUnique[[iConfirmed]])){
-											annotationsConfirmedUnique[[iConfirmed]]<-c(annotationsConfirmedUnique[[iConfirmed]],
-												names(metabolitesTMP)[j])
-										}
-									} #else {
-										annotationsConfirmed[[iConfirmed]]<-c(annotationsConfirmed[[iConfirmed]],
-											names(metabolitesTMP)[j])
-									#}
-								}
+									correlationMatrix>confirmationRthreshold,arr.ind=TRUE)
+							#now search if 3 peaks are significant!
+							significantTMP2<-as.numeric(c(rownames(resultMatrixTMP)[unique(significantTMP[,1])],
+										colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
+							significantTMP2List[[i_peak1]][[i_peak2]]<-significantTMP2
+						}
+					}	
+					#now check for each peak if at least 2 other peaks are correlated, and save those
+					for(isignificantTMP2List in 1:length(significantTMP2List)){
+						lengthListTMP<-lapply(significantTMP2List[[isignificantTMP2List]],length)
+						if(sum(lengthListTMP>0)>1){#more than 0 bins found for more than 1 peak
+							for(jsignificantTMP2List in which(lengthListTMP>1)){
+								correlatedPeakBinsTMP[[isignificantTMP2List]]<-unique(c(correlatedPeakBinsTMP[[isignificantTMP2List]],
+									#colnames(resultMatrixTMP)[unique(significantTMP[,2])]
+									significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 2 as well but it doesn't matter
+									))
+								#find peak number
+								correlatedPeakBinsTMP[[jsignificantTMP2List]]<-unique(c(correlatedPeakBinsTMP[[jsignificantTMP2List]],
+									#rownames(resultMatrixTMP)[unique(significantTMP[,1])]
+									significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 1 as well but it doesn't matter
+									))
+								for(iConfirmed in significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]]){
+									if(is.null(annotationsTiers[[2]][[iConfirmed]])&
+										is.null(annotationsTiers[[1]][[iConfirmed]])
+										){
+										annotationsTiers[[2]][[iConfirmed]]<-c(annotationsTiers[[2]][[iConfirmed]],
+											names(metabolitesTMP2)[j])
+									}
+								}	
 							}
 						}
 					}
+					#remove all bins of this significant peak that were NOT significant - these belong to another metabolite!
+					deleteNotIdentifiedTMP<-NULL
+					for(icorrelatedPeakBinsTMP in 1:length(correlatedPeakBinsTMP)){
+						if(length(correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]])>0){
+							#find remaining bins of this peak:
+							deleteNotIdentifiedTMP<-unique(c(deleteNotIdentifiedTMP,
+								setdiff(metabolitesTMP2[[j]][[icorrelatedPeakBinsTMP]],
+									correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]]
+							)))	
+						}
+					}
+					#now remove these from all instances of this metabolite:
+					namesMatchesTMP<-which(names(metabolitesAllNamesTMP)==
+						names(metabolitesAllNamesTMP)[j])
+					for(iMetaboliteTMP in namesMatchesTMP){
+						if(length(metabolitesTMP[[iMetaboliteTMP]])>0){
+							for(jMetaboliteTMP in 1:length(metabolitesTMP[[iMetaboliteTMP]])){
+								deleteListTMP<-metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]%in%
+									deleteNotIdentifiedTMP
+								if(sum(deleteListTMP)>0){
+									#this means some bins of this peak are in the to-delete list
+									metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]<-
+										metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]][-which(
+											deleteListTMP)]								
+								}
+							}
+						}
+					}	
+					if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
+						metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
+					}						
 				}
-			} else {
-				#single peaks marked by "?" as they cannot be confirmed by using correlation to a separate peak
-				for(jSinglePeaks in 1:length(metabolitesTMP[[j]][[1]])){
-					annotationsSinglePeaks[[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]]<-c(
-						annotationsSinglePeaks[[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]],names(metabolitesTMP)[j])
+			}
+		  }
+		}
+		##Tier 3 (L1-)
+		if(3 %in% tiers){
+		  for(j in 1:length(metabolitesTMP)){
+			#check if 2 peaks are available
+			if(length(metabolitesTMP[[j]])>1){
+				#remove tier 1 - 3 bins
+				#EXCEPT BINS of this metabolite
+				#deleteTMPj<-NULL
+				metabolitesTMP2<-metabolitesTMP
+				deleteTMPi<-NULL
+				for(jExcludeMultiple3 in 1:length(metabolitesTMP2[[j]])){#peaks one by one
+				  if(length(metabolitesTMP2[[j]][[jExcludeMultiple3]])>0){
+					#bins of one peak one by one
+					for(iExcludeMultiple in 1:length(metabolitesTMP2[[j]][[jExcludeMultiple3]])){
+						unlistTMP<-c(unlist(annotationsTiers[[1]]),
+							unlist(annotationsTiers[[2]]),
+							unlist(annotationsTiers[[3]]))
+						if(names(metabolitesTMP2)[j]%in%unlistTMP){
+							unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
+						}
+						if(names(metabolitesTMP2[[j]][[jExcludeMultiple3]][iExcludeMultiple]) %in% 
+							names(unlistTMP)
+							#c(names(unlist(annotationsTiers[[1]])),
+							#  names(unlist(annotationsTiers[[2]])),
+							#  names(unlist(annotationsTiers[[3]])))
+							){
+							#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
+							#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
+							deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+						}
+					}
+					if(length(deleteTMPi)>0){
+						metabolitesTMP2[[j]][[jExcludeMultiple3]]<-
+							metabolitesTMP2[[j]][[jExcludeMultiple3]][-deleteTMPi]
+					}					
+				  }
+				}					
+				if(0 %in% lapply(metabolitesTMP2[[j]],length)){#now remove empty entries:
+					metabolitesTMP2[[j]][which(lapply(metabolitesTMP2[[j]],length)==0)]<-NULL
+				}
+				#re-check if 2 peaks are still available
+				if(length(metabolitesTMP2[[j]])>1){
+					correlatedPeakBinsTMP<-vector("list",length(metabolitesTMP2[[j]]))
+					#find all possible pairs - peak1-peak2, peak1-peak3, etc.
+					for(i_peak1 in 1:(length(metabolitesTMP2[[j]])-1)){
+						for(i_peak2 in (i_peak1+1):length(metabolitesTMP2[[j]])){
+							colnamesTMP<-metabolitesTMP2[[j]][[i_peak1]]
+							rownamesTMP<-metabolitesTMP2[[j]][[i_peak2]]							
+							resultMatrixTMP<-matrix(1,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
+								),nrow=length(rownamesTMP#metabolitesTMP2[[j]][[i_peak2]]
+								))#save p-values here
+							correlationMatrix<-matrix(0,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
+								),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
+								))#save correlation coefficients here
+							colnames(resultMatrixTMP)<-colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
+							rownames(resultMatrixTMP)<-rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
+							for(j_bin1 in 1:length(metabolitesTMP2[[j]][[i_peak1]])){
+								#calculate correlation between baseline and peak 1, bin j_bin1
+								#baselineCorr1<-stats::cor.test(mrbinObject$bins[,
+								#	  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
+									  #mrbinObject$parameters$
+								#	  baseline)
+								for(j_bin2 in 1:length(metabolitesTMP2[[j]][[i_peak2]])){
+									#calculate correlation between baseline and peak 2
+									#baselineCorr2<-stats::cor.test(mrbinObject$bins[,
+									#	metabolitesTMP[[j]][[i_peak2]][j_bin2]],
+										#mrbinObject$parameters$
+									#	baseline[,j])
+									resultsCorTestTMP<-stats::cor.test(mrbinObject$bins[,
+									  metabolitesTMP2[[j]][[i_peak1]][j_bin1]],
+									  mrbinObject$bins[,
+									  metabolitesTMP2[[j]][[i_peak2]][j_bin2]])
+									resultMatrixTMP[j_bin2,j_bin1]<-resultsCorTestTMP$p.value
+									correlationMatrix[j_bin2,j_bin1]<-resultsCorTestTMP$estimate
+									#make sure the correlation is positive! 
+								}
+							}
+							#check for significance using p-value threshold
+							significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
+									correlationMatrix>confirmationRthreshold,arr.ind=TRUE)
+							#if(checkBaselineCorrelation){
+							#		significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
+							#			correlationMatrix>confirmationRthreshold#&(
+										#resultMatrixTMP<baselineCorr1$p.value&#p-value must be smaller than p-value of correlation to baseline
+										#resultMatrixTMP<baselineCorr2$p.value)&(
+										#correlationMatrix^2>baselineCorr1$estimate^2&#R must be greater than R of correlation to baseline
+										#correlationMatrix>baselineCorr2$estimate
+							#			),
+							#			arr.ind=TRUE)
+							#}
+							if(nrow(significantTMP)>0){
+								correlatedPeakBinsTMP[[i_peak1]]<-unique(c(correlatedPeakBinsTMP[[i_peak1]],
+									colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
+								correlatedPeakBinsTMP[[i_peak2]]<-unique(c(correlatedPeakBinsTMP[[i_peak2]],
+									rownames(resultMatrixTMP)[unique(significantTMP[,1])]))
+								significantTMP2<-as.numeric(c(rownames(resultMatrixTMP)[unique(significantTMP[,1])],
+									colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
+								for(iConfirmed in significantTMP2){
+									if(is.null(annotationsTiers[[3]][[iConfirmed]])&
+										is.null(annotationsTiers[[2]][[iConfirmed]])&
+										is.null(annotationsTiers[[1]][[iConfirmed]])
+										){
+										annotationsTiers[[3]][[iConfirmed]]<-c(annotationsTiers[[3]][[iConfirmed]],
+											names(metabolitesTMP2)[j])
+									}
+								}	
+							}
+						}
+					}
+					#remove all bins of this significant peak that were NOT significant - these belong to another metabolite!
+					deleteNotIdentifiedTMP<-NULL
+					for(icorrelatedPeakBinsTMP in 1:length(correlatedPeakBinsTMP)){
+						if(length(correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]])>0){
+							#find remaining bins of this peak:
+							deleteNotIdentifiedTMP<-unique(c(deleteNotIdentifiedTMP,
+								setdiff(metabolitesTMP2[[j]][[icorrelatedPeakBinsTMP]],
+									correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]]
+							)))	
+						}
+					}
+					#now remove these from all instances of this metabolite:
+					namesMatchesTMP<-which(names(metabolitesAllNamesTMP)==
+						names(metabolitesAllNamesTMP)[j])
+					for(iMetaboliteTMP in namesMatchesTMP){
+						if(length(metabolitesTMP[[iMetaboliteTMP]])>0){
+							for(jMetaboliteTMP in 1:length(metabolitesTMP[[iMetaboliteTMP]])){
+								deleteListTMP<-metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]%in%
+									deleteNotIdentifiedTMP
+								if(sum(deleteListTMP)>0){
+									#this means some bins of this peak are in the to-delete list
+									metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]<-
+										metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]][-which(
+											deleteListTMP)]								
+								}
+							
+							}
+						}
+					}
+					if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
+						metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
+					}					
+				}
+			}
+		  }
+		}
+		#Remove tier 1-3 ids
+		#deleteTMPj<-NULL
+		deleteTMPi<-NULL
+		for(jDel in 1:length(metabolitesTMP)){
+			if(length(metabolitesTMP[[jDel]])>0){
+				for(jExcludeMultiple in 1:length(metabolitesTMP[[jDel]])){
+					if(length(metabolitesTMP[[jDel]][[jExcludeMultiple]])>0){
+						for(iExcludeMultiple in 1:length(metabolitesTMP[[jDel]][[jExcludeMultiple]])){
+							unlistTMP<-c(unlist(annotationsTiers[[1]]),
+								unlist(annotationsTiers[[2]]),
+								unlist(annotationsTiers[[3]]))
+							#if(names(metabolitesTMP2)[j]%in%unlistTMP){
+							#	unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
+							#}
+							if(names(metabolitesTMP[[jDel]][[jExcludeMultiple]][iExcludeMultiple]) %in% 
+								names(unlistTMP)
+								#c(names(unlist(annotationsTiers[[1]])),
+								#  names(unlist(annotationsTiers[[2]])),
+								#  names(unlist(annotationsTiers[[3]])))
+								){
+								#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
+								#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
+								deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+							}
+						}
+						if(length(deleteTMPi)>0){
+							metabolitesTMP[[jDel]][[jExcludeMultiple]]<-
+								metabolitesTMP[[jDel]][[jExcludeMultiple]][-deleteTMPi]
+						}					
+					}
+				}
+				if(0 %in% lapply(metabolitesTMP[[jDel]],length)){#now remove empty entries:
+					metabolitesTMP[[jDel]][which(lapply(metabolitesTMP[[jDel]],length)==0)]<-NULL
+				}	
+			}
+		}
+		##Tier 4 (L2) #single peaks cannot be confirmed by using correlation to a separate peak
+		if(4 %in% tiers){
+		  for(j in 1:length(metabolitesTMP)){
+			if(length(metabolitesTMP0[[j]])==1&#use original metabolite list for this comparison, so we don't use metabolite where other peaks were identified at tier 1-3
+		      length(grep("_doNotUse_",names(metabolitesTMP[[j]])))==0  ) {#& does not contain _donotuse
+				#remove tier 1 - 3 bins
+				#deleteTMPj<-NULL
+				# deleteTMPi<-NULL
+				# for(jExcludeMultiple in 1:length(metabolitesTMP[[j]])){
+				  # if(length(metabolitesTMP[[j]][[jExcludeMultiple]])>0){
+					# for(iExcludeMultiple in 1:length(metabolitesTMP[[j]][[jExcludeMultiple]])){
+						# if(names(metabolitesTMP[[j]][[jExcludeMultiple]][iExcludeMultiple]) %in% 
+							# c(names(unlist(annotationsTiers[[1]])),
+							  # names(unlist(annotationsTiers[[2]])),
+							  # names(unlist(annotationsTiers[[3]])))){
+							# #metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
+							# #deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
+							# deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+						# }
+					# }
+					# if(length(deleteTMPi)>0){
+						# metabolitesTMP[[j]][[jExcludeMultiple]]<-
+							# metabolitesTMP[[j]][[jExcludeMultiple]][-deleteTMPi]
+					# }
+				  # }
+				# }	
+				
+				# if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
+					# metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
+				# }
+				if(length(metabolitesTMP[[j]])>0){
+				  if(length(metabolitesTMP[[j]][[1]])>0){
+					for(jSinglePeaks in 1:length(metabolitesTMP[[j]][[1]])){
+						if(!names(metabolitesAllNamesTMP)[j] %in% annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]]){
+							#message(paste(names(metabolitesTMP)[j],"--",annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]],
+							#sep=", ",collapse=" ,"))
+							annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]]<-c(
+								annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]],names(metabolitesAllNamesTMP)[j])
+						}
+					}
+				  }
+				}
+			}
+		  }
+		}
+		##Tier 5 (L3)
+		if(5 %in% tiers){
+		  for(j in 1:length(metabolitesTMP)){
+			if(length(metabolitesTMP[[j]])>0){#check only metabolites where at least 1 peak was identified	
+				#remove tier 1 - 3 bins
+				#deleteTMPj<-NULL
+				# deleteTMPi<-NULL
+				# for(jExcludeMultiple in 1:length(metabolitesTMP[[j]])){
+				  # if(length(metabolitesTMP[[j]][[jExcludeMultiple]])>0){
+					# for(iExcludeMultiple in 1:length(metabolitesTMP[[j]][[jExcludeMultiple]])){
+						# if(names(metabolitesTMP[[j]][[jExcludeMultiple]][iExcludeMultiple]) %in% 
+							# c(names(unlist(annotationsTiers[[1]]))
+							  # ,names(unlist(annotationsTiers[[2]])),
+							  # names(unlist(annotationsTiers[[3]])))){
+							# #metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
+							# #deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
+							# deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+						# }
+					# }
+					# if(length(deleteTMPi)>0){
+						# metabolitesTMP[[j]][[jExcludeMultiple]]<-
+							# metabolitesTMP[[j]][[jExcludeMultiple]][-deleteTMPi]
+					# }
+				  # }
+				# }				
+				# if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
+					# metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
+				# }
+				if(length(metabolitesTMP[[j]])>0){
+				  for(jPeaks in 1:length(metabolitesTMP[[j]])){
+					for(jSinglePeaks in 1:length(metabolitesTMP[[j]][[jPeaks]])){
+						if(!names(metabolitesTMP)[j] %in% annotationsTiers[[5]][[ metabolitesTMP[[j]][[jPeaks]][jSinglePeaks] ]]){
+							annotationsTiers[[5]][[ metabolitesTMP[[j]][[jPeaks]][jSinglePeaks] ]]<-c(
+								annotationsTiers[[5]][[ metabolitesTMP[[j]][[jPeaks]][jSinglePeaks] ]],names(metabolitesTMP)[j])
+						}
+					}
+				  }
+				}
+			}
+		  }
+		}
+		#Create a character vector of all annotations
+		#Remove metabolite name extensions for unused peaks
+		for(iCleanUp in 1:length(annotationsTiers)){
+			for(iannotationsConfirmed in 1:length(annotationsTiers[[iCleanUp]])){
+				if(!is.null(annotationsTiers[[iCleanUp]][[iannotationsConfirmed]])){
+					isuffixTMP<-1
+					while(length(grep("_doNotUse_",annotationsTiers[[iCleanUp]][[iannotationsConfirmed]]))>0){
+						suffixTMP<-sprintf("%03d",isuffixTMP)
+						annotationsTiers[[iCleanUp]][[iannotationsConfirmed]]<-gsub(
+							paste("_doNotUse_",suffixTMP,sep=""),"",
+							annotationsTiers[[iCleanUp]][[iannotationsConfirmed]])
+						isuffixTMP<-isuffixTMP+1
+					}
 				}
 			}
 		}
-		#Create a character vector of all annotations
 		#Remove all confirmed annotations from the list of tentative ids 
-		for(iannotationsConfirmed in 1:length(annotationsConfirmed)){
-			if(!is.null(annotationsConfirmed[[iannotationsConfirmed]])){
-				for(jannotationsConfirmed in annotationsConfirmed[[iannotationsConfirmed]]){
-					annotationsTentative[[iannotationsConfirmed]]<-annotationsTentative[[iannotationsConfirmed]][-
-					  which(annotationsTentative[[iannotationsConfirmed]]==jannotationsConfirmed)]
+		for(iCleanUp in 1:3){
+			for(iannotationsConfirmed in 1:length(annotationsTiers[[iCleanUp]])){
+				if(!is.null(annotationsTiers[[iCleanUp]][[iannotationsConfirmed]])){
+					for(jannotationsConfirmed in annotationsTiers[[iCleanUp]][[iannotationsConfirmed]]){
+						if(jannotationsConfirmed %in% annotationsTiers[[4]][[iannotationsConfirmed]]){
+							annotationsTiers[[4]][[iannotationsConfirmed]]<-annotationsTiers[[4]][[iannotationsConfirmed]][-
+							  which(annotationsTiers[[4]][[iannotationsConfirmed]]==jannotationsConfirmed)]
+						}
+						if(jannotationsConfirmed %in% annotationsTiers[[5]][[iannotationsConfirmed]]){
+							annotationsTiers[[5]][[iannotationsConfirmed]]<-annotationsTiers[[5]][[iannotationsConfirmed]][-
+							  which(annotationsTiers[[5]][[iannotationsConfirmed]]==jannotationsConfirmed)]
+						}
+					}
 				}
 			}
 		}
 		#Remove not-to-be-used annotations from the list of single-peak ids 
-		for(iannotationsSinglePeaks in 1:length(annotationsSinglePeaks)){
-			if(!is.null(annotationsSinglePeaks[[iannotationsSinglePeaks]])){
-				#for(jannotationsSinglePeaks in annotationsSinglePeaks[[iannotationsSinglePeaks]]){
-					if(sum(grepl("_doNotUse_",annotationsSinglePeaks[[iannotationsSinglePeaks]]))>0){
-					annotationsSinglePeaks[[iannotationsSinglePeaks]]<-annotationsSinglePeaks[[iannotationsSinglePeaks]][!
-					  grepl("_doNotUse_",annotationsSinglePeaks[[iannotationsSinglePeaks]])]
-					}
-				#}
-			}
-		}
+		#for(iannotationsL2 in 1:length(annotationsTiers[[4]])){
+		#	if(!is.null(annotationsTiers[[4]][[iannotationsL2]])){
+		#		if(sum(grepl("_doNotUse_",annotationsTiers[[4]][[iannotationsL2]]))>0){
+		#		annotationsTiers[[4]][[iannotationsL2]]<-annotationsTiers[[4]][[iannotationsL2]][!
+		#		  grepl("_doNotUse_",annotationsTiers[[4]][[iannotationsL2]])]
+		#		}
+		#	}
+		#}
 		#Remove all single-peak annotations from the list of tentative ids 
-		for(iannotationsSinglePeaks in 1:length(annotationsSinglePeaks)){
-			if(!is.null(annotationsSinglePeaks[[iannotationsSinglePeaks]])){
-				for(jannotationsSinglePeaks in annotationsSinglePeaks[[iannotationsSinglePeaks]]){
-					annotationsTentative[[iannotationsSinglePeaks]]<-annotationsTentative[[iannotationsSinglePeaks]][-
-					  which(annotationsTentative[[iannotationsSinglePeaks]]==jannotationsSinglePeaks)]
+		for(iannotationsL2 in 1:length(annotationsTiers[[4]])){
+			if(!is.null(annotationsTiers[[4]][[iannotationsL2]])){
+				for(jannotationsL2 in annotationsTiers[[4]][[iannotationsL2]]){
+					if(jannotationsL2 %in% annotationsTiers[[5]][[iannotationsL2]]){
+						annotationsTiers[[5]][[iannotationsL2]]<-annotationsTiers[[5]][[iannotationsL2]][-
+						  which(annotationsTiers[[5]][[iannotationsL2]]==jannotationsL2)]
+					}
 				}
 			}
 		}
-		annotationsTMP<-annotationsTentative
-		annotationsConfirmedTMP<-annotationsConfirmed
-		annotationsCharacter<-rep("",length(annotationsTentative))
-		#first add confirmed ids
-		for(i in 1:length(annotationsCharacter)){
-		  if(!is.null(annotationsConfirmed[[i]])){
-			if(uniqueBins){
-				if(length(annotationsConfirmedUnique[[i]])>0){
-					annotationsCharacter[i]<-paste(annotationsConfirmedUnique[[i]],sep=", ",collapse=", ")
-				}
-			} else {
-				if(length(annotationsConfirmed[[i]])>0){
-					annotationsCharacter[i]<-paste(annotationsConfirmed[[i]],sep=", ",collapse=", ")
+		#annotationsTMP<-annotationsTiers[[5]]
+		#annotationsConfirmedTMP<-annotationsTiers[[1]]
+		annotationsCharacter<-rep("",length(annotationsTiers[[5]]))
+
+		#first add tier 1 ids, then tier 2 etc.
+		for(iannotationsTiers in 1:length(annotationsTiers)){
+			for(i in 1:length(annotationsCharacter)){
+				if(!is.null(annotationsTiers[[iannotationsTiers]][[i]])){
+					if(length(annotationsTiers[[iannotationsTiers]][[i]])>0){
+						#remove empty entries ("")
+						if(sum(annotationsTiers[[iannotationsTiers]][[i]]=="")>0){
+							indexTMP<-which(!annotationsTiers[[iannotationsTiers]][[i]]=="")
+						} else {
+							indexTMP<-1:length(annotationsTiers[[iannotationsTiers]][[i]])
+						}
+						if(length(indexTMP)>0){
+							if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bin, add a comma
+								annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
+							}
+							annotationsCharacter[i]<-paste(annotationsCharacter[i],
+								paste(annotationsTiers[[iannotationsTiers]][[i]][indexTMP],
+								paste("[",tierNames[iannotationsTiers],"]",sep=""),
+								sep="",collapse=", "),sep="")
+						}
+					}
 				}
 			}
-		  }
-		  #then add single-peak ids with one question mark
-		  if(!is.null(annotationsSinglePeaks[[i]])){
-		    if(length(annotationsSinglePeaks[[i]])>0){
+		}
+		if(FALSE){
+		  #then add single-peak ids
+		  if(!is.null(annotationsTiers[[4]][[i]])){
+		    if(length(annotationsTiers[[4]][[i]])>0){
 				if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bins, add a comma
 					annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
 				}
 				#remove empty entries ("")
-				if(sum(annotationsSinglePeaks[[i]]=="")>0){
-					indexTMP<-which(!annotationsSinglePeaks[[i]]=="")
+				if(sum(annotationsTiers[[4]][[i]]=="")>0){
+					indexTMP<-which(!annotationsTiers[[4]][[i]]=="")
 				} else {
-					indexTMP<-1:length(annotationsSinglePeaks[[i]])
+					indexTMP<-1:length(annotationsTiers[[4]][[i]])
 				}
 				if(length(indexTMP)>0){
 					annotationsCharacter[i]<-paste(annotationsCharacter[i],
-						paste(annotationsSinglePeaks[[i]][indexTMP],"?",sep="",collapse=", "),#"Y",sep="",collapse="?, "),
+						paste(annotationsTiers[[4]][[i]][indexTMP],"[L2]",sep="",collapse=", "),#"Y",sep="",collapse="?, "),
 						sep="",collapse="")
 				}
 			}
 		  }
-		  #then add tentative ids with 2 question marks
+		  #then add tentative ids 
  		  if(!hideTentativeIds){
-			if(!is.null(annotationsTentative[[i]])){
-				if(length(annotationsTentative[[i]])>0){
+			if(!is.null(annotationsTiers[[5]][[i]])){
+				if(length(annotationsTiers[[5]][[i]])>0){
 					if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bins, add a comma
 						annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
 					}
 					#remove empty entries ("")
-					if(sum(annotationsTentative[[i]]=="")>0){
-						indexTMP<-which(!annotationsTentative[[i]]=="")
+					if(sum(annotationsTiers[[5]][[i]]=="")>0){
+						indexTMP<-which(!annotationsTiers[[5]][[i]]=="")
 					} else {
-						indexTMP<-1:length(annotationsTentative[[i]])
+						indexTMP<-1:length(annotationsTiers[[5]][[i]])
 					}
 					if(length(indexTMP)>0){
 						annotationsCharacter[i]<-paste(annotationsCharacter[i],
-							paste(annotationsTentative[[i]][indexTMP],"??",sep="",collapse=", "),
+							paste(annotationsTiers[[5]][[i]][indexTMP],"[L2-]",sep="",collapse=", "),
 							sep="",collapse="")
 					}
 				}
@@ -7646,12 +8337,12 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		#Remove the name extension that differentiates identically-named metabolites
 		#from the internal id file and user provided information
 		#annotationsCharacter<-gsub("__internal__","",annotationsCharacter)
-		isuffixTMP<-1
-		while(length(grep("_doNotUse_",annotationsCharacter))>0){
-			suffixTMP<-sprintf("%03d",isuffixTMP)
-			annotationsCharacter<-gsub(paste("_doNotUse_",suffixTMP,sep=""),"",annotationsCharacter)
-			isuffixTMP<-isuffixTMP+1
-		}
+		#isuffixTMP<-1
+		#while(length(grep("_doNotUse_",annotationsCharacter))>0){
+		#	suffixTMP<-sprintf("%03d",isuffixTMP)
+		#	annotationsCharacter<-gsub(paste("_doNotUse_",suffixTMP,sep=""),"",annotationsCharacter)
+		#	isuffixTMP<-isuffixTMP+1
+		#}
 		annotations<-annotationsCharacter
 		if(hideChemicalShift){
 			if(sum(annotations=="")>0) annotations[annotations==""]<-colnames(mrbinObject$bins)[annotations==""]
@@ -7661,29 +8352,33 @@ annotatemrbin<-function(mrbinObject,annotate=TRUE,
 		mrbinObject<-editmrbin(mrbinObject,functionName="mrbin::annotatemrbin",
 				versionNumber=as.character(utils::packageVersion("mrbin")),
 				metadata=list(annotations=trimws(annotations)),verbose=FALSE)
-		if(verbose&!is.null(additionalIdentities)){
-			message(paste("Sample type: ",additionalIdentities
-			), appendLF = TRUE)
-		}
-		confirmedTMP<-#gsub("__internal__","",
-			unique(unlist(annotationsConfirmed))#)
-		if(verbose&length(confirmedTMP)>0){
-			message(paste(length(confirmedTMP),"metabolites were confirmed:\n",
-				paste(confirmedTMP,sep=", ",collapse=", ")
+		if(verbose){
+			if(!is.null(additionalIdentities)){
+				message(paste("Sample type: ",additionalIdentities
 				), appendLF = TRUE)
-			utils::flush.console()
+			}
+			for(itierNames in 1:length(tierNames)){
+				confirmedTMP<-unique(unlist(annotationsTiers[[itierNames]]))
+				if(length(confirmedTMP)>0){
+					message(paste(length(confirmedTMP)," metabolites identified at level ",
+						tierNames[itierNames],":\n",
+						paste(confirmedTMP,sep=", ",collapse=", "),
+						sep=""), appendLF = TRUE)
+					utils::flush.console()
+				}
+			}
 		}
-		tentativeTMP<-unique(unlist(annotationsSinglePeaks))
-		if(length(grep("_doNotUse_",tentativeTMP))>0){
-			tentativeTMP<-tentativeTMP[-grep("_doNotUse_",tentativeTMP)]
-		}
-		if(verbose&length(tentativeTMP)>0){
-			message(paste(length(tentativeTMP),"tentatively identified (only 1 peak available):\n",
-				paste(tentativeTMP,sep=", ",collapse=", ")
-				), appendLF = TRUE)
-			utils::flush.console()
-		}
-	  }
+		# tentativeTMP<-unique(unlist(annotationsL2))
+		# if(length(grep("_doNotUse_",tentativeTMP))>0){
+			# tentativeTMP<-tentativeTMP[-grep("_doNotUse_",tentativeTMP)]
+		# }
+		# if(verbose&length(tentativeTMP)>0){
+			# message(paste(length(tentativeTMP),"tentatively identified (only 1 peak available):\n",
+				# paste(tentativeTMP,sep=", ",collapse=", ")
+				# ), appendLF = TRUE)
+			# utils::flush.console()
+		# }
+	}
   }
   invisible(mrbinObject)
 }
@@ -7711,9 +8406,7 @@ editmrbin<-function(mrbinObject,functionName="mrbin::editmrbin",
   versionNumber=as.character(utils::packageVersion("mrbin")),
   bins=NULL,parameters=NULL,metadata=NULL,transformations=NULL,comment="",
   verbose=TRUE){
-
   mrbinObject<-timeStampMrbin(mrbinObject,steps=0)
-  #changeDetails<-""
   parametersTMP<-NULL
   if(!is.null(bins)){
     if(!identical(bins,mrbinObject$bins)){
@@ -7961,10 +8654,12 @@ calculateNoise<-function(NMRdata=NULL,pointsPerBin=NULL,dimension="1D",
 #' @return {None}
 #' @export
 #' @examples
+#' resetEnv()#clean up previous data from the package environment 
 #' mrbin(silent=TRUE,setDefault=TRUE,parameters=list(dimension="1D",binwidth1D=.1,
-#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",tryParallel=TRUE,
-#'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,
-#'          NMRfolders=system.file("extdata/1/10/pdata/10",package="mrbin")))
+#'          PQNScaling="No",noiseRemoval="No",trimZeros="No",
+#'          fixNegatives="No",logTrafo="No",PCA="No",verbose=TRUE,NMRvendor="mrbin",
+#'          example=TRUE,#only used for the package examples
+#'          NMRfolders=system.file("extdata/1.mr1",package="mrbin")))
 #' plotMultiNMR()
 
 plotMultiNMR<-function(region=NULL,rectangleRegions=NULL,
@@ -8260,6 +8955,7 @@ plotMultiNMR<-function(region=NULL,rectangleRegions=NULL,
 #' 1D and 2D spectra are selected, they are shown in two plots with matched ranges.
 #' @param hideMenu Do not show the menu. Defaults to FALSE
 #' @param folders Optional vector of folder names of spectra to load. Defaults to NULL
+#' @param NMRvendor Optional value naming the format of spectra to load. Defaults to Bruker
 #' @param dimensions Optional vector dimensions of spectra to load. Defaults to NULL
 #' @param zoom Optional vector of initial zoom area. Defaults to NULL
 #' @param intensity1D Optional value of initial 1D intensity. Defaults to NULL
@@ -8280,7 +8976,7 @@ plotMultiNMR<-function(region=NULL,rectangleRegions=NULL,
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' metaboliteIdentities=matrix(c(1.346,1.324,21,23,1,1,
 #'                               4.12,4.1,70.8578,71.653,0,1,
 #'                               3.052,3.043,30.5,33.5,1,1,
@@ -8290,17 +8986,20 @@ plotMultiNMR<-function(region=NULL,rectangleRegions=NULL,
 #'                    ncol=6,byrow=TRUE)
 #' rownames(metaboliteIdentities)=c("Lactate","Lactate","Creatinine","Creatinine","Citrate","Citrate")
 #' colnames(metaboliteIdentities)=c("left","right","top","bottom","usePeak1D","usePeak2D")
-#' mrplot(folders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-#'                  system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                  system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                  system.file("extdata/3/10/pdata/10",package="mrbin")),
+#' mrplot(folders=c(system.file("extdata/1.mr2",package="mrbin"),
+#'                  system.file("extdata/1.mr1",package="mrbin"),
+#'                  system.file("extdata/2.mr1",package="mrbin"),
+#'                  system.file("extdata/3.mr1",package="mrbin")),
+#'        NMRvendor="mrbin",
+#'        example=TRUE,#only used for the package examples
 #'        dimensions=c("2D","1D","1D","1D"),zoom=c(2.8,2.4,20,60),
 #'        highlight=c(2.564,2.537),
 #'        binlist=c("2.725,2.675","2.575,2.525"),
 #'        annotate=TRUE,metaboliteIdentities=metaboliteIdentities,
 #'        plotTitle="Significant Bins",intensity1D=24,hideMenu=TRUE)
 
-mrplot<-function(hideMenu=FALSE,folders=NULL,dimensions=NULL,intensity1D=NULL,
+mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
+  dimensions=NULL,intensity1D=NULL,
   zoom=NULL,color=NULL,background=NULL,lwd=1,plotTitle="",showNames="Spectrum titles",
   graphics= TRUE,highlight=NULL,
   binlist=NULL,annotate=NULL,metaboliteIdentities=NULL,
@@ -8363,24 +9062,30 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,dimensions=NULL,intensity1D=NULL,
     mrbin.env$mrbinTMP$additionalIdentities<-additionalIdentities
   }
   if(!is.null(additionalIdentities)){#read predefined metabolite ids from file and add them
-	    additionalIdentitiesTMP<-utils::read.csv(system.file(paste("extdata/data/",additionalIdentities,".csv",sep=""),
-		  package="mrbin"),header=TRUE)#,colClasses=c("character",rep("numeric",4)))
-		additionalIdentitiesTMP2<-as.matrix(additionalIdentitiesTMP[,
-			c("left","right","top","bottom","usePeak1D","usePeak2D")#2:7
-			,drop=FALSE])
-		rownames(additionalIdentitiesTMP2)<-additionalIdentitiesTMP[,"metabolite"]#needs to be a vector, not a matrix  
-		for(irownames in 1:nrow(additionalIdentitiesTMP2)){#find duplicates
-			if(rownames(additionalIdentitiesTMP2)[irownames] %in% rownames(metaboliteIdentities)){
-				rownames(metaboliteIdentities)[rownames(metaboliteIdentities)==
-					rownames(additionalIdentitiesTMP2)[irownames]]<-paste(
-					rownames(additionalIdentitiesTMP2)[irownames],"_2",sep="")
+		metaboliteIDs<-NULL
+		load(system.file("extdata/TMP/3ADE68B1.000",package="mrbin"))
+		if(additionalIdentities%in%names(metaboliteIDs)){
+			additionalIdentitiesTMP<-metaboliteIDs[[additionalIdentities]]
+		   # additionalIdentitiesTMP<-utils::read.csv(system.file(paste("extdata/data/",additionalIdentities,".csv",sep=""),
+		#	  package="mrbin"),header=TRUE)#,colClasses=c("character",rep("numeric",4)))
+			additionalIdentitiesTMP2<-as.matrix(additionalIdentitiesTMP[,
+				c("left","right","top","bottom","usePeak1D","usePeak2D")#2:7
+				,drop=FALSE])
+			rownames(additionalIdentitiesTMP2)<-additionalIdentitiesTMP[,"metabolite"]#needs to be a vector, not a matrix  
+			for(irownames in 1:nrow(additionalIdentitiesTMP2)){#find duplicates
+				if(rownames(additionalIdentitiesTMP2)[irownames] %in% rownames(metaboliteIdentities)){
+					rownames(metaboliteIdentities)[rownames(metaboliteIdentities)==
+						rownames(additionalIdentitiesTMP2)[irownames]]<-paste(
+						rownames(additionalIdentitiesTMP2)[irownames],"_2",sep="")
+				}
 			}
+			metaboliteIdentities<-rbind(additionalIdentitiesTMP2,metaboliteIdentities)
+		} else {
+			message(paste("The provided sample type is not valid:",additionalIdentities))
 		}
-		metaboliteIdentities<-rbind(additionalIdentitiesTMP2,metaboliteIdentities)
-		#metaboliteIdentitiesUse<-rbind(metaboliteIdentitiesUse,metaboliteIdentitiesUseTMP)
   }
-  if(annotate&(is.null(nrow(metaboliteIdentities)))){
-	annotate<-FALSE
+  if(annotateTMP&(is.null(nrow(metaboliteIdentities)))){
+	annotateTMP<-FALSE
 	message("Warning: No metabolite identity information was provided.\n")
 	utils::flush.console()
   }
@@ -8410,14 +9115,23 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,dimensions=NULL,intensity1D=NULL,
 			stop("Length of dimensions needs to be 1 or equal to number of spectra.")
 		}
 	}
+    #if(length(NMRvendor)<length(folders)){
+	#	if(length(NMRvendor)==1){
+	#		NMRvendor<-rep(NMRvendor[1],length(folders))
+	#	} else {
+	#		stop("Length of NMRvendor needs to be 1 or equal to number of spectra.")
+	#	}
+	#}
     mrbin.env$mrbinTMP$additionalPlots1D<-NULL
 	mrbin.env$mrbinTMP$additionalPlots2D<-NULL
     mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
 	mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
-	setParam(parameters=list(NMRfolders=folders,dimension=dimensions[1]))
+	setParam(parameters=list(NMRfolders=folders,dimension=dimensions[1],
+		NMRvendor=NMRvendor))
     for(iTMP in 1:length(folders)){
 		addToPlot(folder=mrbin.env$mrbin$parameters$NMRfolders[iTMP]
-		,dimension=dimensions[iTMP],add=TRUE,omitCurrent=TRUE)
+		,dimension=dimensions[iTMP],NMRvendor=NMRvendor,
+		add=TRUE,omitCurrent=TRUE)
     }
   }
     stopTMP<-FALSE
@@ -8454,7 +9168,8 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,dimensions=NULL,intensity1D=NULL,
 		 }
 		}
 		rownames(rectangleRegions)<-rep("",nrow(rectangleRegions))
-		rectangleColors<-c(rectangleColors,rep("darkseagreen3",length(binlist)))
+		rectangleColors<-c(rectangleColors,rep("orange"#"darkseagreen3"
+			,length(binlist)))
 		density<-rep(-1,nrow(rectangleRegions))
 	  }
 	  rectangleRegionsTMP<-rectangleRegions
@@ -9052,15 +9767,16 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,dimensions=NULL,intensity1D=NULL,
 #' @return {None}
 #' @export
 #' @examples
-#' resetEnv()
+#' resetEnv()#clean up previous data from the package environment 
 #' # First create NMR bin data, then plot some differential bins.
 #' results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(verbose=FALSE,
 #'                 dimension="1D",binwidth1D=0.01,PCA="No",showSpectrumPreview="No",
 #'                 signal_to_noise1D=25,noiseThreshold=0.75,useAsNames="Spectrum titles",
-#'                 NMRfolders=c(
-#'                 system.file("extdata/1/10/pdata/10",package="mrbin"),
-#'                 system.file("extdata/2/10/pdata/10",package="mrbin"),
-#'                 system.file("extdata/3/10/pdata/10",package="mrbin"))
+#'                 NMRvendor="mrbin",
+#'                 example=TRUE,#only used for the package examples
+#'                 NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+#'                 system.file("extdata/2.mr1",package="mrbin"),
+#'                 system.file("extdata/3.mr1",package="mrbin"))
 #'                 ))
 #' metadata<-c(0,0,1)
 #' #Find significant signals
