@@ -1,16 +1,16 @@
-##TITLE= Parameter file, TopSpin 3.6.1
+##TITLE= Parameter file, TopSpin 4.5.0
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 6	$$ modification sequence number
+##NPOINTS= 43	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= Administrator
-$$ 2020-02-27 10:32:29.874 -0500  BCD\klein.663@fst220415
-$$ C:/Users/klein.663/Box Sync/OSU/Projects/mrbin/NMR data set/1/10/pdata/10/procs
-$$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc1d.exe
-##$ABSF1= 15.07211
-##$ABSF2= -5.478539
-##$ABSG= 5
-##$ABSL= 5
+$$ 2025-06-03 14:08:48.193 -0400  Matthias@MK
+$$ C:/Users/matth/OneDrive - McGill University/MG/Projects/mrbin/data/9/10/pdata/10/procs
+$$ process C:\Bruker\TopSpin4.5.0\prog\mod\proc1d.exe
+##$ABSF1= 0
+##$ABSF2= 0
+##$ABSG= 0
+##$ABSL= 0
 ##$ALPHA= 0
 ##$AQORDER= 0
 ##$ASSFAC= 0
@@ -38,8 +38,8 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc1d.exe
 ##$ERETIC= no
 ##$F1P= 12
 ##$F2P= -0.5
-##$FCOR= 0.5
-##$FTSIZE= 32768
+##$FCOR= 1
+##$FTSIZE= 8192
 ##$FT_mod= 6
 ##$GAMMA= 0
 ##$GB= 0
@@ -85,7 +85,7 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc1d.exe
 ##$NSP= 0
 ##$NTH_PI= 0
 ##$NZP= 0
-##$OFFSET= 15.07211
+##$OFFSET= 15.0721106035633
 ##$PC= 1
 ##$PHC0= 79.29382
 ##$PHC1= 0
@@ -106,7 +106,7 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc1d.exe
 ##$RDPOS= 0
 ##$REVERSE= no
 ##$SF= 600.24994612958
-##$SI= 32768
+##$SI= 8192
 ##$SIGF1= 9
 ##$SIGF2= 5
 ##$SINO= 400
@@ -115,12 +115,12 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\proc1d.exe
 ##$SREF_mod= 1
 ##$SREGLST= <1H.H2O+D2O>
 ##$SSB= 0
-##$STSI= 32768
+##$STSI= 8192
 ##$STSR= 0
 ##$SW_p= 12335.5263157895
 ##$SYMM= 0
 ##$S_DEV= 0
-##$TDeff= 65536
+##$TDeff= 16384
 ##$TDoff= 0
 ##$TI= <PB4
 nPROF_1H.URINE H2O+D2O {C:\Bruker\TOPSPIN2.1PL6} genomik {1  C2 - 1>
@@ -129,12 +129,17 @@ nPROF_1H.URINE H2O+D2O {C:\Bruker\TOPSPIN2.1PL6} genomik {1  C2 - 1>
 ##$TM2= 0
 ##$TOPLEV= 0
 ##$USERP1= <user>
+##$USERP10= <user>
 ##$USERP2= <user>
 ##$USERP3= <user>
 ##$USERP4= <user>
 ##$USERP5= <user>
+##$USERP6= <userUSERP5 DEF user processing parameter 5$80004 255>
+##$USERP7= <>
+##$USERP8= <>
+##$USERP9= <>
 ##$WDW= 1
-##$XDIM= 8192
-##$YMAX_p= 324088098
-##$YMIN_p= -180298646
+##$XDIM= 0
+##$YMAX_p= 288832092
+##$YMIN_p= -166025749
 ##END=

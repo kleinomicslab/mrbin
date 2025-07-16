@@ -1,12 +1,12 @@
-##TITLE= Parameter file, TopSpin 3.6.1
+##TITLE= Parameter file, TopSpin 4.5.0
 ##JCAMPDX= 5.0
 ##DATATYPE= Parameter Values
-##NPOINTS= 3	$$ modification sequence number
+##NPOINTS= 22	$$ modification sequence number
 ##ORIGIN= Bruker BioSpin GmbH
 ##OWNER= Administrator
-$$ 2020-02-27 10:32:11.623 -0500  BCD\klein.663@fst220415
-$$ C:/Users/klein.663/Box Sync/OSU/Projects/mrbin/NMR data set/1/10/pdata/10/proc
-$$ process C:\Bruker\TopSpin3.6.1\prog\mod\dataserver.exe
+$$ 2025-06-03 14:08:44.761 -0400  Matthias@MK
+$$ C:/Users/matth/OneDrive - McGill University/MG/Projects/mrbin/data/9/10/pdata/10/proc
+$$ process C:\Bruker\TopSpin4.5.0\prog\mod\dataserver.exe
 ##$ABSF1= 10
 ##$ABSF2= 0
 ##$ABSG= 5
@@ -96,11 +96,11 @@ $$ process C:\Bruker\TopSpin3.6.1\prog\mod\dataserver.exe
 ##$PYNMP= <proc.py>
 ##$REVERSE= no
 ##$SF= 600.24994612958
-##$SI= 32768
+##$SI= 8192
 ##$SIGF1= 9
 ##$SIGF2= 5
 ##$SINO= 400
-##$SIOLD= 32768
+##$SIOLD= 8192
 ##$SPECTYP= <>
 ##$SREGLST= <1H.H2O+D2O>
 ##$SSB= 2
