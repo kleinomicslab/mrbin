@@ -864,12 +864,6 @@ mrbin will try to use the socket approach for parallel computing. This requires
 establishing network connections to the local cluster, which might
 trigger the firewall. It is safe to unblock these connections.\\
 
-\subsection{Spectra are Missing}
-If a Bruker spectrum is not shown during browsing, please make sure a file
-named title is present in the PROCNO folder of that spectrum. You
-can create a title file by opening the spectrum in Bruker Topspin, selecting
-the Title tab, entering a title and clicking the disk symbol for saving.\\
-
 
 \section{License}
 
