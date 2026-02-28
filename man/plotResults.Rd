@@ -4,7 +4,13 @@
 \alias{plotResults}
 \title{A function for plotting quality indicators, including PCA plots.}
 \usage{
-plotResults(mrbinResults, defineGroups = TRUE, process = TRUE, silent = FALSE)
+plotResults(
+  mrbinResults,
+  defineGroups = TRUE,
+  process = TRUE,
+  silent = FALSE,
+  maxFeatures = 600
+)
 }
 \arguments{
 \item{mrbinResults}{An mrbin object}
@@ -14,6 +20,8 @@ plotResults(mrbinResults, defineGroups = TRUE, process = TRUE, silent = FALSE)
 \item{process}{If set to FALSE, the file name will be extended by "Raw" to indicate that data has not been processed yet}
 
 \item{silent}{If set to TRUE, plots will be saved but not shown for the binning step for speed purposes}
+
+\item{maxFeatures}{Maximum number of features to display for speed purposes}
 }
 \value{
 {None}

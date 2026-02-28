@@ -13,12 +13,18 @@ annotatemrbin(
   metaboliteIdentities = NULL,
   add = FALSE,
   hideChemicalShift = FALSE,
-  tiers = 1:5,
-  hideTentativeIds = TRUE,
-  confirmationRthreshold = 0.7,
-  confirmationPthreshold = 1e-05,
-  uniqueBins = TRUE,
-  checkBaselineCorrelation = FALSE,
+  includeAll = FALSE,
+  maxMetabolites = NULL,
+  batchSize = 50,
+  tiers = c(1, 2, 4, 5),
+  peakRatio = c(0.67, 0.4, 0),
+  Rmodifier = NULL,
+  confirmationRthreshold = c(0.89, 0.84, 0.82),
+  peakRthreshold = NULL,
+  showMissing = FALSE,
+  exclude = NULL,
+  expandRange = 0,
+  expandRangeFactor = 15,
   verbose = TRUE
 )
 }
@@ -33,23 +39,35 @@ annotatemrbin(
 
 \item{dimension}{Dimension of NMR data set, option are "1D" or "2D" (e.g. for HSQC data). Will only be used if mrbinObject is a matrix}
 
-\item{metaboliteIdentities}{A numeric 4-column matrix or the file path for a .csv file containing such a matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names. If provided, this will overwrite any current metaboliteIdentities matrix present in the mrbin object. If missing, data currently attached to the mrbin object (if any) will be used.}
+\item{metaboliteIdentities}{A numeric matrix or the file path for a .csv file containing such a matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names. If provided, this will overwrite any current metaboliteIdentities matrix present in the mrbin object. If missing, data currently attached to the mrbin object (if any) will be used.}
 
 \item{add}{Should the new metabolite list be added to an existing list, or replace the current list?}
 
 \item{hideChemicalShift}{Should the chemical shift (bin borders) of an identified metabolite be removed, leaving only the metabolite id, or should both be shown? Showing both helps in identifying signals of interest, but hiding the chemical shift might make better plots.}
 
+\item{includeAll}{Should all metabolites in the predefined list be used, even if they aren't in the ordered list for this sample matrix?}
+
+\item{maxMetabolites}{Maximum number of metabolites to be used. Default is NULL (all metabolites in the list will be used)}
+
+\item{batchSize}{Look for this number of top metabolites first, then move n the next batch of lower-abundance metabolites}
+
 \item{tiers}{Should all tiers (1 through 5) of identification be applied? .}
 
-\item{hideTentativeIds}{Should the identities of tentative ids be omitted for clarity?}
+\item{peakRatio}{A threshold for the minimum ratio of significant peaks to total peaks to confirm an annotation}
+
+\item{Rmodifier}{A number by which the confirmationRthreshold is multiplied. This can be used to lower R threshold when signal-to-noise levels are low, such as in 2D spectra. If set to NULL (default), this will use 1 for 1D spectra and 0.4 for 2D spectra}
 
 \item{confirmationRthreshold}{A threshold to define the r-value cutoff to confirm an annotation}
 
-\item{confirmationPthreshold}{A threshold to define the p-value cutoff to confirm an annotation}
+\item{peakRthreshold}{A threshold to define the r-value cutoff that bins within one peak need to show to the first identified bin of the peak to be considered. If NULL, this will use .8 for 1D and .2 for 2D}
 
-\item{uniqueBins}{Should each bin be uniquely assigned to only one molecule?}
+\item{showMissing}{Should metabolites missing from the peak database be shown}
 
-\item{checkBaselineCorrelation}{Should correlation to baseline be compared to confirm an annotation}
+\item{exclude}{Exclude specific metbolites from annotation, e.g. "DSS" if TSP was used instead.}
+
+\item{expandRange}{Expand the search range by this value in ppm. This could be used for low-field spectra.}
+
+\item{expandRangeFactor}{The expandRange will be multiplied by this value for the second, indirect dimension, e.g 13C.}
 
 \item{verbose}{Should outputs be shown or suppressed?}
 }

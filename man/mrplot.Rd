@@ -8,7 +8,7 @@ mrplot(
   hideMenu = FALSE,
   folders = NULL,
   NMRvendor = "Bruker",
-  dimensions = NULL,
+  dimensions = "1D",
   intensity1D = NULL,
   zoom = NULL,
   color = NULL,

@@ -11,7 +11,8 @@ plotPCA(
   legendPosition = "bottomleft",
   annotate = TRUE,
   verbose = TRUE,
-  xpd = NA
+  xpd = NA,
+  cex = 1
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ plotPCA(
 \item{verbose}{Should a summary be displayed?}
 
 \item{xpd}{Should labels be clipped to the plot region (TRUE) or exceed to margins (NA)}
+
+\item{cex}{Adjust text in plots by this factor}
 }
 \value{
 An invisible prcomp result object
