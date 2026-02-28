@@ -134,12 +134,6 @@ In some cases, running mrbin from within RStudio on Apple computers will not
 generate pop-up windows. To enable pop-up windows, it might be helpful to install
 the newest version of xquartz from https://www.xquartz.org.
 
-### Spectra are Missing
-If a Bruker spectrum is not shown during browsing, please make sure a file
-with filename title is present in the PROCNO folder of that spectrum. You
-can create a title file by opening the spectrum in Bruker Topspin, selecting
-the Title tab, entering a title and clicking the disk symbol for saving.
-
 
 ## Built With
 

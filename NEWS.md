@@ -1,5 +1,16 @@
 # mrbin News
 
+## Version 1.9.5
+
+* mrbin: Noise handling default paramters are no less exclusive so true signals are more likely to be retained 
+* mrbin: Solvent removal default paramters for water are more narrow so true signals aren't removed 
+* mrbin: Bruker spectrum folders without a file named "title" were previosuly not displayed, this is now fixed
+* mrbin: Result files are now compressed to save space. For better reproducibility, they now again contain the individual estimated noise levels per bin for each sample
+* mrbin: Small bug fixes and improvements
+* checkmrbin: Bugfix: Adding a new variable through editmrbin may have caused an error message, this is fixed now
+* annotatemrbin: Major quality improvements. Bugfix: Annotating reloaded mrbin files failed, this is fixed now
+
+
 ## Version 1.9.4
 
 * mrbin: Small bug fixes and improvements
