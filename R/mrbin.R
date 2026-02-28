@@ -23,6 +23,7 @@
 #' @importFrom graphics axis contour hist legend lines par plot text boxplot points rect polygon box
 #' @importFrom stats heatmap median prcomp quantile sd
 #' @importFrom utils flush.console select.list write.csv
+#' @importFrom Matrix Matrix
 NULL
 
 
@@ -547,6 +548,7 @@ resetEnv<-function(){
                noise_level_TMP=NULL,
                noise_level_Raw_TMP=NULL,
 			   baseline=NULL,
+			   scalingFactor=NULL,
                meanNumberOfPointsPerBin=NULL,
                meanNumberOfPointsPerBin_TMP=NULL,
                binTMP=NULL,
@@ -656,12 +658,12 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
  if(!is.null(metadata)) setParam(metadata=metadata)
  if(!is.null(mrbin.env$mrbin$parameters$Factors)){
    mrbin.env$mrbin$metadata$factors<-mrbin.env$mrbin$parameters$Factors  #for backward compatibility
-   mrbin.env$mrbin$parameters$Factors<-NULL
+   mrbin.env$mrbin$parameters["Factors"]<-list(NULL)
  }
- mrbin.env$mrbinTMP$additionalPlots1D<-NULL
- mrbin.env$mrbinTMP$additionalPlots2D<-NULL
- mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
- mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
+ mrbin.env$mrbinTMP[["additionalPlots1D"]]<-NULL
+ mrbin.env$mrbinTMP[["additionalPlots2D"]]<-NULL
+ mrbin.env$mrbinTMP[["additionalPlots1DMetadata"]]<-NULL
+ mrbin.env$mrbinTMP[["additionalPlots2DMetadata"]]<-NULL
  
  stopTMP<-FALSE
  selectionRepeat<-""
@@ -669,7 +671,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
  restart<-TRUE
  while(restart){#for restarting during data review
   restart<-FALSE
-  mrbin.env$mrbin$parameters$warningMessages<-NULL
+  mrbin.env$mrbin$parameters["warningMessages"]<-list(NULL)
   if(!silent){
    if(Sys.info()['sysname']=='Darwin'&graphics){#On Apple or Mac computer, display a hint for installing Quartz
      if(mrbin.env$mrbin$parameters$verbose){
@@ -873,10 +875,10 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
               mrbin.env$mrbinTMP$currentFolder<-mrbin.env$mrbin$parameters$NMRfolders[1]
               mrbin.env$mrbinTMP$timeEstimate<-max(.001,system.time(readNMR2())[1])
               if(mrbin.env$mrbin$parameters$showSpectrumPreview=="Yes"|mrbin.env$mrbin$parameters$PCA=="Yes"){
-                mrbin.env$mrbinTMP$additionalPlots1D<-NULL
-                mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
-                mrbin.env$mrbinTMP$additionalPlots2D<-NULL
-                mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
+                mrbin.env$mrbinTMP[["additionalPlots1D"]]<-NULL
+                mrbin.env$mrbinTMP[["additionalPlots1DMetadata"]]<-NULL
+                mrbin.env$mrbinTMP[["additionalPlots2D"]]<-NULL
+                mrbin.env$mrbinTMP[["additionalPlots2DMetadata"]]<-NULL
                 #Find 3 more spectra: 33 percentile, 66 percentile, last spectrum
                 mrbin.env$mrbinTMP$spectrumListPlotTMP<-setdiff(unique(c(
                   ceiling(length(mrbin.env$mrbin$parameters$NMRfolders)*.33),
@@ -1108,7 +1110,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
           if(!stopTMP&mrbin.env$mrbin$parameters$binMethod=="Custom bin list"){
             adjbinRegion<-""
             if(!is.null(mrbin.env$mrbin$parameters$specialBinList)){
-              if(nrow(mrbin.env$mrbin$parameters$specialBinList)==0) mrbin.env$mrbin$parameters$specialBinList<-NULL
+              if(nrow(mrbin.env$mrbin$parameters$specialBinList)==0) mrbin.env$mrbin$parameters["specialBinList"]<-list(NULL)
             }
             adjbinRegionSelect<-""
             adjbinRegionAccept<-""
@@ -1138,7 +1140,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
 			  par(bg="white")
 			  plotMultiNMR(region="all",
                     rectangleRegions=mrbin.env$mrbin$parameters$specialBinList,color=NULL,
-                    manualScale=FALSE,rectangleColors="orange",#"darkseagreen3"
+                    manualScale=FALSE,rectangleColors="darkseagreen3",#"orange",#
 					maxPlots=2,
                     plotTitle=paste("Bin regions\n",sep=""),restrictToRange=TRUE)
 			}
@@ -1149,7 +1151,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
             if(length(adjbinRegionSelect)==0|adjbinRegionSelect=="") stopTMP<-TRUE
             if(!stopTMP){
               if(adjbinRegionSelect=="Create new bin list"){
-                mrbin.env$mrbin$parameters$specialBinList<-NULL
+                mrbin.env$mrbin$parameters["specialBinList"]<-list(NULL)
               }
             }
             if(!stopTMP){
@@ -1297,7 +1299,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
                   }
                 }
                 if(nrow(mrbin.env$mrbin$parameters$specialBinList)==0){
-                  mrbin.env$mrbin$parameters$specialBinList<-NULL
+                  mrbin.env$mrbin$parameters["specialBinList"]<-list(NULL)
                   adjbinRegion<-"Go back"
                 }
               }
@@ -1447,7 +1449,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
                   if(mrbin.env$mrbin$parameters$showSpectrumPreview=="Yes"){
 				    try(dev.off(),silent=TRUE)
 					par(bg="white")
- 				    plotMultiNMR(region=c(mean1+6*range1,mean1-6*range1,-10,160),rectangleColors="orange",#"darkseagreen3",
+ 				    plotMultiNMR(region=c(mean1+6*range1,mean1-6*range1,-10,160),rectangleColors="darkseagreen3",#"orange",#
                           rectangleRegions=matrix(c(mrbin.env$mrbin$parameters$solventRegion[1],
                                                   mrbin.env$mrbin$parameters$solventRegion[2],-1000,1000),ncol=4),
                           color=NULL,manualScale=FALSE,restrictToRange=TRUE,maxPlots=2,
@@ -1500,7 +1502,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
                 addAreasFlag<-TRUE
                 if(!is.null( mrbin.env$mrbin$parameters$removeAreaList)){
                   if(nrow(mrbin.env$mrbin$parameters$removeAreaList)==0){
-                    mrbin.env$mrbin$parameters$removeAreaList<-NULL
+                    mrbin.env$mrbin$parameters["removeAreaList"]<-list(NULL)
                   }
                 }
                 if(!is.null(mrbin.env$mrbin$parameters$removeAreaList)){
@@ -1667,7 +1669,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
           }
           if(!is.null(mrbin.env$mrbin$parameters$removeAreaList)){
             if(nrow(mrbin.env$mrbin$parameters$removeAreaList)==0){
-              mrbin.env$mrbin$parameters$removeAreaList<-NULL
+              mrbin.env$mrbin$parameters["removeAreaList"]<-list(NULL)
               adjbinRegion<-"Go back"
             }
           }
@@ -1700,7 +1702,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
                   addAreasFlag<-TRUE
                   if(!is.null( mrbin.env$mrbin$parameters$sumBinList)){
                     if(nrow(mrbin.env$mrbin$parameters$sumBinList)==0){
-                      mrbin.env$mrbin$parameters$sumBinList<-NULL
+                      mrbin.env$mrbin$parameters["sumBinList"]<-list(NULL)
                     }
                   }
                   if(!is.null( mrbin.env$mrbin$parameters$sumBinList)){
@@ -1732,7 +1734,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
 				    par(bg="white")
 				    plotMultiNMR(region="all",
                           rectangleRegions=mrbin.env$mrbin$parameters$sumBinList,color=NULL,
-                          manualScale=FALSE,rectangleColors="orange",#"darkseagreen3",
+                          manualScale=FALSE,rectangleColors="darkseagreen3",#"orange",#
 						  maxPlots=2,
                           plotTitle=paste("Summed areas\n",sep=""),restrictToRange=TRUE)
 				  }
@@ -1862,7 +1864,7 @@ mrbin<-function(silent=FALSE,setDefault=FALSE,parameters=NULL,metadata=NULL,grap
               adjbinRegion<-"Go back"
             } else {
               if(nrow(mrbin.env$mrbin$parameters$sumBinList)==0){
-                mrbin.env$mrbin$parameters$sumBinList<-NULL
+                mrbin.env$mrbin$parameters["sumBinList"]<-list(NULL)
                 adjbinRegion<-"Go back"
               }
             }
@@ -2526,10 +2528,10 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
         message("Processing data... ", appendLF = FALSE)
         utils::flush.console()
       }
-        mrbin.env$mrbinTMP$additionalPlots1D<-NULL
-        mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
-        mrbin.env$mrbinTMP$additionalPlots2D<-NULL
-        mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
+        mrbin.env$mrbinTMP[["additionalPlots1D"]]<-NULL
+        mrbin.env$mrbinTMP[["additionalPlots1DMetadata"]]<-NULL
+        mrbin.env$mrbinTMP[["additionalPlots2D"]]<-NULL
+        mrbin.env$mrbinTMP[["additionalPlots2DMetadata"]]<-NULL
         #Find 3 more spectra: 33 percentile, 66 percentile, last spectrum
         mrbin.env$mrbinTMP$spectrumListPlotTMP<-setdiff(unique(c(
           ceiling(length(mrbinResults$parameters$NMRfolders)*.33),
@@ -2546,7 +2548,8 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
           }
         }
       #create and save noise plots
-      if(silent&mrbinResults$parameters$saveFiles=="Yes") setNoiseLevels(mrbinResults,plotOnly=TRUE,silent=silent,graphics=graphics)
+      if(!is.null(mrbinResults$parameters$annotate)) mrbinResults<-annotatemrbin(mrbinResults,annotate=mrbinResults$parameters$annotate,verbose=TRUE)
+	  if(silent&mrbinResults$parameters$saveFiles=="Yes") setNoiseLevels(mrbinResults,plotOnly=TRUE,silent=silent,graphics=graphics)
       if(mrbinResults$parameters$noiseRemoval=="Yes") mrbinResults<-removeNoise(mrbinResults,verbose=FALSE)
       if(mrbinResults$parameters$dilutionCorrection=="Yes") mrbinResults<-dilutionCorrection(mrbinResults)
       if(mrbinResults$parameters$fixNegatives=="Yes") mrbinResults<-atnv(mrbinResults,verbose=FALSE)
@@ -2594,7 +2597,7 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
          message(resultOutputTMP, appendLF = FALSE)
          utils::flush.console()
        }
-      if(!is.null(mrbinResults$parameters$annotate)) mrbinResults<-annotatemrbin(mrbinResults,annotate=mrbinResults$parameters$annotate,verbose=TRUE)
+      #if(!is.null(mrbinResults$parameters$annotate)) mrbinResults<-annotatemrbin(mrbinResults,annotate=mrbinResults$parameters$annotate,verbose=TRUE)
     }
     if(mrbinResults$parameters$PCA=="Yes"){
       if(mrbin.env$mrbin$parameters$saveFiles=="Yes"|process|!silent){
@@ -2610,10 +2613,12 @@ mrbinrun<-function(createbins=TRUE,process=TRUE,mrbinResults=NULL,silent=TRUE,
 		results<-editmrbin(mrbinObject=mrbinResults,
 			 functionName="mrbin::mrbinrun",
 			 versionNumber=as.character(utils::packageVersion("mrbin")),
-			 parameters=list(noise_level=NULL,binRegions=NULL),#to save memory and disk space
+			 parameters=list(#noise_level=list(NULL),#0,#do not set to NULL, this would cause issues with change tracking after the next change!
+			   binRegions=list(NULL)#matrix(0,ncol=4,nrow=0)
+			   ),#to save memory and disk space
 			 verbose=FALSE)
 		if(mrbinResults$parameters$saveFiles=="Yes"){
-			save(results,file=paste(results$parameters$outputFileName,".Rdata",sep=""))
+			save(results,file=paste(results$parameters$outputFileName,".Rdata",sep=""),compress="xz")
 			parametersTMP<-results$parameters
 			dput(parametersTMP,file=paste(mrbinResults$parameters$outputFileName,".txt",sep=""))
 			cat(results$parameters$createCode,file=paste(mrbinResults$parameters$outputFileName,"Code.R",sep=""))
@@ -2742,10 +2747,10 @@ setNoiseLevels<-function(mrbinObject,plotOnly=FALSE,
           readNMR2(dimension=mrbinObject$parameters$dimension,
                    NMRvendor=mrbinObject$parameters$NMRvendor,
                    useAsNames=mrbinObject$parameters$useAsNames)
-          mrbin.env$mrbinTMP$additionalPlots1D<-NULL
-          mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
-          mrbin.env$mrbinTMP$additionalPlots2D<-NULL
-          mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
+          mrbin.env$mrbinTMP[["additionalPlots1D"]]<-NULL
+          mrbin.env$mrbinTMP[["additionalPlots1DMetadata"]]<-NULL
+          mrbin.env$mrbinTMP[["additionalPlots2D"]]<-NULL
+          mrbin.env$mrbinTMP[["additionalPlots2DMetadata"]]<-NULL
           #Find 3 more spectra: 33 percentile, 66 percentile, last spectrum
           mrbin.env$mrbinTMP$spectrumListPlotTMP<-setdiff(unique(c(
             ceiling(length(mrbinObject$parameters$NMRfolders)*.33),
@@ -3326,7 +3331,7 @@ metadatamrbin<-function(mrbinResults,metadata=NULL,graphics=graphics){
      i<-i+1
     }
   }
-  mrbinResults<-annotatemrbin(mrbinResults)
+  #mrbinResults<-annotatemrbin(mrbinResults)
   invisible(mrbinResults)
 }
 
@@ -3993,7 +3998,7 @@ selectFolders<-function(keep=FALSE,graphics= TRUE){#Select NMR spectral folders
 selectBrukerFolders<-function(keep=FALSE,graphics= TRUE){#Select Bruker NMR spectral folders
   selectionFolders<-""
   if(!keep){
-    mrbin.env$mrbin$parameters$NMRfolders<-NULL
+    mrbin.env$mrbin$parameters["NMRfolders"]<-list(NULL)
   }
   NMRfoldersTMP<-NULL
   datanameDict<-c("1r","2rr")
@@ -4071,7 +4076,8 @@ selectBrukerFolders<-function(keep=FALSE,graphics= TRUE){#Select Bruker NMR spec
                  if(length(spectrum_path_list)>0){
                    for(i in 1:length(spectrum_path_list)){
                        list.filesTMP<-list.files(spectrum_path_list[i])
-                       if(datanameTmp%in%list.filesTMP&"title"%in%list.filesTMP){
+                       if(datanameTmp%in%list.filesTMP#&"title"%in%list.filesTMP
+						){
                            spectrum_proc_path<-c(spectrum_proc_path,spectrum_path_list[i])
                        }
                     }
@@ -4098,7 +4104,8 @@ selectBrukerFolders<-function(keep=FALSE,graphics= TRUE){#Select Bruker NMR spec
                if(length(spectrum_path_list)>0){
                  for(i in 1:length(spectrum_path_list)){
                      list.filesTMP<-list.files(spectrum_path_list[i])
-                     if(datanameTmp%in%list.filesTMP&"title"%in%list.filesTMP){
+                     if(datanameTmp%in%list.filesTMP#&"title"%in%list.filesTMP
+						){
                          spectrum_proc_path<-c(spectrum_proc_path,spectrum_path_list[i])
                      }
                   }
@@ -4180,7 +4187,7 @@ selectBrukerFolders<-function(keep=FALSE,graphics= TRUE){#Select Bruker NMR spec
 
 binMultiNMR<-function(){
  if(!is.null(mrbin.env$mrbin$parameters$NMRfolders)){
-    mrbin.env$mrbinTMP$binNames<-NULL
+    mrbin.env$mrbinTMP["binNames"]<-list(NULL)
     #Open and bin all spectra
     #Before binning first spectrum
     mrbin.env$mrbin$parameters$AcquPars<-list(
@@ -4196,7 +4203,7 @@ binMultiNMR<-function(){
       nrow(mrbin.env$mrbin$parameters$binRegions)),ncol=nrow(mrbin.env$mrbin$parameters$binRegions))
     mrbin.env$mrbinTMP$meanNumberOfPointsPerBin<-matrix(rep(NA,length(mrbin.env$mrbin$parameters$NMRfolders)*
       nrow(mrbin.env$mrbin$parameters$binRegions)),ncol=nrow(mrbin.env$mrbin$parameters$binRegions))
-    mrbin.env$mrbinTMP$binTMP<-NULL
+    mrbin.env$mrbinTMP["binTMP"]<-list(NULL)
     mrbin.env$mrbinTMP$currentFolder<-mrbin.env$mrbin$parameters$NMRfolders[1]
     transformations<-NULL
     if(mrbin.env$mrbin$parameters$referenceScaling=="Yes"){
@@ -4333,6 +4340,8 @@ binMultiNMR<-function(){
       mrbin.env$mrbin$parameters$baseline[ibinData]<-
         binData[[ibinData]]$baseline
       currentSpectrumNameTMP[ibinData]<-binData[[ibinData]]$currentSpectrumName
+	  mrbin.env$mrbin$parameters$scalingFactor[ibinData]<-
+        binData[[ibinData]]$scalingFactor
     }
     if(length(unique(mrbin.env$mrbin$parameters$AcquPars$NS))>1){
       warningTMP<-paste("NS mismatch: ",
@@ -4457,8 +4466,8 @@ createBinRegions<-function(){
 #'
 #' This function creates titles for the bins to represent their ppm range. This function is
 #' meant only for use within the mrbin function.
-#' @param binsRaw A matrix of binned data
-#' @return An invisible matrix of binned data
+#' @param binsRaw An mrbin variable
+#' @return An invisible mrbin variable
 #' @keywords internal
 #' @noRd
 #' @examples
@@ -4600,12 +4609,12 @@ addToPlot<-function(folder=NULL,
            useAsNames=useAsNames)
     if(dimension=="1D"){
      if(!add){
-       mrbin.env$mrbinTMP$additionalPlots1D<-NULL
-       mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
+       mrbin.env$mrbinTMP[["additionalPlots1D"]]<-NULL
+       mrbin.env$mrbinTMP[["additionalPlots1DMetadata"]]<-NULL
      }
      if( is.null(mrbin.env$mrbinTMP$additionalPlots1D)){
        mrbin.env$mrbinTMP$additionalPlots1D<-list(NMRdataList$currentSpectrum)
-	   mrbin.env$mrbinTMP$additionalPlotsTMP1D<-list(NULL)
+	   mrbin.env$mrbinTMP[["additionalPlotsTMP1D"]]<-list(NULL)
      } else {
        mrbin.env$mrbinTMP$additionalPlots1D[[
          length(mrbin.env$mrbinTMP$additionalPlots1D)+1]]<-NMRdataList$currentSpectrum
@@ -4635,12 +4644,12 @@ addToPlot<-function(folder=NULL,
    }
    if(dimension=="2D"){
      if(!add){
-       mrbin.env$mrbinTMP$additionalPlots2D<-NULL
-       mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
+       mrbin.env$mrbinTMP[["additionalPlots2D"]]<-NULL
+       mrbin.env$mrbinTMP[["additionalPlots2DMetadata"]]<-NULL
      }
      if( is.null(mrbin.env$mrbinTMP$additionalPlots2D)){
        mrbin.env$mrbinTMP$additionalPlots2D<-list(NMRdataList$currentSpectrum)
-       mrbin.env$mrbinTMP$additionalPlotsTMP2D<-list(NULL)
+       mrbin.env$mrbinTMP[["additionalPlotsTMP2D"]]<-list(NULL)
      } else {
        mrbin.env$mrbinTMP$additionalPlots2D[[
          length(mrbin.env$mrbinTMP$additionalPlots2D)+1]]<-NMRdataList$currentSpectrum
@@ -4689,8 +4698,8 @@ removeFromPlot<-function(folder=NULL,
      if(!is.null(mrbin.env$mrbinTMP$additionalPlots1D)){
        if(folder%in%mrbin.env$mrbinTMP$additionalPlots1DMetadata[,5]){
          if(nrow(mrbin.env$mrbinTMP$additionalPlots1DMetadata)==1){
-            mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
-            mrbin.env$mrbinTMP$additionalPlots1D<-NULL
+            mrbin.env$mrbinTMP[["additionalPlots1DMetadata"]]<-NULL
+            mrbin.env$mrbinTMP[["additionalPlots1D"]]<-NULL
          } else {
            deleteTMP<-which(mrbin.env$mrbinTMP$additionalPlots1DMetadata[,5]==folder)
            mrbin.env$mrbinTMP$additionalPlots1D[[deleteTMP]]<-NULL
@@ -4704,8 +4713,8 @@ removeFromPlot<-function(folder=NULL,
      if(!is.null(mrbin.env$mrbinTMP$additionalPlots2D)){
        if(folder%in%mrbin.env$mrbinTMP$additionalPlots2DMetadata[,5]){
          if(nrow(mrbin.env$mrbinTMP$additionalPlots2DMetadata)==1){
-            mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
-            mrbin.env$mrbinTMP$additionalPlots2D<-NULL
+            mrbin.env$mrbinTMP[["additionalPlots2DMetadata"]]<-NULL
+            mrbin.env$mrbinTMP[["additionalPlots2D"]]<-NULL
          } else {
            deleteTMP<-which(mrbin.env$mrbinTMP$additionalPlots2DMetadata[,5]==folder)
            mrbin.env$mrbinTMP$additionalPlots2D[[deleteTMP]]<-NULL
@@ -4799,11 +4808,16 @@ sumBins<-function(){#sum up regions with shifting peaks and remove remaining bin
            #   mrbin.env$mrbin$parameters$binRegions[i_TMP2,]<-limits
            #}
           # if(!is.matrix(mrbin.env$mrbin$parameters$binRegions)) mrbin.env$mrbin$parameters$binRegions<-matrix(mrbin.env$mrbin$parameters$binRegions,ncol=4)
-       }
-       #New bins are added on top of list to ensure they see all data points before they are set to NA
+
+	   }
+       #New bins are added on top of list to ensure they see all data points before they are set to NA (For 2D)
        mrbin.env$mrbin$parameters$binRegions<-rbind(c(0,0,0,0),mrbin.env$mrbin$parameters$binRegions)
        mrbin.env$mrbin$parameters$binRegions[1,]<-limits
     }
+	if(mrbin.env$mrbin$parameters$dimension=="1D"){
+		#sort binRegions by left values (only for 1D)
+		mrbin.env$mrbin$parameters$binRegions<-mrbin.env$mrbin$parameters$binRegions[order(mrbin.env$mrbin$parameters$binRegions[,1],decreasing=TRUE),]
+	}
   }
   mrbin.env$mrbin$parameters$numberOfFeaturesAfterSummingBins<-nrow(mrbin.env$mrbin$parameters$binRegions)
  #}
@@ -4890,6 +4904,8 @@ trimZeros<-function(mrbinResults){
     if(sum(TMP)>0&sum(TMP)<ncol(mrbinResultsTMP$bins)){
       mrbinResultsTMP$bins<-mrbinResultsTMP$bins[,which(TMP),drop=FALSE]
       mrbinResultsTMP$parameters$binRegions<-mrbinResultsTMP$parameters$binRegions[which(TMP),,drop=FALSE]
+	  if(!is.null(mrbinResultsTMP$metadata$annotations)) mrbinResultsTMP$metadata$annotations<-
+			mrbinResultsTMP$metadata$annotations[which(TMP)]
     }
   } else {
     #if(sum(sum(mrbin.env$mrbin$bins==0)/nrow(mrbin.env$mrbin$bins)<.75)>0){
@@ -4945,6 +4961,39 @@ removeNoise<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){#remove 
   }
   mrbinResults2<-mrbinResults
   if(ncol(mrbinResults$bins)>1){
+		
+	binRegionsMissing<-FALSE
+	if(is.null(mrbinResults$parameters$binRegions)){
+		binRegionsMissing<-TRUE
+	} else {
+		if(is.list(mrbinResults$parameters$binRegions)){
+			if(is.null(mrbinResults$parameters$binRegions[[1]])){
+				binRegionsMissing<-TRUE
+			}
+		} else {
+			if(nrow(mrbinResults$parameters$binRegions)==0) binRegionsMissing<-TRUE
+		}
+	}
+	if(binRegionsMissing){#create binRegions - not saved in .Rdata file
+		if(length(strsplit(colnames(mrbinResults$bins)[1],",")[[1]])==2){
+			binRegions<-cbind(
+				matrix(as.numeric(unlist(strsplit(colnames(mrbinResults$bins),","))),
+				ncol=2,byrow=TRUE),
+				matrix(NA,ncol=2,nrow=ncol(mrbinResults$bins))
+				)
+		} else {
+			if(length(strsplit(colnames(mrbinResults$bins)[1],",")[[1]])==4){#if 2D values were provided (not used in this case)
+				binRegions<-matrix(as.numeric(unlist(strsplit(colnames(mrbinResults$bins),","))),
+					ncol=4,byrow=TRUE)
+			}
+		}	
+		rownames(binRegions)<-colnames(mrbinResults$bins)
+		mrbinResults<-editmrbin(mrbinResults,functionName="mrbin::annotatemrbin",
+				versionNumber=as.character(utils::packageVersion("mrbin")),
+		parameters=list(binRegions=binRegions))
+	}  
+  
+  
     minimumNumber<-max(1,floor(mrbinResults$parameters$noiseThreshold*nrow(mrbinResults$bins)))
     colnames_NMRdata_no_noise<-NULL
     if(mrbinResults$parameters$dimension=="2D"){
@@ -4965,6 +5014,9 @@ removeNoise<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){#remove 
           mrbinResults$parameters$binRegions[colnames_NMRdata_no_noise,,drop=FALSE]
         if(!is.matrix(mrbinResults$parameters$binRegions)) mrbinResults$parameters$binRegions<-
            matrix(mrbinResults$parameters$binRegions,ncol=4)
+		if(!is.null(mrbinResults$metadata$annotations)) mrbinResults$metadata$annotations<-
+			mrbinResults$metadata$annotations[colnames_NMRdata_no_noise,drop=FALSE]
+        
     } else {
         if(!errorsAsWarnings) warning("No bins above noise level. Noise removal stopped.")
     }
@@ -4974,7 +5026,7 @@ removeNoise<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){#remove 
  }
  mrbinResults2<-editmrbin(mrbinObject=mrbinResults2,functionName="mrbin::removeNoise",
        versionNumber=as.character(utils::packageVersion("mrbin")),
-       bins=mrbinResults$bins, parameters=mrbinResults$parameters,
+       bins=mrbinResults$bins, parameters=mrbinResults$parameters, metadata=mrbinResults$metadata,
         transformations=transformations,verbose=verbose)
  invisible(mrbinResults2)
 }
@@ -5129,6 +5181,21 @@ PQNScaling<-function(NMRdata,ignoreGlucose="Yes",dimension="1D",
     NMRdataTMP<-as.matrix(NMRdata)
   }
   if(ncol(NMRdataTMP)>1){
+	binRegions<-NMRdata$parameters$binRegions
+	if(length(binRegions)==0){
+		if(length(strsplit(colnames(NMRdataTMP)[1],",")[[1]])==2){
+			binRegions<-cbind(
+				matrix(unlist(strsplit(colnames(NMRdataTMP),",")),
+				ncol=2,byrow=TRUE),
+				matrix(NA,ncol=2,nrow=ncol(NMRdataTMP))
+				)
+		} else {
+			if(length(strsplit(colnames(NMRdataTMP)[1],",")[[1]])==4){#if 2D values were provided (not used in this case)
+				binRegions<-matrix(unlist(strsplit(colnames(NMRdataTMP),",")),
+					ncol=4,byrow=TRUE)
+			}
+		}
+	}
     if(nrow(NMRdataTMP)>1){#Create synthetic median spectrum by averaging all spectra
       NMRdataTmp<-rbind(NMRdataTMP,apply(NMRdataTMP,2,mean))
       rownames(NMRdataTmp)[nrow(NMRdataTmp)]<-"Median"
@@ -5145,8 +5212,8 @@ PQNScaling<-function(NMRdata,ignoreGlucose="Yes",dimension="1D",
                   apply(colnamesTMP[,1:2],1,mean))
 
             } else {
-              coordTmpAll<-cbind(apply(mrbin.env$mrbin$parameters$binRegions[,3:4],1,mean),
-                  apply(mrbin.env$mrbin$parameters$binRegions[,1:2],1,mean))
+              coordTmpAll<-cbind(apply(binRegions[,3:4],1,mean),
+                  apply(binRegions[,1:2],1,mean))#mrbin.env$mrbin$parameters$
             }
           }
           if(ppmNames=="mean"){
@@ -5170,7 +5237,7 @@ PQNScaling<-function(NMRdata,ignoreGlucose="Yes",dimension="1D",
                             NMRdataTmp),","))),ncol=2,byrow=TRUE)
               coordTmpAll<-apply(colnamesTMP[,1:2],1,mean)
             } else {
-              coordTmpAll<-apply(mrbin.env$mrbin$parameters$binRegions[,1:2],1,mean)
+              coordTmpAll<-apply(binRegions[,1:2],1,mean)
             }
           }
           if(ppmNames=="mean"){
@@ -5345,6 +5412,7 @@ unitVarianceScaling<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
 #' @param annotate Should loadings be annotated with metabolite identities, if available in $metadata?
 #' @param verbose Should a summary be displayed?
 #' @param xpd Should labels be clipped to the plot region (TRUE) or exceed to margins (NA)
+#' @param cex Adjust text in plots by this factor
 #' @return An invisible prcomp result object
 #' @export
 #' @examples
@@ -5360,7 +5428,7 @@ unitVarianceScaling<-function(mrbinResults,verbose=TRUE,errorsAsWarnings=FALSE){
 #'     NMRvendor="mrbin"))
 #' plotPCA(results)
 plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="bottomleft",
- annotate=TRUE,verbose=TRUE,xpd=NA){
+ annotate=TRUE,verbose=TRUE,xpd=NA,cex=1){
  PCA<-NULL
  if(!is.null(mrbinResults$bins)){
     checkmrbin(mrbinResults,verbose=verbose)
@@ -5373,7 +5441,9 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
     if(annotate){
       #mrbinResults<-annotatemrbin(mrbinResults)
       if(length(mrbinResults$metadata$annotations)==ncol(mrbinResults$bins)){
-        colnames(mrbinResults$bins)<-mrbinResults$metadata$annotations
+        if(!is.na(mrbinResults$metadata$annotations[1])){
+			colnames(mrbinResults$bins)<-mrbinResults$metadata$annotations
+		}
       }
     }
     if(nrow(mrbinResults$bins)>1){
@@ -5419,13 +5489,13 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
       }
       if(loadings){#plot loadings: do only if parameter set
         graphics::plot(PCA$rotation,xlim=xlimTMProt,ylim=ylimTMProt,xlab="PC1",ylab="PC2",
-                       pch=16,cex=.75,main="PCA Loadings Plot", ask=FALSE, xaxt='n', yaxt='n'
+                       pch=16,cex=cex*.75,main="PCA Loadings Plot", ask=FALSE, xaxt='n', yaxt='n'
 					   ,mgp=c(0,0,0))
         #display only top feature names
         topFeatures<-order(PCA$rotation[,1]^2+PCA$rotation[,2]^2,
           decreasing=TRUE)[1:min(nrow(PCA$rotation),50)]
-        graphics::text(PCA$rotation[topFeatures,],labels=rownames(PCA$rotation)[topFeatures]
-                       ,pos=4,cex=.65,xpd=xpd)
+        graphics::text(PCA$rotation[topFeatures,],labels=rownames(PCA$rotation)[
+			topFeatures],pos=4,cex=cex*.65,xpd=xpd)
       } else {
         graphics::plot(PCA$x
              ,xlim=xlimTMP,
@@ -5436,15 +5506,15 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
              main="PCA Scores Plot",
              xlab=xlabTMP,
              ylab=ylabTMP,
-             cex=.75, ask=FALSE,mgp=c(0,0,0))
+             cex=cex*.75, ask=FALSE,mgp=c(0,0,0))
 	    if(annotate){
           graphics::text(PCA$x,labels=paste(substr(rownames(PCA$x),1,
-            mrbinResults$parameters$PCAtitlelength)),pos=3,cex=.65,
+            mrbinResults$parameters$PCAtitlelength)),pos=3,cex=cex*.65,
                col=colorPalette[PCAFactors],xpd=xpd)
 		}
           if(defineGroups) graphics::legend(legendPosition,
                   legend=levels(FactorsTMP),
-                  col=colorPalette[numlevels],pch=numlevels2,cex=.7,bg=NULL)#"white"
+                  col=colorPalette[numlevels],pch=numlevels2,cex=cex*.7,bg=NULL)#"white"
       }
       utils::flush.console()
     } else {
@@ -5462,6 +5532,7 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
 #' @param defineGroups Should group membership be highlighted in PCA?
 #' @param process If set to FALSE, the file name will be extended by "Raw" to indicate that data has not been processed yet
 #' @param silent If set to TRUE, plots will be saved but not shown for the binning step for speed purposes
+#' @param maxFeatures Maximum number of features to display for speed purposes
 #' @return {None}
 #' @export
 #' @examples
@@ -5476,7 +5547,7 @@ plotPCA<-function(mrbinResults,defineGroups=TRUE,loadings=FALSE,legendPosition="
 #'     NMRvendor="mrbin"))
 #' plotResults(results)
 
-plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
+plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE,maxFeatures=600){
  if(!is.null(mrbinResults$bins)){
     #first write plot to object, then plot object (speed!)
     outputFileName<-mrbinResults$parameters$outputFileName
@@ -5552,14 +5623,14 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
     }
     if(mrbinResults$parameters$dimension=="1D"){
       plotMultiNMR(region=region,rectangleRegions=rectangleRegionsTMP,buffer=FALSE,
-          color=NULL,rectangleColors="orange",#"darkseagreen3", 
+          color=NULL,rectangleColors="darkseagreen3",#"orange",#
 		  rectangleFront=FALSE,
           manualScale=FALSE,maxPlots=2,plotTitle=mainTitle,restrictToRange=TRUE,
           dimension=mrbinResults$parameters$dimension,enableSplit=FALSE)
     }
     if(mrbinResults$parameters$dimension=="2D"){
       plotMultiNMR(rectangleRegions=rectangleRegionsTMP,buffer=FALSE,
-          color=NULL,rectangleColors="orange",#"darkseagreen3", 
+          color=NULL,rectangleColors="darkseagreen3",#"orange",#
 		  rectangleFront=FALSE,#TRUE,
           manualScale=FALSE,maxPlots=2,plotTitle=mainTitle,restrictToRange=TRUE,
           dimension=mrbinResults$parameters$dimension,enableSplit=FALSE)
@@ -5580,7 +5651,7 @@ plotResults<-function(mrbinResults,defineGroups=TRUE,process=TRUE,silent=FALSE){
     if(nrow(mrbinResults$bins)<15) axisCex2<-.7
 	binsTMP<-mrbinResults$bins
 	binsTMP[binsTMP<=0]<-NA
-    graphics::boxplot(binsTMP[,1:min(ncol(mrbinResults$bins),5000)],medlwd = 1,
+    graphics::boxplot(binsTMP[,1:min(ncol(mrbinResults$bins),maxFeatures)],medlwd = 1,
 	  main="Bin-wise intensity boxplots",yaxt="n",
       xlab="",ylab="",boxwex=.95,ask=FALSE,xaxt="n",log="y")
     graphics::axis(2,cex.axis=.7,tck=-0.0075,mgp=c(0,0.1,0))
@@ -5660,6 +5731,7 @@ plotNMR<-function(region=NULL,rectangleRegions=NULL,
 				   spectrumTMP=NULL,renewSpectrum=TRUE,
 				   cex.axis=.7,
                    perspective=FALSE,noise=NULL,dimension=NULL,plotDelay=0.1,lwd=1,background=NULL,...){
+ if(is.null(angles)) density<-NULL
  if(is.null(currentSpectrumOriginal)) currentSpectrumOriginal<-mrbin.env$mrbinTMP$currentSpectrumOriginal
  if(is.null(rectangleColors2D)) rectangleColors2D<-rectangleColors
  if(is.null(dimension)){
@@ -5757,7 +5829,7 @@ plotNMR<-function(region=NULL,rectangleRegions=NULL,
       spectrumTMP<-currentSpectrumOriginal[TMP_1,TMP_2]
     }
     if(perspective){
-		displaySize<-50#256#512#Reduce resolution for faster plotting of high-res spectra
+		displaySize<-128#50#256#512#Reduce resolution for faster plotting of high-res spectra
 		if(nrow(spectrumTMP)>(2.1*displaySize)){
 		   sizeRegion1<- ceiling(nrow(spectrumTMP)/displaySize)
 		   nRegion1<-floor(nrow(spectrumTMP)/sizeRegion1)
@@ -5816,7 +5888,7 @@ plotNMR<-function(region=NULL,rectangleRegions=NULL,
 		}  
 		if(!manualScale){
           }
-		displaySize<-300#256#512#Reduce resolution for faster plotting of high-res spectra
+		displaySize<-600#300#256#512#Reduce resolution for faster plotting of high-res spectra
 		if(!showGrid){#When using showGrid, the original resolution should be maintained to show true location of individual data points
 			if(nrow(spectrumTMP)>(2.1*displaySize)){
 			   sizeRegion1<- ceiling(nrow(spectrumTMP)/displaySize)
@@ -5998,7 +6070,7 @@ plotNMR<-function(region=NULL,rectangleRegions=NULL,
           imarginTMP<-imarginTMP+1  
 		}		
         spectrumTMP<-currentSpectrumOriginal[TMP_1]
-        displaySize1D<-1600#Reduce resolution for faster plotting of high-res spectra
+        displaySize1D<-3200#1600#Reduce resolution for faster plotting of high-res spectra
 		if(!showGrid){#When using showGrid, the original resolution should be maintained to show true location of individual data points
 		 #this only shows the max values of each segment
          if(length(spectrumTMP)>(2.5*displaySize1D)){
@@ -6637,8 +6709,9 @@ binMultiNMR2<-function(folder=NULL,dimension="1D",
        baseline=noiseData$baseline,#baseline level per sample before reference scaling
        currentSpectrumName=NMRdataList$currentSpectrumName,
        AcquPars=NMRdataList$AcquPars,
-       warningMessage=warningMessage
-       ))
+       warningMessage=warningMessage,
+       scalingFactor=scalingFactor
+	   ))
   }
  },error=function(e){return(e$message)})
 }
@@ -7009,14 +7082,14 @@ createmrbin<-function(){
                PCA="Yes",
                reference1D=c(.03,-0.03),
                reference2D=c(.04,-0.04,-2,2),
-               solventRegion=c(4.95,4.65),
+               solventRegion=c(4.9,4.7),
                removeAreaList=NULL,
                sumBinList=NULL,
                showSpectrumPreview="Yes",
-               noiseThreshold=0.75,
-               signal_to_noise1D=25,
-               signal_to_noise2D=6,
-               noiseRange2d=c(3.3,2.3,90,110),
+               noiseThreshold=0.1,
+               signal_to_noise1D=5.5,
+               signal_to_noise2D=5.5,
+               noiseRange2d=c(3.2,2.3,90,110),
                noiseRange1d=c(10,9.5),
                croptopRight=c(0,-1.50),#only 2D, defines edge points of the cropped area
                croptopLeft=c(0,3.5),
@@ -7046,6 +7119,7 @@ createmrbin<-function(){
                noise_level_adjusted=NULL,
                noise_level=NULL,#noise levels for each bin of each spectrum
 			   baseline=NULL,
+			   scalingFactor=NULL,
                binRegions=matrix(ncol=4,nrow=0),#dimnames=list(NULL,c("left","right","top","bottom"))),
                AcquPars=list(NS=0,BF1=0,P1=0,RG=0,PULPROG="",SOLVENT=""),
                numberOfFeaturesRaw=NULL,
@@ -7240,14 +7314,22 @@ checkmrbin<-function(mrbinObject,verbose=TRUE,errorsAsWarnings=NULL){
           namesTMP<-NULL
           for(j in names(mrbinObject$changeValues[[i]])){
            if(j %in% names(mrbinObject$changeValues[[i-1]])){
-             if(!identical(#round values to avoid numeric instabilities
-                 signif(mrbinObject$changeValues[[i]][[j]][2],6),
-                 signif(mrbinObject$changeValues[[i-1]][[j]][1]*cos(i)/cos(i-1),6))
-                 ){
-                 namesTMP<-c(namesTMP,j)
-             }
-           } else {
-             namesTMP<-c(namesTMP,j)
+			if(!(j=="binRegions"&
+				(j %in% strsplit(gsub(",","",mrbinObject$changeLog[i,"Change"]),split=" ")[[1]]))){#is.null(mrbinObject$parameters$binRegions)
+				if(!identical(#round values to avoid numeric instabilities
+					signif(mrbinObject$changeValues[[i]][[j]][2],6),
+					signif(mrbinObject$changeValues[[i-1]][[j]][1]*cos(i)/cos(i-1),6))
+					){
+					namesTMP<-c(namesTMP,j)
+				}
+			}
+           } else {#new variable was added
+			if(!j %in% strsplit(gsub(",","",mrbinObject$changeLog[i,"Change"]),split=" ")[[1]]){
+				if(!(j=="binRegions"&is.null(mrbinObject$parameters$binRegions))){
+					namesTMP<-c(namesTMP,j)
+					#warning(j)
+				}
+			}
            }
          }
          if(!is.null(namesTMP)){
@@ -7347,23 +7429,48 @@ editmetabolitesmrbin<-function(mrbinObject,
 }
 
 
+#' A function for creating annotation lists.
+#'
+#' This function creates a matrix of peak positions for use with the annotatemrbin function
+#' @param metaboliteNames Vector of metabolite names
+#' @param binwidth Full width of each bin. Will only be used if mrbinObject is a matrix
+#' @param binheight Full height of each bin. Will only be used if mrbinObject is a matrix and dimension is set to "2D"
+#' @param verbose Should outputs be shown or suppressed?
+#' @return  A numeric matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names.
+#' @export
+#' @examples
+#' resetEnv()#clean up previous data from the package environment 
+
+createAnnotationList<-function(metaboliteNames,binwidth=.01,binheight=1,
+  verbose=TRUE){
+  metaboliteIdentities<-NULL
+  invisible(metaboliteIdentities)
+  }
+
+
 #' A function for annotating mrbin objects.
 #'
 #' This function annotates an mrbin object and returns it with updated $annotations vector
 #' @param mrbinObject An mrbin object or matrix of bin intensities. In case of a matrix, the row names can be in the format left border, right border ("1.22,1.21") or the center of the bin ("1.215"). In the latter case, the parameters binwidth (and binheight if required) should be chosen accordingly. For 2D data, this would be "1.22,1.21,35,36" or "1.215,35.5"
 #' @param annotate If FALSE, the mrbin object will not be changed.
-#' @param metaboliteIdentities A numeric 4-column matrix or the file path for a .csv file containing such a matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names. If provided, this will overwrite any current metaboliteIdentities matrix present in the mrbin object. If missing, data currently attached to the mrbin object (if any) will be used.
+#' @param metaboliteIdentities A numeric matrix or the file path for a .csv file containing such a matrix, the first columns containing metabolite names and the first row being a header. Each row belongs to one unique metabolite signal (left, right, top, bottom borders). Row names are metabolite names. If provided, this will overwrite any current metaboliteIdentities matrix present in the mrbin object. If missing, data currently attached to the mrbin object (if any) will be used.
 #' @param binwidth Full width of each bin. Will only be used if mrbinObject is a matrix
 #' @param binheight Full height of each bin. Will only be used if mrbinObject is a matrix and dimension is set to "2D"
 #' @param dimension Dimension of NMR data set, option are "1D" or "2D" (e.g. for HSQC data). Will only be used if mrbinObject is a matrix
 #' @param hideChemicalShift Should the chemical shift (bin borders) of an identified metabolite be removed, leaving only the metabolite id, or should both be shown? Showing both helps in identifying signals of interest, but hiding the chemical shift might make better plots.
 #' @param tiers Should all tiers (1 through 5) of identification be applied? .
-#' @param hideTentativeIds Should the identities of tentative ids be omitted for clarity?
+#' @param peakRatio A threshold for the minimum ratio of significant peaks to total peaks to confirm an annotation
 #' @param add Should the new metabolite list be added to an existing list, or replace the current list?
-#' @param confirmationPthreshold A threshold to define the p-value cutoff to confirm an annotation
+#' @param Rmodifier A number by which the confirmationRthreshold is multiplied. This can be used to lower R threshold when signal-to-noise levels are low, such as in 2D spectra. If set to NULL (default), this will use 1 for 1D spectra and 0.4 for 2D spectra
 #' @param confirmationRthreshold A threshold to define the r-value cutoff to confirm an annotation
-#' @param uniqueBins Should each bin be uniquely assigned to only one molecule?
-#' @param checkBaselineCorrelation Should correlation to baseline be compared to confirm an annotation
+#' @param peakRthreshold A threshold to define the r-value cutoff that bins within one peak need to show to the first identified bin of the peak to be considered. If NULL, this will use .8 for 1D and .2 for 2D
+#' @param includeAll Should all metabolites in the predefined list be used, even if they aren't in the ordered list for this sample matrix?
+#' @param batchSize Look for this number of top metabolites first, then move n the next batch of lower-abundance metabolites
+#' @param exclude Exclude specific metbolites from annotation, e.g. "DSS" if TSP was used instead.
+#' @param maxMetabolites Maximum number of metabolites to be used. Default is NULL (all metabolites in the list will be used)
+#' @param expandRange Expand the search range by this value in ppm. This could be used for low-field spectra.
+#' @param expandRangeFactor The expandRange will be multiplied by this value for the second, indirect dimension, e.g 13C.
+#' @param showMissing Should metabolites missing from the peak database be shown
 #' @param verbose Should outputs be shown or suppressed?
 #' @return An (invisible) mrbin object
 #' @export
@@ -7389,999 +7496,1656 @@ editmetabolitesmrbin<-function(mrbinObject,
 #' plotPCA(results,loadings=TRUE)
 
 annotatemrbin<-function(mrbinObject,annotate=TRUE,binwidth=.01,binheight=1,dimension="1D",
-  metaboliteIdentities=NULL,add=FALSE,hideChemicalShift=FALSE,
-  tiers=1:5,hideTentativeIds=TRUE,confirmationRthreshold=.7,#.6
-  confirmationPthreshold=1e-5,#5e-6
-  uniqueBins=TRUE,checkBaselineCorrelation=FALSE,verbose=TRUE){#Define metabolite names
-  if(is.matrix(mrbinObject)){
-	#check feature names and adjust to left,right(,top,bottom)
-	if(dimension=="1D"){
-		if(length(strsplit(rownames(mrbinObject)[1,","]))==1){
-			#use binwidth
-			binRegions<-cbind(
-				as.numeric(rownames(mrbinObject))+binwidth/2,
-				as.numeric(rownames(mrbinObject))-binwidth/2,
-				matrix(NA,ncol=2,nrow=nrow(mrbinObject))
-				)
-		} else {
-			if(length(strsplit(rownames(mrbinObject)[1,","]))==2){
+  metaboliteIdentities=NULL,add=FALSE,hideChemicalShift=FALSE,includeAll=FALSE,maxMetabolites=NULL,batchSize=50,
+  tiers=c(1,2,4,5),peakRatio=c(.67,.4,0),Rmodifier=NULL,confirmationRthreshold=c(.89,.84,.82),#c(.975,.95,.925,.9),#,.85,.8
+  peakRthreshold=NULL,
+  #baselinethreshold=.5, #' @param baselinethreshold A threshold to define the r-value cutoff for correlation to the baseline to be considered, as noise signals will usually correlate if baseline isn't perfectly flat
+  showMissing=FALSE,
+  exclude=NULL,expandRange=0,expandRangeFactor=15,verbose=TRUE){#Define metabolite names
+	if(is.matrix(mrbinObject)){
+		#check feature names and adjust to left,right(,top,bottom)
+		if(dimension=="1D"){
+			if(length(strsplit(colnames(mrbinObject)[1],",")[[1]])==1){
+				#use binwidth
 				binRegions<-cbind(
-					matrix(unlist(strsplit(rownames(mrbinObject),",")),
-					ncol=2,byrow=TRUE),
+					as.numeric(colnames(mrbinObject))+binwidth/2,
+					as.numeric(colnames(mrbinObject))-binwidth/2,
 					matrix(NA,ncol=2,nrow=nrow(mrbinObject))
 					)
 			} else {
-				if(length(strsplit(rownames(mrbinObject)[1,","]))==4){#if 2D values were provided (not used in this case)
-					binRegions<-matrix(unlist(strsplit(rownames(mrbinObject),",")),
+				if(length(strsplit(colnames(mrbinObject)[1],",")[[1]])==2){
+					binRegions<-cbind(
+						matrix(unlist(strsplit(colnames(mrbinObject),",")),
+						ncol=2,byrow=TRUE),
+						matrix(NA,ncol=2,nrow=ncol(mrbinObject))
+						)
+				} else {
+					if(length(strsplit(colnames(mrbinObject)[1],",")[[1]])==4){#if 2D values were provided (not used in this case)
+						binRegions<-matrix(unlist(strsplit(colnames(mrbinObject),",")),
+							ncol=4,byrow=TRUE)
+					}
+				}
+			}
+			 if(nrow(binRegions)>1){
+				  namesTMP<-apply(binRegions[,1:2],1,paste,collapse=",")
+			 } else {
+				  namesTMP<-paste(binRegions[,1:2],collapse=",")
+			}
+			rownames(binRegions)<-namesTMP
+		} else {#2D
+			if(length(strsplit(colnames(mrbinObject)[1],",")[[1]])==2){
+				#use binwidth
+				binreginsTMP<-matrix(unlist(strsplit(colnames(mrbinObject),",")),
+					ncol=2,byrow=TRUE)
+				binRegions<-cbind(
+					as.numeric(binreginsTMP[,1])+binwidth/2,
+					as.numeric(binreginsTMP[,1])-binwidth/2,
+					as.numeric(binreginsTMP[,2])-binheight/2,
+					as.numeric(binreginsTMP[,2])+binheight/2
+					)		
+			} else {
+				if(length(strsplit(colnames(mrbinObject)[1],",")[[1]])==4){
+					binRegions<-matrix(unlist(strsplit(colnames(mrbinObject),",")),
+						ncol=4,byrow=TRUE)
+				}	
+			}
+			 if(nrow(binRegions)>1){
+				  namesTMP<-apply(binRegions,1,paste,collapse=",")
+			 } else {
+				  namesTMP<-paste(binRegions,collapse=",")
+			}
+			rownames(binRegions)<-namesTMP		
+		}
+		mrbinObjectTMP<-createmrbin()
+		mrbinObjectTMP<-editmrbin(mrbinObjectTMP,
+			bins=mrbinObject,
+			parameters=list(dimension=dimension,
+			binRegions=binRegions)
+			)
+		mrbinObject<-mrbinObjectTMP
+	} else {
+		dimension<-mrbinObject$parameters$dimension
+		binRegionsMissing<-FALSE
+		if(is.null(mrbinObject$parameters$binRegions)){
+			binRegionsMissing<-TRUE
+		} else {
+			if(is.list(mrbinObject$parameters$binRegions)){
+				if(is.null(mrbinObject$parameters$binRegions[[1]])){
+					binRegionsMissing<-TRUE
+				}
+			} else {
+				if(nrow(mrbinObject$parameters$binRegions)==0) binRegionsMissing<-TRUE
+			}
+		}
+		if(binRegionsMissing){#create binRegions - not saved in .Rdata file
+			if(length(strsplit(colnames(mrbinObject$bins)[1],",")[[1]])==2){
+				binRegions<-cbind(
+					matrix(as.numeric(unlist(strsplit(colnames(mrbinObject$bins),","))),
+					ncol=2,byrow=TRUE),
+					matrix(NA,ncol=2,nrow=ncol(mrbinObject$bins))
+					)
+			} else {
+				if(length(strsplit(colnames(mrbinObject$bins)[1],",")[[1]])==4){#if 2D values were provided (not used in this case)
+					binRegions<-matrix(as.numeric(unlist(strsplit(colnames(mrbinObject$bins),","))),
 						ncol=4,byrow=TRUE)
 				}
+			}	
+			rownames(binRegions)<-colnames(mrbinObject$bins)
+			mrbinObject<-editmrbin(mrbinObject,functionName="mrbin::annotatemrbin",
+					versionNumber=as.character(utils::packageVersion("mrbin")),
+			parameters=list(binRegions=binRegions))
+		}
+	}
+	if(is.null(Rmodifier)){
+		Rmodifier<-1
+		if(dimension=="2D") Rmodifier<-.4
+	}
+	if(is.null(peakRthreshold)){
+		peakRthreshold<-.8
+		if(dimension=="2D") peakRthreshold<-.2
+	}
+	
+	confirmationRthreshold<-confirmationRthreshold*Rmodifier
+	if(is.character(annotate)){
+		annotateTMP<-TRUE
+		additionalIdentities<-annotate
+	} else {
+		annotateTMP<-annotate
+		additionalIdentities<-NULL
+	}
+	if(annotateTMP){
+		if(is.null(metaboliteIdentities)){#if no ids provided, search them in the mrbin object
+		  metaboliteIdentities<-mrbinObject$metadata$metaboliteIdentities
+		} else {#if ids are provided use them (or load them from the provided csv file
+			if(is.character(metaboliteIdentities)){#load from .csv file
+				filepathTMP<-metaboliteIdentities
+				metaboliteIdentitiesTMP<-utils::read.csv(filepathTMP,
+					header=TRUE)
+				metaboliteIdentities<-as.matrix(metaboliteIdentitiesTMP[,
+					c("left","right","top","bottom","usePeak1D","usePeak2D")#2:7
+					,drop=FALSE])
+				rownames(metaboliteIdentities)<-trimws(metaboliteIdentitiesTMP[,"metabolite"])#do not use drop=FALSE here - needs to be a vector 
+			}
+			mrbinObject<-editmetabolitesmrbin(mrbinObject,ids=metaboliteIdentities,add=add)
+		}
+		if(ncol(metaboliteIdentities)==4){#add 1's to show these peaks should be used
+			metaboliteIdentities<-cbind(metaboliteIdentities,rep(1,nrow(metaboliteIdentities)),
+				rep(1,nrow(metaboliteIdentities)))
+		}
+		additionalIdentitiesTMP<-NULL
+		indicesTMP<-NULL
+		if(!is.null(additionalIdentities)){#read predefined metabolite ids from file and add them
+			#Mark these metabolites with name extensions _2 etc so they do not get mixed up
+			#with metabolites of the same name provided by the user
+			#metaboliteIDs<-NULL
+			ordered<-NULL
+			sampleMatrix<-NULL
+			load(system.file("extdata/def2",package="mrbin"))
+			load(system.file("extdata/ord",package="mrbin"))
+			
+			if(any(names(ordered)==additionalIdentities)){
+				missingTMP<-NULL
+				for(i in 1:length(ordered[[additionalIdentities]])){
+					if(any(rownames(sampleMatrix)==ordered[[additionalIdentities]][i])){
+						indicesTMP2<-which(rownames(sampleMatrix)==ordered[[additionalIdentities]][i])
+						indicesTMP<-c(indicesTMP,indicesTMP2)
+					} else {
+						missingTMP<-c(missingTMP,ordered[[additionalIdentities]][i])
+					}
+				}
+				if(showMissing&!is.null(missingTMP)){
+							message(paste(length(missingTMP)," missing for ",additionalIdentities,": ",paste(missingTMP,sep=", ",collapse=", ")))
+				}
+				if(length(indicesTMP)>0){
+					additionalIdentitiesTMP<-sampleMatrix[indicesTMP,]
+				}
+			} else {
+				message(paste("The provided sample type is not valid:",additionalIdentities))
 			}
 		}
-	
-	} else {#2D
-		if(length(strsplit(rownames(mrbinObject)[1,","]))==2){
-			#use binwidth
-			binreginsTMP<-matrix(unlist(strsplit(rownames(mrbinObject),",")),
-				ncol=2,byrow=TRUE)
-			binRegions<-cbind(
-				as.numeric(binreginsTMP[,1])+binwidth/2,
-				as.numeric(binreginsTMP[,1])-binwidth/2,
-				as.numeric(binreginsTMP[,2])-binheight/2,
-				as.numeric(binreginsTMP[,2])+binheight/2
-				)		
-		} else {
-			if(length(strsplit(rownames(mrbinObject)[1,","]))==4){
-				binRegions<-matrix(unlist(strsplit(rownames(mrbinObject),",")),
-					ncol=4,byrow=TRUE)
-			}	
-		}
-	}
-	mrbinObjectTMP<-createmrbin()
-	mrbinObjectTMP<-editmrbin(mrbinObjectTMP,
-		bins=mrbinObject,
-		parameters=list(dimension=dimension,
-		binRegions=binRegions)
-		)
-	mrbinObject<-mrbinObjectTMP
-  }
-  if(is.character(annotate)){
-    annotateTMP<-TRUE
-	additionalIdentities<-annotate
-  } else {
-    annotateTMP<-annotate
-	additionalIdentities<-NULL
-  }
-  if(annotateTMP){
-    if(is.null(metaboliteIdentities)){#if no ids provided, search them in the mrbin object
-      metaboliteIdentities<-mrbinObject$metadata$metaboliteIdentities
-	} else {#if ids are provided use them (or load them from the provided csv file
-		if(is.character(metaboliteIdentities)){#load from .csv file
-			filepathTMP<-metaboliteIdentities
-			metaboliteIdentitiesTMP<-utils::read.csv(filepathTMP,
-				header=TRUE)
-			metaboliteIdentities<-as.matrix(metaboliteIdentitiesTMP[,
-				c("left","right","top","bottom","usePeak1D","usePeak2D")#2:7
-				,drop=FALSE])
-			rownames(metaboliteIdentities)<-trimws(metaboliteIdentitiesTMP[,"metabolite"])#do not use drop=FALSE here - needs to be a vector 
-		}
-		mrbinObject<-editmetabolitesmrbin(mrbinObject,ids=metaboliteIdentities,add=add)
-	}
-	if(ncol(metaboliteIdentities)==4){#add 1's to show these peaks should be used
-		metaboliteIdentities<-cbind(metaboliteIdentities,rep(1,nrow(metaboliteIdentities)),
-			rep(1,nrow(metaboliteIdentities)))
-	}
-	if(!is.null(additionalIdentities)){#read predefined metabolite ids from file and add them
-		#Mark these metabolites with name extensions _2 etc so they do not get mixed up
-		#with metabolites of the same name provided by the user
-		metaboliteIDs<-NULL
-		load(system.file("extdata/TMP/3ADE68B1.000",package="mrbin"))
-		if(additionalIdentities%in%names(metaboliteIDs)){
-			additionalIdentitiesTMP<-metaboliteIDs[[additionalIdentities]]
-			additionalIdentitiesTMP2<-as.matrix(additionalIdentitiesTMP[,
-				c("left","right","top","bottom","usePeak1D","usePeak2D")#2:7
-				,drop=FALSE])
-			rownames(additionalIdentitiesTMP2)<-additionalIdentitiesTMP[,"metabolite"]
-			for(irownames in 1:nrow(additionalIdentitiesTMP2)){#find duplicates
-				if(rownames(additionalIdentitiesTMP2)[irownames] %in% rownames(metaboliteIdentities)){
+		if(includeAll){
+			if(is.null(indicesTMP)){
+				additionalIdentitiesTMP<-rbind(additionalIdentitiesTMP,sampleMatrix)
+			} else {
+				if(length(indicesTMP)<nrow(sampleMatrix)) additionalIdentitiesTMP<-rbind(additionalIdentitiesTMP,sampleMatrix[-indicesTMP,])
+			}
+		}	
+		if(!is.null(additionalIdentitiesTMP)&!is.null(metaboliteIdentities)){
+			for(irownames in 1:nrow(additionalIdentitiesTMP)){#find duplicates between predefined lists and user-provided lists. 
+				#duplicates will be retained but a "_2" will be added to the metabolite name of the metabolite in the user-provided list
+				if(any(rownames(metaboliteIdentities)==rownames(additionalIdentitiesTMP)[irownames] )){
 					rownames(metaboliteIdentities)[rownames(metaboliteIdentities)==
-						rownames(additionalIdentitiesTMP2)[irownames]]<-paste(
-						rownames(additionalIdentitiesTMP2)[irownames],"_2",sep="")
+						rownames(additionalIdentitiesTMP)[irownames]]<-paste(
+						rownames(additionalIdentitiesTMP)[irownames],"_2",sep="")
 				}
 			}
-			metaboliteIdentities<-rbind(additionalIdentitiesTMP2,metaboliteIdentities)
-		} else {
-			message(paste("The provided sample type is not valid:",additionalIdentities))
+			metaboliteIdentities<-rbind(additionalIdentitiesTMP,metaboliteIdentities)
 		}
-	}
-	if(nrow(metaboliteIdentities)>0){
-		usePeakID<-5
-		if(mrbinObject$parameters$dimension=="2D") usePeakID<-6
-		#This finds matches and estimates if the molecule is present by analyzing correlations of different peak of one metabolite
-	    #annotationsTiers = a list of lists of lists, each bin has one list item. this item names potential identifications for the respective bin
-	    #annotationsConfirmed = a list of lists, each bin has one list item. this item names confirmed identifications for the respective bin
-		#metabolitesTMP = a list of lists, each item is one unique metabolite. each subitem is one unique peak of this metabolite and contains all bins that fall within the peak range
-		#if multiple bins are assigned the same id:
-		#calculate Pearson correlation coefficients (p-value) for all of them
-		#no correlation was found/only one peak available, therefore the correlation analysis could not be performed (manual verififcation required)
-		#two peaks correlated to each other, ...
-		tierNames<-c("L1+","L1","L1-","L2","L3")
-		if(mrbinObject$parameters$dimension=="2D"){
-			tierNames<-c("L1++","L1+","L1","L1-","L2")
-		}
- 		annotationsL1TMP<-vector("list",nrow(mrbinObject$parameters$binRegions))
-		names(annotationsL1TMP)<-colnames(mrbinObject$bins)
-		annotationsTiers<-list(
-			"1"=annotationsL1TMP,#L1+
-			"2"=annotationsL1TMP,#L1
-			"3"=annotationsL1TMP,#L1-
-			"4"=annotationsL1TMP,#L2
-			"5"=annotationsL1TMP#L3
-		)
-		metabolitesTMP<-list()#one entry for each metabolite to save which bins belong to it
-		#metaboliteBinsTMP<-list()#one entry for each metabolite to save which bins belong to it
-	    metabolitesAllNamesTMP<-NULL
-		metNameListTMP<-NULL
-		i<-0
-		jTMP<-NULL
-		#first, find all metabolites and peaks, THEN do the math for each
-		
-		while(i<nrow(metaboliteIdentities)){
-			i<-i+1
-			metNameTMP<-rownames(metaboliteIdentities)[i]
-			metNameTMP0<-metNameTMP
-			if(mrbinObject$parameters$dimension=="1D"){
-				#find all bins that lie (fully or partially) within metabolite boundaries
-				testTMP<-which((mrbinObject$parameters$binRegions[,1]<=metaboliteIdentities[i,1]&
-							mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,2])|
-						   (mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,1]&
-							mrbinObject$parameters$binRegions[,2]>=metaboliteIdentities[i,2])|
-						   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,1]&
-							mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,2]))
-			}	
-			if(mrbinObject$parameters$dimension=="2D"){
-				testTMP<-which(((mrbinObject$parameters$binRegions[,1]<=metaboliteIdentities[i,1]&
-							mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,2])|
-						   (mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,1]&
-							mrbinObject$parameters$binRegions[,2]>=metaboliteIdentities[i,2])|
-						   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,1]&
-							mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,2]))&#2D
-						   ((mrbinObject$parameters$binRegions[,4]<=metaboliteIdentities[i,4]&
-							mrbinObject$parameters$binRegions[,4]>=metaboliteIdentities[i,3])|
-						   (mrbinObject$parameters$binRegions[,3]<=metaboliteIdentities[i,4]&
-							mrbinObject$parameters$binRegions[,3]>=metaboliteIdentities[i,3])|
-						   (mrbinObject$parameters$binRegions[,4]>=metaboliteIdentities[i,4]&
-							mrbinObject$parameters$binRegions[,3]<=metaboliteIdentities[i,3])))
+		if(nrow(metaboliteIdentities)>0){
+			#remove "empty" rows (no peak information available)
+			metaboliteIdentities<-metaboliteIdentities[!(is.na(metaboliteIdentities[,1])&is.na(metaboliteIdentities[,3])),]
+			#remove excuded metabolites
+			if(length(exclude)>0){
+				metaboliteIdentities<-metaboliteIdentities[!rownames(metaboliteIdentities) %in% exclude,]
 			}
-			if(length(testTMP)>0){
-				#save all bins of a metabolite
-				#if(!metNameTMP%in%names(metaboliteBinsTMP)){#if this metabolite was not found before, add it to the list
-				#	  metaboliteBinsTMP<-c(metaboliteBinsTMP,list(testTMP))
-				#	  names(metaboliteBinsTMP)[length(metaboliteBinsTMP)]<-metNameTMP
-				#	  
-				#} else {#metabolite was in list already, add a new peak
-				#	  metaboliteBinsTMP[[metNameTMP]]<-c(metaboliteBinsTMP[[metNameTMP]],list(listEntryTMP))
-				#}
-				#peaks marked for exclusion
-				if(metaboliteIdentities[i,usePeakID]==0){#0 means do not use
-					imetNameTMP2<-1
-					metNameTMP2<-paste(metNameTMP,"_doNotUse_",sprintf("%03d",imetNameTMP2),sep="")
-					while(metNameTMP2%in%metNameListTMP){
-						metNameTMP2<-paste(metNameTMP,"_doNotUse_",sprintf("%03d",imetNameTMP2),sep="")
-						imetNameTMP2<-imetNameTMP2+1
+			#restrict to max number:
+			if(!is.null(maxMetabolites)){
+				metaboliteIdentities<-metaboliteIdentities[which(rownames(metaboliteIdentities)%in%(
+					unique(rownames(metaboliteIdentities))[1:min(maxMetabolites,length(unique(rownames(metaboliteIdentities))))])),]
+			}
+			usePeakID<-5
+			if(mrbinObject$parameters$dimension=="2D"){
+				usePeakID<-6
+				#Nyquist fold-back: correct chemical shift is same distance [ppm] from "wrong" end of axis as it is outside of correct end of axis []
+				#Find max and min spectrum borders
+				#this will not be possible if only bins are provided
+				#instead: use maximum ppm value (13C) seen in any bin, then set any peak borders exceeding this value to NA
+				#this way all 13C values will be tested
+				max13C<-max(mrbinObject$parameters$binRegions[,3:4])
+				min13C<-min(mrbinObject$parameters$binRegions[,3:4])
+			}
+			#This finds matches and estimates if the molecule is present by analyzing correlations of different peak of one metabolite
+			#annotationsTiers = a list of lists of lists, each bin has one list item. this item names potential identifications for the respective bin
+			#annotationsConfirmed = a list of lists, each bin has one list item. this item names confirmed identifications for the respective bin
+			#metabolitesTMP = a list of lists, each item is one unique metabolite. each subitem is one unique peak of this metabolite and contains all bins that fall within the peak range
+			#metabolitesTMP
+			#matrix, col 1 = metabolite number j
+			#col 2 = peak number
+			#col 3 = bin number
+			#rownames = metabolite name
+			#Lactose 1 1 452
+			#Lactose 1 1 453
+			#Lactose 1 2 521
+			#Lactose 1 2 522
+			#if multiple bins are assigned the same id:
+			#calculate Pearson correlation coefficients (p-value) for all of them
+			#no correlation was found/only one peak available, therefore the correlation analysis could not be performed (manual verififcation required)
+			#two peaks correlated to each other, ...
+			tierNames<-c("1+","1","1-","2","3")
+			if(mrbinObject$parameters$dimension=="2D"){
+				tierNames<-c("1++","1+","1","1-","2")
+			}
+			annotationsL1TMP<-vector("list",ncol(mrbinObject$bins)#nrow(mrbinObject$parameters$binRegions)
+			)
+			#for matching, use indices instead of colnames
+			names(annotationsL1TMP)<-1:ncol(mrbinObject$bins)#colnames(mrbinObject$bins)
+			annotationsTiers<-list(
+				"1"=NA,#annotationsL1TMP,#L1+
+				"2"=NA,#annotationsL1TMP,#L1
+				"3"=NA,#annotationsL1TMP,#L1-
+				"4"=annotationsL1TMP,#L2
+				"5"=annotationsL1TMP#L3
+			)
+			annotationNumbersTiers<-annotationsTiers
+			annotationNumbersTiers2<-annotationsTiers
+			#
+			annotationsTiers1<-rep("",ncol(mrbinObject$bins))
+			names(annotationsTiers1)<-1:ncol(mrbinObject$bins)
+			annotationNumbers1Tiers<-rep(0,ncol(mrbinObject$bins))
+			names(annotationNumbers1Tiers)<-1:ncol(mrbinObject$bins)
+			annotationNumbers1Tiers2<-annotationsTiers1
+			#
+			annotationsTiers2<-annotationsTiers1
+			annotationsTiers3<-annotationsTiers1
+			annotationNumbers2Tiers<-annotationNumbers1Tiers
+			annotationNumbers2Tiers2<-annotationsTiers1
+			annotationNumbers3Tiers<-annotationNumbers1Tiers
+			annotationNumbers3Tiers2<-annotationsTiers1
+			metabolitesTMP<-matrix(ncol=4,nrow=0)#one entry for each metabolite to save which bins belong to it
+			colnames(metabolitesTMP)<-c("Metabolite","Peak","Bin","Unique")
+			metabolitesAllNamesTMP<-NULL
+			metNameListTMP<-NULL
+			i<-0
+			jTMP<-NULL
+			#first, find all metabolites and peaks, THEN do the math for each
+			metaboliteIdentitiesTMP<-metaboliteIdentities
+			#Save all calculations to speed things up
+			SparseRMatrix<-Matrix::Matrix(0,ncol=ncol(mrbinObject$bins),nrow=ncol(mrbinObject$bins),sparse=TRUE)
+			message("Progress: ",appendLF = FALSE)
+			progressStepsTMP<-0
+			while(i<nrow(metaboliteIdentities)){
+				i<-i+1
+				metNameTMP<-rownames(metaboliteIdentities)[i]
+				metNameTMP0<-metNameTMP
+				testTMP<-NULL
+				if(mrbinObject$parameters$dimension=="1D"){
+					#find all bins that lie (fully or partially) within metabolite boundaries
+					testTMP<-#rownames(mrbinObject$parameters$binRegions)[
+						which((mrbinObject$parameters$binRegions[,1]<=(metaboliteIdentities[i,1]+expandRange)&
+								mrbinObject$parameters$binRegions[,1]>=(metaboliteIdentities[i,2]-expandRange))|
+							   (mrbinObject$parameters$binRegions[,2]<=(metaboliteIdentities[i,1]+expandRange)&
+								mrbinObject$parameters$binRegions[,2]>=(metaboliteIdentities[i,2]-expandRange))|
+							   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentities[i,1]&
+								mrbinObject$parameters$binRegions[,2]<=metaboliteIdentities[i,2]))
+						#]
+				}	
+				if(mrbinObject$parameters$dimension=="2D"){
+					#if fold-back is likely, or if no 13C data is available (NA), use -Inf to Inf as search area
+					#this is due to the fact that we might not have the actual max or min chemical shifts, which we 
+					#would need to calculate actual backfolded peak positions
+					if(is.na(metaboliteIdentitiesTMP[i,3])) metaboliteIdentitiesTMP[i,3]<--Inf
+					if(is.na(metaboliteIdentitiesTMP[i,4])) metaboliteIdentitiesTMP[i,4]<-Inf
+					if(metaboliteIdentitiesTMP[i,3]>max13C|metaboliteIdentitiesTMP[i,4]>max13C|
+					  metaboliteIdentitiesTMP[i,3]<min13C|metaboliteIdentitiesTMP[i,4]<min13C){
+						metaboliteIdentitiesTMP[i,3]<--Inf
+						metaboliteIdentitiesTMP[i,4]<-Inf
 					}
-					metNameTMP<-metNameTMP2
+					
+					testTMP<-#rownames(mrbinObject$parameters$binRegions)[
+						which(((mrbinObject$parameters$binRegions[,1]<=(metaboliteIdentitiesTMP[i,1]+expandRange)&
+								mrbinObject$parameters$binRegions[,1]>=(metaboliteIdentitiesTMP[i,2]-expandRange))|
+							   (mrbinObject$parameters$binRegions[,2]<=(metaboliteIdentitiesTMP[i,1]+expandRange)&
+								mrbinObject$parameters$binRegions[,2]>=(metaboliteIdentitiesTMP[i,2]-expandRange))|
+							   (mrbinObject$parameters$binRegions[,1]>=metaboliteIdentitiesTMP[i,1]&
+								mrbinObject$parameters$binRegions[,2]<=metaboliteIdentitiesTMP[i,2]))&#2D
+							   ((mrbinObject$parameters$binRegions[,4]<=(metaboliteIdentitiesTMP[i,4]+expandRange*expandRangeFactor)&
+								mrbinObject$parameters$binRegions[,4]>=(metaboliteIdentitiesTMP[i,3]-expandRange*expandRangeFactor))|
+							   (mrbinObject$parameters$binRegions[,3]<=(metaboliteIdentitiesTMP[i,4]+expandRange*expandRangeFactor)&
+								mrbinObject$parameters$binRegions[,3]>=(metaboliteIdentitiesTMP[i,3]-expandRange*expandRangeFactor))|
+							   (mrbinObject$parameters$binRegions[,4]>=metaboliteIdentitiesTMP[i,4]&
+								mrbinObject$parameters$binRegions[,3]<=metaboliteIdentitiesTMP[i,3])))
+							#]
 				}
 				if(length(testTMP)>0){
-					#Find out if there are multiple peaks for one metabolite
-					metNameListTMP<-c(metNameListTMP,metNameTMP)
-					peakNumberTMP<-0+sum(metNameListTMP==metNameTMP)
-					listEntryTMP<-testTMP#use this to add to the growing list (add bin name or number)
-					if(!metNameTMP%in%names(metabolitesTMP)){#if this metabolite was not found before, add it to the list
-					  metabolitesAllNamesTMP<-c(metabolitesAllNamesTMP,metNameTMP)
-					  names(metabolitesAllNamesTMP)[length(metabolitesAllNamesTMP)]<-metNameTMP0
-					  metabolitesTMP<-c(metabolitesTMP,list(list(listEntryTMP)))
-					  names(metabolitesTMP)[length(metabolitesTMP)]<-metNameTMP
-					  names(metabolitesTMP[[metNameTMP]])[1]<-peakNumberTMP
-					} else {#metabolite was in list already, add a new peak
-					  metabolitesTMP[[metNameTMP]]<-c(metabolitesTMP[[metNameTMP]],list(listEntryTMP))
-					  additionTMP<-""
-					  if(metaboliteIdentities[i,usePeakID]==2) additionTMP<-"_uniquePeak"
-					  names(metabolitesTMP[[metNameTMP]])[length(metabolitesTMP[[metNameTMP]])]<-paste(peakNumberTMP,additionTMP,sep="")
-					}
-					#for(j in testTMP){
-					#	if(is.null(annotationsL2minus[[j]])){
-					#		annotationsL2minus[[j]]<-list(metNameTMP)
-					#	} else {
-					#		if(!(metNameTMP%in%annotationsL2minus[[j]])){
-					#			annotationsL2minus[[j]]<-c(annotationsL2minus[[j]],metNameTMP)
-					#		}
-					#	}
-					#}
-				}
-			}
-			if(i==nrow(metaboliteIdentities)){#end of file or matrix
-				metNameTMPNext<-"end"
-			} else {
-				metNameTMPNext<-rownames(metaboliteIdentities)[i+1]
-			}
-		}
-		#exclude bins that match multiple peaks of the same compund (only keep first hit)
-		for(j in 1:length(metabolitesTMP)){
-			if(length(metabolitesTMP[[j]])>1){
-				#deleteTMPj<-NULL
-				deleteTMPi<-NULL
-				for(jExcludeMultiple in 2:length(metabolitesTMP[[j]])){
-				  if(length(metabolitesTMP[[j]][[jExcludeMultiple]])>0){
-					for(iExcludeMultiple in 1:length(metabolitesTMP[[j]][[jExcludeMultiple]])){
-						if(metabolitesTMP[[j]][[jExcludeMultiple]][iExcludeMultiple] %in% 
-							unlist(metabolitesTMP[[j]][1:(jExcludeMultiple-1)])){
-							#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
-							#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
-							deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+					#save all bins of a metabolite
+					#peaks marked for exclusion
+					#remove these for speed
+					if(!metaboliteIdentities[i,usePeakID]==0){#0 means do not use
+						#Find out if there are multiple peaks for one metabolite
+						metNameListTMP<-c(metNameListTMP,metNameTMP)
+						peakNumberTMP<-0+sum(metNameListTMP==metNameTMP)
+						#listEntryTMP<-testTMP#use this to add to the growing list (add bin name or number)
+						if(!any(rownames(metabolitesTMP)==metNameTMP)){#if this metabolite was not found before, add it to the list
+							metabolitesAllNamesTMP<-c(metabolitesAllNamesTMP,metNameTMP)
+							names(metabolitesAllNamesTMP)[length(metabolitesAllNamesTMP)]<-metNameTMP0
 						}
-					}
-					if(length(deleteTMPi)>0){
-						metabolitesTMP[[j]][[jExcludeMultiple]]<-
-							metabolitesTMP[[j]][[jExcludeMultiple]][-deleteTMPi]
-					}
-				  }
-				}
-				#now remove empty entries:
-				if(0 %in% lapply(metabolitesTMP[[j]],length)){
-					metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
-				}
-			}
-		}
-		metabolitesTMP0<-metabolitesTMP
-		#Estimate the baseline by averaging the 5% lowest bins after excluding bins of the current metabolite 
-		#baseline<-matrix(0,ncol=length(metabolitesTMP),nrow=nrow(mrbinObject$bins))
-		#for(j in 1:length(metabolitesTMP)){
-			#if(length(metabolitesTMP[[j]])>0){#check only metabolites where at least 1 peak was identified			
-		#		if(sum(1:ncol(mrbinObject$bins)%in%unique(unlist(metabolitesTMP[[j]])))>0){
-		#			if(sum(1:ncol(mrbinObject$bins)%in%unique(unlist(metabolitesTMP[[j]])))<ncol(mrbinObject$bins)){
-		#				binsTMP<-mrbinObject$bins[,!1:ncol(mrbinObject$bins)%in%unique(unlist(metabolitesTMP[[j]])),drop=FALSE]
-		#				#keep only lowest 5% (mean) bins
-		#				binsTMP<-binsTMP[,order(apply(binsTMP,2,mean))[1:ceiling(ncol(binsTMP)*.05)],drop=FALSE]
-		#				baseline[,j]<-apply(binsTMP,1,mean)
-		#			} else {
-						#baseline<-rep(0,nrow(mrbinObject$bins))
-						#message("Unexpected issue: All bins marked as",names(metabolitesTMP)[j])
-		#			}
-		#		} else {
-					#message("Baseline ",j," ",paste(unlist(metabolitesTMP[[j]]),sep=" ",collapse=", "))
-		#		}
-		#	}
-		#}
-		#now do the math
-		#Tier 1 (L1+)	
-		if(1 %in% tiers){		
-		  for(j in 1:length(metabolitesTMP)){
-			if(length(metabolitesTMP[[j]])>1){#check only metabolites where at least 1 peak was identified	
-				if(length(grep("_uniquePeak",names(metabolitesTMP[[j]])))>0){
-					#message("Unique peak found, ",j,", ",names(metabolitesTMP)[j],", ",names(metabolitesTMP[[j]]))
-					#Remove tier 1 bins 
-					#EXCEPT BINS of this metabolite
-					#deleteTMPj<-NULL
-					metabolitesTMP2<-metabolitesTMP
-					deleteTMPi<-NULL
-					for(jExcludeMultiple1 in 1:length(metabolitesTMP2[[j]])){
-					  if(length(metabolitesTMP2[[j]][[jExcludeMultiple1]])>0){
-						for(iExcludeMultiple in 1:length(metabolitesTMP2[[j]][[jExcludeMultiple1]])){
-							unlistTMP<-unlist(annotationsTiers[[1]])
-							if(names(metabolitesTMP2)[j]%in%unlistTMP){
-								unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
-							}
-							if(names(metabolitesTMP2[[j]][[jExcludeMultiple1]][iExcludeMultiple]) %in% 
-								names(unlistTMP)){
-								#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
-								#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
-								#message(names(metabolitesTMP)[j]," ",
-									#names(metabolitesTMP[[j]][[jExcludeMultiple]])[iExcludeMultiple]," ",
-								#	paste(names(unlistTMP),sep=" ", collapse=" ")," ",
-								#	paste(unlistTMP,sep=" ", collapse=" "))
-								deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
-							}
-						}
-					  	if(length(deleteTMPi)>0){
-							metabolitesTMP2[[j]][[jExcludeMultiple1]]<-
-								metabolitesTMP2[[j]][[jExcludeMultiple1]][-deleteTMPi]
-						}
-					  }
-					}				
-					if(0 %in% lapply(metabolitesTMP2[[j]],length)){#now remove empty entries:
-						metabolitesTMP2[[j]][which(lapply(metabolitesTMP2[[j]],length)==0)]<-NULL
+						jMetaboliteTMP<-max(1,length(unique(c(rownames(metabolitesTMP),metNameTMP))))
+						metabolitesTMPEntry<-cbind(
+							rep(jMetaboliteTMP,length(testTMP)),
+							rep(peakNumberTMP,length(testTMP)),
+							testTMP,
+							rep(metaboliteIdentities[i,usePeakID]-1,length(testTMP))
+							)
+						rownames(metabolitesTMPEntry)<-rep(metNameTMP,length(testTMP))
+						  
+						metabolitesTMP<-rbind(metabolitesTMP,metabolitesTMPEntry)
 					}					
-					#re-check if _uniquePeaks is still there
-					if(length(metabolitesTMP2[[j]])>1&length(grep("_uniquePeak",names(metabolitesTMP2[[j]])))>0){
-						correlatedPeakBinsTMP<-vector("list",length(metabolitesTMP2[[j]]))
-						#find only pairs for unique peaks
-						for(i_peak1 in grep("_uniquePeak",names(metabolitesTMP2[[j]]))){
-							i_peak2TMP<-1:length(metabolitesTMP2[[j]])
-							i_peak2TMP<-i_peak2TMP[!i_peak2TMP==i_peak1]#remove the unique peak
-							#message("Unique peak found 2: ",i_peak1,", ",i_peak2TMP)
-							for(i_peak2 in i_peak2TMP){
-								colnamesTMP<-metabolitesTMP2[[j]][[i_peak1]]
-								rownamesTMP<-metabolitesTMP2[[j]][[i_peak2]]							
-								resultMatrixTMP<-matrix(1,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-									),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-									))#save p-values here
-								correlationMatrix<-matrix(0,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-									),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-									))#save correlation coefficients here
-								colnames(resultMatrixTMP)<-colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-								rownames(resultMatrixTMP)<-rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-								for(j_bin1 in 1:length(metabolitesTMP2[[j]][[i_peak1]])){
-									#calculate correlation between baseline and peak 1, bin j_bin1
-									#baselineCorr1<-stats::cor.test(mrbinObject$bins[,
-									#	  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
-										  #mrbinObject$parameters$
-									#	  baseline[,j])
-									for(j_bin2 in 1:length(metabolitesTMP2[[j]][[i_peak2]])){
-										#calculate correlation between baseline and peak 2
-										#baselineCorr2<-stats::cor.test(mrbinObject$bins[,
-										#	metabolitesTMP[[j]][[i_peak2]][j_bin2]],
-											#mrbinObject$parameters$
-										#	baseline[,j])
-										resultsCorTestTMP<-stats::cor.test(mrbinObject$bins[,
-										  metabolitesTMP2[[j]][[i_peak1]][j_bin1]],
-										  mrbinObject$bins[,
-										  metabolitesTMP2[[j]][[i_peak2]][j_bin2]])
-										resultMatrixTMP[j_bin2,j_bin1]<-resultsCorTestTMP$p.value
-										correlationMatrix[j_bin2,j_bin1]<-resultsCorTestTMP$estimate
-										#make sure the correlation is positive! 
+				}
+				if(i==nrow(metaboliteIdentities)){#end of file or matrix
+					metNameTMPNext<-"end"
+				} else {
+					metNameTMPNext<-rownames(metaboliteIdentities)[i+1]
+				}
+			}
+			#remove bins that are noise (based on strong correlation to baseline signal)
+			# if(FALSE){
+			# if(!is.null(mrbinObject$parameters$baseline)){
+				# #calculate correlation between baseline and peak 1, bin j_bin1
+				# #message(print(sort(unique(metabolitesTMP[,3]),decreasing=TRUE)))
+				# baselineCorr1<-stats::cor(mrbinObject$parameters$baseline,
+					# mrbinObject$bins[,sort(unique(metabolitesTMP[,3]),decreasing=TRUE)],
+					# )
+				# colnames(baselineCorr1)<-sort(unique(metabolitesTMP[,3]),decreasing=TRUE)
+				# #message(print(baselineCorr1))
+				# #message(print(colnames(baselineCorr1)[baselineCorr1>=baselinethreshold]))
+				# metabolitesTMP<-metabolitesTMP[!metabolitesTMP[,3]%in%as.numeric(colnames(baselineCorr1)[baselineCorr1>=baselinethreshold]),]
+			# }
+			# }
+			
+			#exclude bins that match multiple peaks of the same compund (only keep first hit)
+			jAll<-unique(metabolitesTMP[,1])
+			for(jAllTMP in 1:length(jAll)){
+				names(jAll)[jAllTMP]<-rownames(metabolitesTMP)[which(metabolitesTMP[,1]==jAll[jAllTMP])[1]]
+			}
+			numberOfPeaks<-rep(0,length(unique(metabolitesTMP[,1])))#max(jAll))#unlist(lapply(metabolitesTMP,length))
+			for(j in jAll){
+			  numberOfPeaks[j]<-length(unique(metabolitesTMP[metabolitesTMP[,1]==j,2]))
+			}
+			binsPerMetaboliteSparseMatrix<-Matrix::Matrix(0,ncol=length(numberOfPeaks),nrow=nrow(mrbinObject$parameters$binRegions),sparse=TRUE)
+			for(j in unique(metabolitesTMP[,1])#1:length(metabolitesTMP)
+			  ){
+				indexTMP<-which(metabolitesTMP[,1]==j)
+				indexTMP<-indexTMP[duplicated(metabolitesTMP[indexTMP,3])]
+				if(length(indexTMP)>0){
+					metabolitesTMP<-metabolitesTMP[-indexTMP,,drop=FALSE]
+				}
+			}
+			batchSizeVector<-1:ceiling(length(unique(metabolitesTMP[,1]))/batchSize)
+			progressSteps=length(peakRatio)*length(batchSizeVector)#(1+length(peakRatio)*length(batchSizeVector)*sum(c(sum(tiers==1),sum(tiers==2),sum(tiers==1)))+1)
+			progressStepsTMP2<-0
+			metabolitesTMP0<-metabolitesTMP#Batch
+			numberOfPeaks2<-numberOfPeaks
+			changeFlag4<-FALSE
+			ibatchIndexList<-list()
+			for(ibatchSize in batchSizeVector){
+				#calculate max number of peaks in any metabolite
+				ibatchIndex<-unique(metabolitesTMP[,1])[
+								(1:length(unique(metabolitesTMP[,1])))>((ibatchSize-1)*batchSize) & 
+							   (1:length(unique(metabolitesTMP[,1])))<=min(length(unique(metabolitesTMP[,1])),(ibatchSize*batchSize))
+							]
+				ibatchIndexList<-c(ibatchIndexList,list(ibatchIndex))
+			}
+			for(iPeakRatio in peakRatio){
+				#do this in batches, starting with most abundant
+				for(ibatchSize in batchSizeVector){
+					if(verbose){
+						if(round(100*sqrt(progressStepsTMP/progressSteps))>=progressStepsTMP2){
+							progressStepsTMP2<-progressStepsTMP2+20
+							message(round(100*sqrt(progressStepsTMP/progressSteps)),"% ",appendLF = FALSE)
+							utils::flush.console()	
+						}
+					}	
+					progressStepsTMP<-progressStepsTMP+1
+					#calculate max number of peaks in any metabolite
+					ibatchIndex<-ibatchIndexList[[ibatchSize]]
+					ibatchIndex<-intersect(ibatchIndex,unique(metabolitesTMP[,1]))
+					sumlengthListTMPVector<-NULL
+					sumlengthListTMPRatioVector<-NULL
+					changeFlag2<-FALSE
+					if(length(ibatchIndex)>0){
+						maxPeaks<-max(numberOfPeaks[ibatchIndex])
+						#
+						#Tier 1 (L1+/L1++)	###################################################################
+						#
+						if(any(tiers==1)&maxPeaks>=2){
+							#start with the max number of peaks, then work your way down to 2
+							#check first for very high correlations, then go to lower R
+							#first check for the highest number of shared correlations, then move down to 2 bit by bit
+							#this way, bins are assigned to molecules where more peaks are correlated
+							imaxPeaks<-maxPeaks+1
+							while(imaxPeaks>2){
+								imaxPeaks<-imaxPeaks-1
+								for(iconfirmationRthreshold in confirmationRthreshold){
+									if(imaxPeaks>max(numberOfPeaks2[ibatchIndex])) imaxPeaks<-max(c(2,numberOfPeaks2[ibatchIndex]))
+									jTMP2<-unique(metabolitesTMP[metabolitesTMP[,4]==1,1])#metabolite numbers of with unique peaks
+									jTMP<-intersect(jAll[which(numberOfPeaks2>=imaxPeaks)],ibatchIndex)
+									jTMP<-intersect(jTMP,jTMP2)
+									if(length(jTMP)>0){
+										for(j in jTMP){#jAll[]
+											#changeFlag5<-TRUE
+											#while(changeFlag5){
+											#changeFlag5<-FALSE
+											jRowsTMP<-metabolitesTMP[,1]==j
+											#remove metabolite if all (remaining) bins were already assigned to this metabolite, to avoid long repetitive calculations
+											if(sum(jRowsTMP)<=sum(binsPerMetaboliteSparseMatrix[,j])){
+												metabolitesTMP<-metabolitesTMP[!jRowsTMP,]
+												numberOfPeaks2[j]<-0
+												jRowsTMP<-NULL				
+											}
+											if(length(jRowsTMP)>0){
+												if(length(unique(metabolitesTMP[jRowsTMP,2,drop=FALSE]))>=imaxPeaks){#
+													if(sum(metabolitesTMP[jRowsTMP,4,drop=FALSE]==1)>0){#unique peak?
+														if(changeFlag2){
+															sumlengthListTMPVector<-NULL
+															sumlengthListTMPRatioVector<-NULL
+															changeFlag2<-FALSE
+														}
+														previousFlag<-TRUE
+														#don't repeat this calculation if you know the results will be below threshold
+														if(any(names(sumlengthListTMPVector)==j)){
+															if(!(sumlengthListTMPVector[as.character(j)]>=(imaxPeaks-1)&
+															  sumlengthListTMPRatioVector[as.character(j)]>iPeakRatio)){
+															  previousFlag<-FALSE
+															}												
+														}
+														if(previousFlag){
+															#Outdated: Remove previous tier 1 - 3 bins EXCEPT BINS of this metabolite
+															metabolitesTMP2<-metabolitesTMP[jRowsTMP,,drop=FALSE]
+															#We need to make sure that all bins that are assigned to one molecule are correlated to each other
+															#In rare cases, two different "sets" of correlation may emerge that are not corelated to each other
+															#To avoid this, we need to make sure that only one set of correlated bins is assigned initially,
+															#and all subsequent assignments need to be linked to this initial set
+															#In the first run, check if any correlations are significant. In this case assign the bins to this molecule
+															#If several "sets" of correlated bins are identified in this step, chose the one that includes the
+															#highest number of peaks. If these are the same, pick the one with highest median R value, if these
+															#are identical, pick the one with highest mean R, if these are still identical, pick the one with 
+															#highest number of bins, if still identical, pick the first one
+															#After this, only consider correlations to one of the already identified bins
+															#If any bins are assigned in this step, this step needs to be repeated, as new bins may be identified
+															#now. Continue repeating until no further change
+															#each peak now gets a list entry:
+															#INSTEAD: Create as many list items as there are bins in ALL peaks that are unique
+															#find only pairs for unique peaks
+															uniquePeakIndex<-metabolitesTMP2[,4]==1#grep("_uniquePeak",rownames(metabolitesTMP2))
+															#now find which are unique peak numbers
+															uniquePeakIndex<-unique(metabolitesTMP2[uniquePeakIndex,2])
+															significantTMP2List<-vector("list",length(uniquePeakIndex))
+															names(significantTMP2List)<-uniquePeakIndex
+															significantTMP2ListR<-significantTMP2List
+															for(i_peak1 in 1:length(uniquePeakIndex)){
+																#this grabs every bin, it should grab every peak!
+																#add a list to this unique peak, length is number of bins for this peak
+																#peak1->bin1->peak1/2/3/4/5/6...
+																#message("i1: ",print(i_peak1))
+																colnamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==uniquePeakIndex[i_peak1],3]#unique peak bins!
+																significantTMP2List[[i_peak1]]<-vector("list",length(colnamesTMP))
+																names(significantTMP2List[[i_peak1]])<-colnamesTMP
+																significantTMP2ListR[[i_peak1]]<-vector("list",length(colnamesTMP))
+																names(significantTMP2ListR[[i_peak1]])<-colnamesTMP
+																#add a list of lists to each bin of this peak entry, length is the number of peaks
+																#significantTMP2List[[i_peak1]]<-vector("list",(length(metabolitesTMP2)))
+																#add a list of lists to this bin of a peak entry, length is the number of peaks
+																#significantTMP2List
+																#	- unique peak1
+																#		- bin 1
+																#			- peak 1: 123, 124, 125
+																#			- peak 2: 304
+																#			- peak 3: NULL
+																#			- unique peak 1 (not filled with values)
+																#		- bin 2
+																#			- peak 1
+																#			- peak 2
+																#			- peak 3
+																#			- unique peak 1 (not filled)
+																#	- unique peak 2
+																#		...
+																uniquePeakIndex2<-unique(metabolitesTMP2[,2])
+																for(i_peak1TMP in 1:length(significantTMP2List[[i_peak1]])){
+																	significantTMP2List[[i_peak1]][[i_peak1TMP]]<-
+																		vector("list",length(uniquePeakIndex2))#(length(metabolitesTMP2)))
+																	significantTMP2ListR[[i_peak1]][[i_peak1TMP]]<-
+																		vector("list",length(uniquePeakIndex2))#(length(metabolitesTMP2)))
+																	names(significantTMP2List[[i_peak1]][[i_peak1TMP]])<-uniquePeakIndex2
+																	names(significantTMP2ListR[[i_peak1]][[i_peak1TMP]])<-uniquePeakIndex2
+				
+																}
+																#i_peak2TMP<-unique(metabolitesTMP2[,2])#1:length(metabolitesTMP2)#all peaks
+																i_peak2TMP<-uniquePeakIndex2[!uniquePeakIndex2==uniquePeakIndex[i_peak1]]#remove the unique peak
+																for(i_peak2 in i_peak2TMP){												
+																	rownamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==i_peak2,3]#[i_peak2]]#bin of one other peak						
+																	#resultMatrixTMP<-as.matrix(SparsePMatrix[rownamesTMP,colnamesTMP,drop=FALSE])
+																	correlationMatrix<-as.matrix(SparseRMatrix[rownamesTMP,colnamesTMP,drop=FALSE])
+																	#colnames(resultMatrixTMP)<-colnamesTMP
+																	#rownames(resultMatrixTMP)<-rownamesTMP
+																	colnames(correlationMatrix)<-colnamesTMP
+																	rownames(correlationMatrix)<-rownamesTMP
+																	if(sum(correlationMatrix==0)>0){
+																		indicesZeroTMP<-which(correlationMatrix==0,arr.ind=TRUE)
+																		for(iindicesZeroTMP in 1:nrow(indicesZeroTMP)){
+																			resultsCorTestTMP <- stats::cor(
+																			  mrbinObject$bins[,rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]]],
+																			  mrbinObject$bins[,colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]]])
+																			#SparsePMatrix[rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]],
+																			#  colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]]] <- resultsCorTestTMP$p.value
+																			SparseRMatrix[rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]],
+																			  colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]]] <- resultsCorTestTMP#$estimate
+																			#SparsePMatrix[colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]],
+																			#  rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]]] <- resultsCorTestTMP$p.value
+																			SparseRMatrix[colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]],
+																				rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]]] <- resultsCorTestTMP#$estimate
+																			#correlationMatrix[indicesZeroTMP[iindicesZeroTMP,1],
+																			#  indicesZeroTMP[iindicesZeroTMP,2]] <- resultsCorTestTMP$p.value
+																			correlationMatrix[indicesZeroTMP[iindicesZeroTMP,1],
+																			  indicesZeroTMP[iindicesZeroTMP,2]] <- resultsCorTestTMP#$estimate
+																		}
+																	}
+																	for(isignificantTMP2columns in 1:ncol(correlationMatrix)){
+																		#check for significance using p-value threshold
+																		significantTMP<-#resultMatrixTMP[,isignificantTMP2columns]<=confirmationPthreshold&
+																			correlationMatrix[,isignificantTMP2columns]>iconfirmationRthreshold
+																		if(sum(significantTMP)>0){
+																			significantTMP<-which(significantTMP)
+																			#save numbers of bins in other peak AND NOT bin in unique peak
+																			significantTMP2<-
+																				rownames(correlationMatrix)[significantTMP]#bins in other peak
+																			significantTMP2List[[i_peak1]][[isignificantTMP2columns]][[i_peak2]]<-
+																				as.numeric(significantTMP2)
+																			#save significant Pearson Rs for this combination of peaks
+																			significantTMP2ListR[[i_peak1]][[isignificantTMP2columns]][[i_peak2]]<-
+																				as.vector(correlationMatrix[rownames(correlationMatrix)[significantTMP],
+																					isignificantTMP2columns])
+																		}
+																	}
+																}
+															}
+															#this only compared how many correlations all bins of a peak have - these might be 
+															#different bins
+															#instead: one row or list item for each bin of a peak!											
+															#now check for each peak how many other peaks are correlated
+															#in this case, ONLY save the ONE with most correlated peaks!
+															#lengthListTMP<-list()
+															#lengthListTMP<-NULL#list()
+															lengthListTMP<-list()
+															#lengthListTMPIndex<-NULL#list()
+															meanlengthListTMPR<-NULL
+															sumlengthListTMP<-NULL
+															peakNumberTMP2<-NULL
+															binNumberTMP2<-NULL
+															for(isignificantTMP2List in names(significantTMP2List)#1:length(significantTMP2List)
+																){#unique peaks
+																for(jsignificantTMP2List in names(significantTMP2List[[isignificantTMP2List]])#1:length(significantTMP2List[[isignificantTMP2List]])
+																	){#bins of unique peak
+																	#save for each bin of a unique peak a vector with the number of how many bins of this peak are significant
+																	#this does no longer include the name of the bin of the unique peak, (in which case the actual number would be 1 less)
+																	lengthListTMP2<-unlist(lapply(significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]],length))
+																	lengthListTMP<-c(lengthListTMP,
+																		list(lapply(significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]],length)))
+																	#this incudes Rs from only the significant bins
+																	if(sum(lengthListTMP2>0)>0){#>0)>0)
+																		meanlengthListTMPR<-c(meanlengthListTMPR,
+																			#mean.default
+																			max(unlist(significantTMP2ListR[[isignificantTMP2List]][[jsignificantTMP2List]], use.names = FALSE)))
+																	} else {
+																		meanlengthListTMPR<-c(meanlengthListTMPR,0)
+																	}
+																	#save for how many peaks at least 1 bin was found 
+																	sumlengthListTMP<-c(sumlengthListTMP,sum(lengthListTMP2>0))
+																	peakNumberTMP2<-c(peakNumberTMP2,isignificantTMP2List)#which unique peak does this belong to
+																	binNumberTMP2<-c(binNumberTMP2,jsignificantTMP2List)#which bin of the unique peak?
+																}
+															}
+															# #each peak now gets a list entry:
+															# #INSTEAD: Create as many list items as there are bins in ALL peaks that are unique
+															#now check if either:
+															# 1. no bin has been assigned for this metabolite at all OR
+															# 2. a bin of this peak has been assigned
+															#if not, this peak cannot be used in this iteration and for this tier
+															#(otherwise, inconsistent sets of bins could be assigned to the same molecule)
+															#we need a list of all bins with assignments to check this
+															if(!any(names(sumlengthListTMPVector)==j)){
+																sumlengthListTMPVector<-c(sumlengthListTMPVector,0)
+																names(sumlengthListTMPVector)[length(sumlengthListTMPVector)]<-j
+																sumlengthListTMPRatioVector<-c(sumlengthListTMPRatioVector,0)
+																names(sumlengthListTMPRatioVector)[length(sumlengthListTMPRatioVector)]<-j
+															}
+															sumlengthListTMPVector[as.character(j)]<-max(sumlengthListTMP)
+															sumlengthListTMPRatioVector[as.character(j)]<-(max(sumlengthListTMP)+1)/length(unique(metabolitesTMP2[,2]))#metabolitesTMP0[[j]])
+															
+															if(sum(binsPerMetaboliteSparseMatrix[,j])==0){ #if no bin has been found for this metabolite yet
+																#correlatedPeakBinsTMP is a list, each entry stands for one bin of the current peak
+																#changeFlag5<-FALSE
+																#correlatedPeakBinsTMP<-NULL
+																#check if this enough bins for current iteration
+																if(sumlengthListTMPVector[as.character(j)]>=(imaxPeaks-1)){
+																	if(sumlengthListTMPRatioVector[as.character(j)]>iPeakRatio){
+																		#Only check the bins with the highest number of correlations
+																		#this may be one bin or several bins. In the latter case, pick the one with 
+																		#highest mean R
+																		topTMP<-which(sumlengthListTMP==max(sumlengthListTMP)&
+																				(sumlengthListTMP+1)/length(unique(metabolitesTMP2[,2]))>iPeakRatio)#metabolitesTMP0[[j]]
+																		if(length(topTMP)>1){
+																			#pick the one with highest max R
+																			topTMP<-topTMP[which.max(meanlengthListTMPR[topTMP])[1]]
+																		}															
+																		#now use topTMP (index in vector of top peak pairs) to find which unique peak and which bin this is
+																		isignificantTMP2List <- peakNumberTMP2[topTMP]
+																		i2significantTMP2List <- binNumberTMP2[topTMP]
+																		#save the identified bins for the UNIQUE peak/bin
+																		#correlatedPeakBinsTMP is a vector, each entry stands for one bin of the current metabolite
+																		correlatedPeakBinsTMP<-as.numeric(i2significantTMP2List)#names(significantTMP2List[[isignificantTMP2List]])[i2significantTMP2List])
+																		#Now calculate which bins of this peak are correlated to the top bin. Save all that are belwo for deletion
+																		#correlatedPeakBinsTMP this is the top bin
+																		if(length(significantTMP2List[[isignificantTMP2List]])>1){
+																			for(iOtherPeaks in setdiff(as.numeric(names(significantTMP2List[[isignificantTMP2List]])),
+																				correlatedPeakBinsTMP)){#for all other bins of this peak
+																				resultsCorTestTMP <- stats::cor(
+																				  mrbinObject$bins[,iOtherPeaks],
+																				  mrbinObject$bins[,correlatedPeakBinsTMP[1]])
+																				if(!resultsCorTestTMP>=peakRthreshold){
+																					#first, remove this from correlation list
+																					significantTMP2List[[isignificantTMP2List]][[as.character(iOtherPeaks)]]<-NULL
+																					#then, remove this from bin matrix
+																					metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																					),,drop=FALSE]
+																				}
+																			}
+																		}																			
+																		for(jsignificantTMP2ListB in which(lengthListTMP[[topTMP]]>0)){#>0[topTMP]
+																			#save identified bins for all other peaks!
+																			#only save the one bin showing highest correlation to keep things consistent
+																			#this is only looking at signficant bins
+																			#we need to check all bins
+																			columnsBinNamesTMP<-setdiff(significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2ListB]],correlatedPeakBinsTMP[1])
+																			#find peak number
+																			peakNameTMP<-metabolitesTMP2[metabolitesTMP2[,3]==columnsBinNamesTMP[1],2]
+																			columnsBinNamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==peakNameTMP,3]
+																			resultsCorTestTMPMatrix<-as.matrix(SparseRMatrix[correlatedPeakBinsTMP[1],columnsBinNamesTMP,drop=FALSE])
+																			#this is a matrix with 1 row
+																			correlatedPeakBinsTMP<-c(correlatedPeakBinsTMP,columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)])
+																			#Now calculate which bins of this peak are correlated to the top bin. Save all that are belwo for deletion
+																			if(length(columnsBinNamesTMP)>1){
+																				for(iOtherPeaks in setdiff(columnsBinNamesTMP,correlatedPeakBinsTMP)#columnsBinNamesTMP[-which.max(resultsCorTestTMPMatrix)]
+																				){#for all other bins of this peak
+																					resultsCorTestTMP <- stats::cor(
+																					  mrbinObject$bins[,iOtherPeaks],
+																					  mrbinObject$bins[,columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]])
+																					if(!resultsCorTestTMP>=peakRthreshold){#then, remove this from bin matrix
+																						metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																						),,drop=FALSE]
+																					}
+																				}#remove all but top from correlation list
+																				significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2ListB]]<-
+																					columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]#iOtherPeaks
+																			}	
+																		}
+																		for(iConfirmed in unique(correlatedPeakBinsTMP)){
+																			if(annotationsTiers1[iConfirmed]==""&
+																				annotationsTiers2[iConfirmed]==""){#do not double annotate
+																				binsPerMetaboliteSparseMatrix[iConfirmed,j]<-1
+																				annotationsTiers1[iConfirmed]<-names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																				annotationNumbers1Tiers[iConfirmed]<-sumlengthListTMP[topTMP]+1
+																				annotationNumbers1Tiers2[iConfirmed]<-
+																						paste("*/",length(unique(metabolitesTMP2[,2])),")",sep="")#metabolitesTMP0[[j]]
+																				changeFlag2<-TRUE
+																				changeFlag4<-TRUE
+																				#changeFlag5<-TRUE
+																			} else {#replace if better number or tier found this time
+																				if(annotationsTiers1[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j])
+																				){
+																					if(annotationNumbers1Tiers[iConfirmed]<sumlengthListTMP[topTMP]+1){
+																						annotationNumbers1Tiers[iConfirmed]<-sumlengthListTMP[topTMP]+1
+																					}
+																				} else {
+																					if(annotationsTiers2[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																					){
+																						if(annotationNumbers2Tiers[iConfirmed]<=sumlengthListTMP[topTMP]+1){
+																							annotationsTiers1[iConfirmed]<-names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																							annotationNumbers1Tiers[iConfirmed]<-sumlengthListTMP[topTMP]+1
+																							annotationNumbers1Tiers2[iConfirmed]<-
+																								paste("*/",length(unique(metabolitesTMP2[,2])),")",sep="")#metabolitesTMP0[[j]]
+																							annotationsTiers2[iConfirmed]<-""
+																							annotationNumbers2Tiers[iConfirmed]<-0
+																							annotationNumbers2Tiers2[iConfirmed]<-""
+																						}
+																					}
+																				}
+																			}
+																		}	
+																	}														
+																}
+															} #else {#if already any peak was identified for this molecule
+															if(sum(binsPerMetaboliteSparseMatrix[,j])>0){#if already any peak was identified for this molecule
+																changeFlag<-TRUE#repeat any time a new bin was added!
+																changeFlag2<-TRUE
+																#changeFlag5<-FALSE
+																alreadyChecked<-NULL#only do calculaton of p, R if it hasn't been done before
+																while(changeFlag){
+																	changeFlag<-FALSE
+																	if(changeFlag2){
+																		sumlengthListTMPVector<-NULL
+																		sumlengthListTMPRatioVector<-NULL
+																		changeFlag2<-FALSE
+																	}
+																	if(!any(names(sumlengthListTMPVector)==j)){
+																		sumlengthListTMPVector<-c(sumlengthListTMPVector,0)
+																		names(sumlengthListTMPVector)[length(sumlengthListTMPVector)]<-j
+																		sumlengthListTMPRatioVector<-c(sumlengthListTMPRatioVector,0)
+																		names(sumlengthListTMPRatioVector)[length(sumlengthListTMPRatioVector)]<-j
+																	}
+																	sumlengthListTMPVector[as.character(j)]<-max(sumlengthListTMP)
+																	sumlengthListTMPRatioVector[as.character(j)]<-(max(sumlengthListTMP)+1)/length(unique(metabolitesTMP2[,2]))#metabolitesTMP0[[j]])
+																	#correlatedPeakBinsTMP is a list, each entry stands for one bin of the current peak
+																	correlatedPeakBinsTMP<-NULL#vector("list",length(metabolitesTMP2))
+																	#AND one of the bins needs to have been assigned to this metabolite earlier!
+																	#find only pairs for unique peaks
+																	#check if this enough bins for current iteration
+																	if(sumlengthListTMPVector[as.character(j)]>=(imaxPeaks-1)){
+																		if(sumlengthListTMPRatioVector[as.character(j)]>iPeakRatio){
+																			#Only assign correlations where at least 1 bin had been previously assigned
+																			topTMP<-which(sumlengthListTMP>=(imaxPeaks-1)&
+																				(sumlengthListTMP+1)/length(unique(metabolitesTMP2[,2]))>iPeakRatio)#metabolitesTMP0[[j]]
+																			#check if any bin was already identified for this peak before
+																			#if not, pick the highest R and
+																			if(length(topTMP)>1){
+																			  #message("topTMP")
+																			  #message(print(topTMP))
+																			  #message("Names")
+																			  #message(print(names(significantTMP2List[[isignificantTMP2List]])))
+																			  #message("Sparse")
+																			  #message(print(which(binsPerMetaboliteSparseMatrix[,j]==1)))
+																			  if(!any(as.numeric(names(significantTMP2List[[isignificantTMP2List]]))%in%which(binsPerMetaboliteSparseMatrix[,j]==1))
+																				){
+																				#pick the one with highest max R
+																				topTMP<-topTMP[which.max(meanlengthListTMPR[topTMP])[1]]
+																				#message("Top2")
+																				#message(print(topTMP))
+																				isignificantTMP2List <- peakNumberTMP2[topTMP]
+																				i2significantTMP2List <- binNumberTMP2[topTMP]
+																				correlatedPeakBinsTMP<-as.numeric(i2significantTMP2List)#names(significantTMP2List[[isignificantTMP2List]])[i2significantTMP2List])
+																				#Now calculate which bins of this peak are correlated to the top bin. Save all that are belwo for deletion
+																				#correlatedPeakBinsTMP this is the top bin
+																				if(length(significantTMP2List[[isignificantTMP2List]])>1){
+																					for(iOtherPeaks in setdiff(as.numeric(names(significantTMP2List[[isignificantTMP2List]])),
+																						correlatedPeakBinsTMP)){#for all other bins of this peak
+																						resultsCorTestTMP <- stats::cor(
+																						  mrbinObject$bins[,iOtherPeaks],
+																						  mrbinObject$bins[,correlatedPeakBinsTMP[1]])
+																						if(!resultsCorTestTMP>=peakRthreshold){
+																							#first, remove this from correlation list
+																							significantTMP2List[[isignificantTMP2List]][[as.character(iOtherPeaks)]]<-NULL
+																							#then, remove this from bin matrix
+																							metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																							),,drop=FALSE]
+																						}
+																					}
+																				}	
+																			  }
+																			}
+																			topTMP<-setdiff(topTMP,alreadyChecked)
+																			for(itopTMP in topTMP){
+																				isignificantTMP2List <- peakNumberTMP2[itopTMP]
+																				i2significantTMP2List <- binNumberTMP2[itopTMP]
+																				#save the identified bins for the UNIQUE peak/bin
+																				#correlatedPeakBinsTMP is a list, each entry stands for one peak of the current metabolite
+																				correlatedPeakBinsTMP<-#c(correlatedPeakBinsTMP,
+																					as.numeric(i2significantTMP2List)
+																					#as.numeric(names(significantTMP2List[[isignificantTMP2List]])[i2significantTMP2List])
+																					#)
+																				for(jsignificantTMP2List in which(lengthListTMP[[itopTMP]]>0)){#>0
+																					#lengthListTMP[lengthListTMPIndex==topTMP]
+																					#message(isignificantTMP2List,i2significantTMP2List,jsignificantTMP2List)
+																					#If no bin was previosly found for this peak, keep
+																					#only the top bin and remove the bins that aren't
+																					#correlated to it
+																					correlatedBinsTMP<-significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 1 as well but it doesn't matter
+																						
+																					if(!any(correlatedBinsTMP%in%which(binsPerMetaboliteSparseMatrix[,j]==1))
+																					){
+																						#only save the one bin showing highest correlation to keep things consistent
+																						columnsBinNamesTMP<-setdiff(correlatedBinsTMP,correlatedPeakBinsTMP[1])
+																						resultsCorTestTMPMatrix<-as.matrix(SparseRMatrix[correlatedPeakBinsTMP[1],columnsBinNamesTMP,drop=FALSE])
+																						#this is a matrix with 1 row
+																						#first, only save the best bin
+																						correlatedBinsTMP<-columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]
+																						#then, delete the non-correlated ones
+																						#find peak number
+																						peakNameTMP<-metabolitesTMP2[metabolitesTMP2[,3]==correlatedBinsTMP,2]
+																						columnsBinNamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==peakNameTMP,3]
+																						
+																						if(length(columnsBinNamesTMP)>1){
+																							for(iOtherPeaks in setdiff(columnsBinNamesTMP,correlatedBinsTMP)#[-which.max(resultsCorTestTMPMatrix)]
+																							){#for all other bins of this peak
+																								resultsCorTestTMP <- stats::cor(
+																								  mrbinObject$bins[,iOtherPeaks],
+																								  mrbinObject$bins[,columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]])
+																								if(!resultsCorTestTMP>=peakRthreshold){#then, remove this from bin matrix
+																									metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																									),,drop=FALSE]
+																								} else {
+																									#if this bin is significant, keep it in results
+																									if(iOtherPeaks %in% significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]){
+																										correlatedBinsTMP<-c(correlatedBinsTMP,iOtherPeaks)
+																									}
+																								}
+																							}#remove all but top from correlation list
+																							significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]<-
+																								correlatedBinsTMP#columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]])#iOtherPeaks
+																						}	
+																					}
+																					correlatedPeakBinsTMP<-c(correlatedPeakBinsTMP,
+																						correlatedBinsTMP
+																						)
+																				}
+																				#only do this if one bin was already identified
+																				binIDdTMP<-FALSE
+																				iConfirmedList <- unique(correlatedPeakBinsTMP)
+																				iConfirmedList <- iConfirmedList[!is.na(iConfirmedList)]
+																				if(length(iConfirmedList)>0){
+																					if(any(annotationsTiers1[iConfirmedList]==names(jAll)[jAll==j])|#unique(metabolitesTMP[,1])[j])|
+																					   any(annotationsTiers2[iConfirmedList]==names(jAll)[jAll==j])#|#unique(metabolitesTMP[,1])[j])|
+																					   #any(annotationsTiers3[iConfirmedList]==names(jAll)[jAll==j])#unique(metabolitesTMP[,1])[j])
+																					   ){
+																							binIDdTMP<-TRUE
+																					}
+																				}
+																				if(binIDdTMP){
+																					for(iConfirmed in iConfirmedList){
+																						if(!is.na(iConfirmed)){
+																							if(annotationsTiers1[iConfirmed]==""&
+																							  annotationsTiers2[iConfirmed]==""#&
+																							  #annotationsTiers3[iConfirmed]==""
+																							  ){#do not double annotate
+																								binsPerMetaboliteSparseMatrix[iConfirmed,j]<-1
+																								annotationsTiers1[iConfirmed]<-names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																								annotationNumbers1Tiers[iConfirmed]<-
+																									sumlengthListTMP[itopTMP]+1
+																								annotationNumbers1Tiers2[iConfirmed]<-
+																									paste("*/",length(unique(metabolitesTMP2[,2])),")",sep="")#metabolitesTMP0[[j]]
+																								#repeat the calculation for this metabolite now, because there was a change
+																								changeFlag<-TRUE
+																								changeFlag2<-TRUE
+																								changeFlag4<-TRUE
+																								#changeFlag5<-TRUE
+																								alreadyChecked<-c(alreadyChecked,itopTMP)
+																							} else {#replace if better number or tier found this time
+																								if(annotationsTiers1[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																								){
+																									if(annotationNumbers1Tiers[iConfirmed]<sumlengthListTMP[itopTMP]+1){
+																										annotationNumbers1Tiers[iConfirmed]<-sumlengthListTMP[itopTMP]+1
+																									}
+																								} else {
+																									if(annotationsTiers2[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																									){
+																										if(annotationNumbers2Tiers[iConfirmed]<=sumlengthListTMP[itopTMP]+1){
+																											annotationsTiers1[iConfirmed]<-names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																											annotationNumbers1Tiers[iConfirmed]<-sumlengthListTMP[itopTMP]+1
+																											annotationNumbers1Tiers2[iConfirmed]<-
+																												paste("*/",length(unique(metabolitesTMP2[,2])),")",sep="")#metabolitesTMP0[[j]]
+																											annotationsTiers2[iConfirmed]<-""
+																											annotationNumbers2Tiers[iConfirmed]<-0
+																											annotationNumbers2Tiers2[iConfirmed]<-""
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+															if(changeFlag4){
+																unlistTMP<-which(binsPerMetaboliteSparseMatrix[,j]>0)#]
+																unlistTMP2<-which(metabolitesTMP[,3]%in%unlistTMP&
+																		 !metabolitesTMP[,1]==j)
+																if(length(unlistTMP2)>0){
+																	junlistTMP2List<-unique(metabolitesTMP[unlistTMP2,1])
+																	metabolitesTMP<-metabolitesTMP[-unlistTMP2,]
+																	for(junlistTMP2 in junlistTMP2List){
+																		numberOfPeaks2[junlistTMP2]<-length(unique(metabolitesTMP[metabolitesTMP[,1]==junlistTMP2,2]))
+																	}
+																}
+																changeFlag4<-FALSE
+															}
+														}
+													}
+												}
+											}
+											#}
+										}	
 									}
 								}
-								#check for significance using p-value threshold
-								significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
-										correlationMatrix>confirmationRthreshold,arr.ind=TRUE)
-								#if(checkBaselineCorrelation){
-								#		significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
-								#			correlationMatrix>confirmationRthreshold#&(
-											#resultMatrixTMP<baselineCorr1$p.value&#p-value must be smaller than p-value of correlation to baseline
-											#resultMatrixTMP<baselineCorr2$p.value
-											#)&(
-											#correlationMatrix^2>baselineCorr1$estimate^2&#R must be greater than R of correlation to baseline
-											#correlationMatrix>baselineCorr2$estimate
-								#			),
-								#			arr.ind=TRUE)
-								#}
-								if(nrow(significantTMP)>0){
-									correlatedPeakBinsTMP[[i_peak1]]<-unique(c(correlatedPeakBinsTMP[[i_peak1]],
-										colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
-									correlatedPeakBinsTMP[[i_peak2]]<-unique(c(correlatedPeakBinsTMP[[i_peak2]],
-										rownames(resultMatrixTMP)[unique(significantTMP[,1])]))
-									significantTMP2<-as.numeric(c(rownames(resultMatrixTMP)[unique(significantTMP[,1])],
-												colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
-									for(iConfirmed in significantTMP2){
-										if(is.null(annotationsTiers[[1]][[iConfirmed]])){
-											annotationsTiers[[1]][[iConfirmed]]<-c(annotationsTiers[[1]][[iConfirmed]],
-												names(metabolitesTMP2)[j])
+							}
+						}
+						#Tier 2 (L1/L1+)
+						if(any(tiers==2)){
+						#start with the max number of peaks, then works your way down to 3
+						#calculate max number of peaks in any metabolite
+							#numberOfPeaks2<-rep(0,length(jAll))#max(jAll))#unlist(lapply(metabolitesTMP,length))
+							#for(j in jAll){
+							#  numberOfPeaks2[j]<-length(unique(metabolitesTMP[metabolitesTMP[,1]==j,2]))
+							#}
+							maxPeaks<-max(numberOfPeaks2[ibatchIndex])
+							if(maxPeaks>=2){
+								#numberOfPeaks3<-sort(unique(numberOfPeaks[numberOfPeaks>=3]),decreasing=TRUE)
+								#changeFlag<-TRUE#repeat any time a new bin was added!
+								#changeFlag2<-TRUE
+								#alreadyChecked<-NULL#only do calculaton of p, R if it hasn't been done before
+								imaxPeaks<-maxPeaks+1							
+								#for(imaxPeaks in maxPeaks:2){
+								while(imaxPeaks>2){
+									imaxPeaks<-imaxPeaks-1
+									for(iconfirmationRthreshold in confirmationRthreshold){
+									  #numberOfPeaks2<-rep(0,length(jAll))#max(jAll))#unlist(lapply(metabolitesTMP,length))
+									  #for(j in jAll){
+									  #  numberOfPeaks2[j]<-length(unique(metabolitesTMP[metabolitesTMP[,1]==j,2]))
+									  #}
+									  if(imaxPeaks>max(numberOfPeaks2[ibatchIndex])) imaxPeaks<-max(c(2,numberOfPeaks2[ibatchIndex]))
+									  jTMP<-intersect(jAll[which(numberOfPeaks>=imaxPeaks)],ibatchIndex)
+									  if(length(jTMP)>0){			   
+										for(j in jTMP){
+											jRowsTMP<-metabolitesTMP[,1]==j
+											#remove metabolite if all (remaining) bins were already assigned to this metabolite, to avoid long repetitive calculations
+											if(sum(jRowsTMP)==sum(binsPerMetaboliteSparseMatrix[,j])){
+												metabolitesTMP<-metabolitesTMP[!jRowsTMP,]
+												numberOfPeaks2[j]<-0
+												jRowsTMP<-NULL				
+											}	
+											if(length(jRowsTMP)>0){
+												if(changeFlag2){
+													sumlengthListTMPVector<-NULL
+													sumlengthListTMPRatioVector<-NULL
+													changeFlag2<-FALSE
+												}
+												previousFlag<-TRUE
+												#don't repeat this calculation if you know the results will be below threshold
+												if(any(names(sumlengthListTMPVector)==j)){
+													if(!(sumlengthListTMPVector[as.character(j)]>=(imaxPeaks-1)&
+													  sumlengthListTMPRatioVector[as.character(j)]>iPeakRatio)){
+													  previousFlag<-FALSE
+													}												
+												}
+												if(previousFlag){
+													#remove tier 1 - 3 bins EXCEPT BINS of this metabolite
+													metabolitesTMP2<-metabolitesTMP[jRowsTMP,,drop=FALSE]
+													#re-check if 3 peaks are still available
+													uniquePeakIndex<-unique(metabolitesTMP2[,2])
+													if(length(uniquePeakIndex)>=imaxPeaks){#>2
+														#find all possible pairs - peak1-peak2, peak1-peak3, etc.
+														significantTMP2List<-vector("list",(length(uniquePeakIndex)))
+														names(significantTMP2List)<-uniquePeakIndex
+														significantTMP2ListR<-significantTMP2List
+														for(i_peak1 in 1:length(uniquePeakIndex)){#metabolitesTMP2
+															#add a list to this unique peak, length is number of bins for this peak
+															#peak1->bin1->peak1/2/3/4/5/6...
+															colnamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==uniquePeakIndex[i_peak1],3]#unique peak bins!
+															significantTMP2List[[i_peak1]]<-vector("list",length(colnamesTMP))
+															names(significantTMP2List[[i_peak1]])<-colnamesTMP
+															significantTMP2ListR[[i_peak1]]<-vector("list",length(colnamesTMP))
+															names(significantTMP2ListR[[i_peak1]])<-colnamesTMP
+															for(i_peak1TMP in 1:length(significantTMP2List[[i_peak1]])){
+																significantTMP2List[[i_peak1]][[i_peak1TMP]]<-vector("list",length(uniquePeakIndex))
+																significantTMP2ListR[[i_peak1]][[i_peak1TMP]]<-vector("list",length(uniquePeakIndex))#(length(metabolitesTMP2)))
+																names(significantTMP2List[[i_peak1]][[i_peak1TMP]])<-uniquePeakIndex
+																names(significantTMP2ListR[[i_peak1]][[i_peak1TMP]])<-uniquePeakIndex
+					
+															}
+															i_peak2TMP<-uniquePeakIndex[-i_peak1]#names(significantTMP2List)[i_peak1]]#remove current peak
+															for(i_peak2 in i_peak2TMP){
+																rownamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==i_peak2,3]#metabolitesTMP2[[i_peak2]]							
+																correlationMatrix<-as.matrix(SparseRMatrix[rownamesTMP,colnamesTMP,drop=FALSE])
+																colnames(correlationMatrix)<-colnamesTMP
+																rownames(correlationMatrix)<-rownamesTMP
+																if(sum(correlationMatrix==0)>0){#find missing correlations and calculate them now
+																	indicesZeroTMP<-which(correlationMatrix==0,arr.ind=TRUE)
+																	for(iindicesZeroTMP in 1:nrow(indicesZeroTMP)){
+																		resultsCorTestTMP <- stats::cor(
+																		  mrbinObject$bins[,rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]]],
+																		  mrbinObject$bins[,colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]]])
+																		#SparsePMatrix[rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]],
+																		#  colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]]] <- resultsCorTestTMP$p.value
+																		SparseRMatrix[rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]],
+																		  colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]]] <- resultsCorTestTMP#$estimate
+																		#SparsePMatrix[colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]],
+																		#  rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]]] <- resultsCorTestTMP$p.value
+																		SparseRMatrix[colnamesTMP[indicesZeroTMP[iindicesZeroTMP,2]],
+																			rownamesTMP[indicesZeroTMP[iindicesZeroTMP,1]]] <- resultsCorTestTMP#$estimate
+																		#correlationMatrix[indicesZeroTMP[iindicesZeroTMP,1],
+																		#  indicesZeroTMP[iindicesZeroTMP,2]] <- resultsCorTestTMP$p.value
+																		correlationMatrix[indicesZeroTMP[iindicesZeroTMP,1],
+																		  indicesZeroTMP[iindicesZeroTMP,2]] <- resultsCorTestTMP#$estimate
+																	}
+																}
+																for(isignificantTMP2columns in 1:ncol(correlationMatrix)){
+																	#check for significance using p-value threshold
+																	significantTMP<-correlationMatrix[,isignificantTMP2columns]>iconfirmationRthreshold														
+																	#now search if 3 peaks are significant!
+																	if(sum(significantTMP)>0){
+																		significantTMP<-which(significantTMP)
+																		significantTMP2<-rownames(correlationMatrix)[significantTMP]#bins in other peak
+																		significantTMP2List[[i_peak1]][[isignificantTMP2columns]][[i_peak2]]<-
+																			as.numeric(significantTMP2)
+																		#save significant Pearson Rs for this combination of peaks
+																		significantTMP2ListR[[i_peak1]][[isignificantTMP2columns]][[i_peak2]]<-
+																			as.vector(correlationMatrix[rownames(correlationMatrix)[significantTMP],
+																				isignificantTMP2columns])
+																	}
+																}
+															}
+														}
+														#now check for each peak if at least 2 other peaks are correlated, and save those
+														lengthListTMP<-list()
+														meanlengthListTMPR<-NULL
+														sumlengthListTMP<-NULL
+														peakNumberTMP2<-NULL
+														binNumberTMP2<-NULL
+														for(isignificantTMP2List in 1:length(significantTMP2List)){
+															for(jsignificantTMP2List in names(significantTMP2List[[isignificantTMP2List]])#1:length(significantTMP2List[[isignificantTMP2List]])
+															){#bins of unique peak
+																#save for each bin of a unique peak a vector with the number of how many bins of this peak are significant
+																#this does no longer include the name of the bin of the unique peak, (in which case the actual number would be 1 less)
+																lengthListTMP<-c(lengthListTMP,
+																	list(lapply(significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]],length)))
+																#this incudes Rs from only the significant bins
+																if(sum(lengthListTMP[[length(lengthListTMP)]]>0)>0){#>0)>0)
+																	meanlengthListTMPR<-c(meanlengthListTMPR,
+																		max(unlist(significantTMP2ListR[[isignificantTMP2List]][[jsignificantTMP2List]], use.names = FALSE)))
+																} else {
+																	meanlengthListTMPR<-c(meanlengthListTMPR,0)
+																}
+																#save for how many peaks at least 1 bin was found 
+																sumlengthListTMP<-c(sumlengthListTMP,sum(#lengthListTMP
+																	lengthListTMP[[length(lengthListTMP)#isignificantTMP2List]][[jsignificantTMP2List
+																		]]>0))#>0
+																peakNumberTMP2<-c(peakNumberTMP2,isignificantTMP2List)#which unique peak does this belong to
+																binNumberTMP2<-c(binNumberTMP2,jsignificantTMP2List)#which bin of the unique peak?
+															}									
+														}
+														if(!any(names(sumlengthListTMPVector)==j)){
+																	sumlengthListTMPVector<-c(sumlengthListTMPVector,0)
+																	names(sumlengthListTMPVector)[length(sumlengthListTMPVector)]<-j
+																	sumlengthListTMPRatioVector<-c(sumlengthListTMPRatioVector,0)
+																	names(sumlengthListTMPRatioVector)[length(sumlengthListTMPRatioVector)]<-j
+																}
+														sumlengthListTMPVector[as.character(j)]<-max(sumlengthListTMP)
+														sumlengthListTMPRatioVector[as.character(j)]<-(max(sumlengthListTMP)+1)/length(unique(metabolitesTMP2[,2]))#metabolitesTMP0[[j]])
+														if(sum(binsPerMetaboliteSparseMatrix[,j])==0){ #if no bin has been found for this metabolite yet
+															correlatedPeakBinsTMP<-NULL#vector("list",length(metabolitesTMP2))
+															#check if this enough bins for current iteration
+															if(sumlengthListTMPVector[as.character(j)]>=(imaxPeaks-1)){
+																if(sumlengthListTMPRatioVector[as.character(j)]>iPeakRatio){
+																	#Only check the bins with the highest number of correlations
+																	#this may be one bin or several bins. In the latter case, pick the one with 
+																	#highest mean R
+																	topTMP<-which(sumlengthListTMP==max(sumlengthListTMP)&
+																					(sumlengthListTMP+1)/length(unique(metabolitesTMP2[,2]))>iPeakRatio)
+																	if(length(topTMP)>1){#pick the one with highest mean R
+																		topTMP<-topTMP[which.max(meanlengthListTMPR[topTMP])[1]]
+																	}
+																	#now use topTMP (index in vector of top peak pairs) to find which unique peak and which bin this is
+																	isignificantTMP2List <- peakNumberTMP2[topTMP]
+																	i2significantTMP2List <- binNumberTMP2[topTMP]
+																	#save the identified bins for the current peak/bin
+																	#correlatedPeakBinsTMP is a list, each entry stands for one peak of the current metabolite
+																	correlatedPeakBinsTMP<-#c(correlatedPeakBinsTMP,
+																		as.numeric(i2significantTMP2List)
+																		#as.numeric(names(significantTMP2List[[isignificantTMP2List]])[i2significantTMP2List])
+																		#)
+																	#Now calculate which bins of this peak are correlated to the top bin. Save all that are belwo for deletion
+																	#correlatedPeakBinsTMP this is the top bin
+																	if(length(significantTMP2List[[isignificantTMP2List]])>1){
+																		for(iOtherPeaks in setdiff(as.numeric(names(significantTMP2List[[isignificantTMP2List]])),
+																			correlatedPeakBinsTMP)){#for all other bins of this peak
+																			resultsCorTestTMP <- stats::cor(
+																			  mrbinObject$bins[,iOtherPeaks],
+																			  mrbinObject$bins[,correlatedPeakBinsTMP[1]])
+																			if(!resultsCorTestTMP>=peakRthreshold){
+																				#first, remove this from correlation list
+																				significantTMP2List[[isignificantTMP2List]][[as.character(iOtherPeaks)]]<-NULL
+																				#then, remove this from bin matrix
+																				metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																				),,drop=FALSE]
+																			}
+																		}
+																	}	
+																	for(jsignificantTMP2List in which(lengthListTMP[[topTMP]]>0)){#>0
+																		#save identified bins for all other peaks!
+																		#only save the one bin showing highest correlation to keep things consistent
+																		#this is only looking at signficant bins
+																		#we need to check all bins
+																		columnsBinNamesTMP<-setdiff(significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]],correlatedPeakBinsTMP[1])
+																		#find peak number
+																		peakNameTMP<-metabolitesTMP2[metabolitesTMP2[,3]==columnsBinNamesTMP[1],2]
+																		columnsBinNamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==peakNameTMP,3]
+																		resultsCorTestTMPMatrix<-as.matrix(SparseRMatrix[correlatedPeakBinsTMP[1],columnsBinNamesTMP,drop=FALSE])
+																		#this is a matrix with 1 row
+																		correlatedPeakBinsTMP<-c(correlatedPeakBinsTMP,columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)])
+																		#Now calculate which bins of this peak are correlated to the top bin. Save all that are belwo for deletion
+																		if(length(columnsBinNamesTMP)>1){
+																			for(iOtherPeaks in setdiff(columnsBinNamesTMP,correlatedPeakBinsTMP)#columnsBinNamesTMP[-which.max(resultsCorTestTMPMatrix)]
+																			){#for all other bins of this peak
+																				resultsCorTestTMP <- stats::cor(
+																				  mrbinObject$bins[,iOtherPeaks],
+																				  mrbinObject$bins[,columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]])
+																				if(!resultsCorTestTMP>=peakRthreshold){#then, remove this from bin matrix
+																					metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																					),,drop=FALSE]
+																				}
+																			}#remove all but top from correlation list
+																			significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]<-
+																				columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]#iOtherPeaks
+																		}	
+																		#correlatedPeakBinsTMP<-c(correlatedPeakBinsTMP,
+																		#	significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 1 as well but it doesn't matter
+																		#	)
+																	}
+																	#if(names(jAll)[jAll==j]=="Choline"){
+																	#	message(print(correlatedPeakBinsTMP))
+																	#	message(print(names(significantTMP2List[[isignificantTMP2List]])))
+																	#}
+																	#message(print(correlatedPeakBinsTMP))
+																	for(iConfirmed in unique(correlatedPeakBinsTMP)){
+																		if(annotationsTiers1[iConfirmed]==""&
+																		   annotationsTiers2[iConfirmed]==""#&
+																		   #annotationsTiers3[iConfirmed]==""
+																		   ){#do not double annotate
+																			binsPerMetaboliteSparseMatrix[iConfirmed,j]<-1
+																			annotationsTiers2[iConfirmed]<-names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																			annotationNumbers2Tiers[iConfirmed]<-
+																							sumlengthListTMP[topTMP]+1
+																			annotationNumbers2Tiers2[iConfirmed]<-
+																							paste("/",length(unique(metabolitesTMP2[,2])),")",sep="")#metabolitesTMP0[[j]]
+																			changeFlag2<-TRUE
+																			changeFlag4<-TRUE
+																		} else {#replace if better number or tier found this time
+																			if(annotationsTiers2[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																			){
+																				if(annotationNumbers2Tiers[iConfirmed]<sumlengthListTMP[topTMP]+1){
+																					annotationNumbers2Tiers[iConfirmed]<-sumlengthListTMP[topTMP]+1
+																				}
+																			} else {
+																				if(annotationsTiers1[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																				){
+																					if(annotationNumbers1Tiers[iConfirmed]<sumlengthListTMP[topTMP]+1){
+																						annotationNumbers1Tiers[iConfirmed]<-sumlengthListTMP[topTMP]+1
+																					}
+																				} #else {
+																			}
+																		}
+																	}	
+																}
+															}
+														} 
+														if(sum(binsPerMetaboliteSparseMatrix[,j])>0){ #if a bin has been found for this metabolite yet
+															#AND one of the bins needs to have been assigned to this metabolite earlier!
+															changeFlag<-TRUE
+															changeFlag2<-TRUE
+															alreadyChecked<-NULL
+															while(changeFlag){
+																changeFlag<-FALSE
+																correlatedPeakBinsTMP<-NULL#vector("list",length(metabolitesTMP2))										
+																if(changeFlag2){
+																	sumlengthListTMPVector<-NULL
+																	sumlengthListTMPRatioVector<-NULL
+																	changeFlag2<-FALSE
+																}
+																if(!any(names(sumlengthListTMPVector)==j)){
+																	sumlengthListTMPVector<-c(sumlengthListTMPVector,0)
+																	names(sumlengthListTMPVector)[length(sumlengthListTMPVector)]<-j
+																	sumlengthListTMPRatioVector<-c(sumlengthListTMPRatioVector,0)
+																	names(sumlengthListTMPRatioVector)[length(sumlengthListTMPRatioVector)]<-j
+																}
+																sumlengthListTMPVector[as.character(j)]<-max(sumlengthListTMP)
+																sumlengthListTMPRatioVector[as.character(j)]<-(max(sumlengthListTMP)+1)/length(unique(metabolitesTMP2[,2]))#metabolitesTMP0[metabolitesTMP0[,1]==j,2]))
+																#check if this enough bins for current iteration
+																if(sumlengthListTMPVector[as.character(j)]>=(imaxPeaks-1)){
+																	if(sumlengthListTMPRatioVector[as.character(j)]>iPeakRatio){
+																		#Only assign correlations where at least 1 bin had been previously assigned
+																		topTMP<-which(sumlengthListTMP>=(imaxPeaks-1)&
+																					(sumlengthListTMP+1)/length(unique(metabolitesTMP2[,2]))>iPeakRatio)#metabolitesTMP0[metabolitesTMP0[,1]==j,2]))>iPeakRatio)
+																		if(length(topTMP)>1){
+																		  #message("topTMP")
+																		  #message(print(topTMP))
+																		  #message("Names")
+																		  #message(print(names(significantTMP2List[[isignificantTMP2List]])))
+																		  #message("Sparse")
+																		  #message(print(which(binsPerMetaboliteSparseMatrix[,j]==1)))
+																		  if(!any(as.numeric(names(significantTMP2List[[isignificantTMP2List]]))%in%which(binsPerMetaboliteSparseMatrix[,j]==1))
+																			){
+																			#pick the one with highest max R
+																			topTMP<-topTMP[which.max(meanlengthListTMPR[topTMP])[1]]
+																			#message("Top2")
+																			#message(print(topTMP))
+																			isignificantTMP2List <- peakNumberTMP2[topTMP]
+																			i2significantTMP2List <- binNumberTMP2[topTMP]
+																			correlatedPeakBinsTMP<-as.numeric(i2significantTMP2List)#names(significantTMP2List[[isignificantTMP2List]])[i2significantTMP2List])
+																			#Now calculate which bins of this peak are correlated to the top bin. Save all that are belwo for deletion
+																			#correlatedPeakBinsTMP this is the top bin
+																			if(length(significantTMP2List[[isignificantTMP2List]])>1){
+																				for(iOtherPeaks in setdiff(as.numeric(names(significantTMP2List[[isignificantTMP2List]])),
+																					correlatedPeakBinsTMP)){#for all other bins of this peak
+																					resultsCorTestTMP <- stats::cor(
+																					  mrbinObject$bins[,iOtherPeaks],
+																					  mrbinObject$bins[,correlatedPeakBinsTMP[1]])
+																					if(!resultsCorTestTMP>=peakRthreshold){
+																						#first, remove this from correlation list
+																						significantTMP2List[[isignificantTMP2List]][[as.character(iOtherPeaks)]]<-NULL
+																						#then, remove this from bin matrix
+																						metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																						),,drop=FALSE]
+																					}
+																				}
+																			}	
+																		  }
+																		}
+																		
+																		topTMP<-setdiff(topTMP,alreadyChecked)
+																		for(itopTMP in topTMP){
+																			isignificantTMP2List <- peakNumberTMP2[itopTMP]
+																			i2significantTMP2List <- binNumberTMP2[itopTMP]
+																			#save the identified bins for the current peak/bin
+																			#correlatedPeakBinsTMP is a list, each entry stands for one peak of the current metabolite
+																			correlatedPeakBinsTMP<-#c(correlatedPeakBinsTMP,
+																				#as.numeric(names(significantTMP2List[[isignificantTMP2List]])[i2significantTMP2List])
+																				as.numeric(i2significantTMP2List)
+																				#as.numeric(names(significantTMP2List[[isignificantTMP2List]])[i2significantTMP2List])
+																				#)
+																			for(jsignificantTMP2List in which(lengthListTMP[[itopTMP]]>0)){#>0
+																				#If no bin was previosly found for this peak, keep
+																				#only the top bin and remove the bins that aren't
+																				#correlated to it
+																				correlatedBinsTMP<-significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 1 as well but it doesn't matter
+																							
+																				if(!any(correlatedBinsTMP%in%which(binsPerMetaboliteSparseMatrix[,j]==1))
+																				){
+																					#only save the one bin showing highest correlation to keep things consistent
+																					columnsBinNamesTMP<-setdiff(correlatedBinsTMP,correlatedPeakBinsTMP[1])
+																					resultsCorTestTMPMatrix<-as.matrix(SparseRMatrix[correlatedPeakBinsTMP[1],columnsBinNamesTMP,drop=FALSE])
+																					#this is a matrix with 1 row
+																					#first, only save the best bin
+																					correlatedBinsTMP<-columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]
+																					#then, delete the non-correlated ones
+																					#find peak number
+																					peakNameTMP<-metabolitesTMP2[metabolitesTMP2[,3]==correlatedBinsTMP,2]
+																					columnsBinNamesTMP<-metabolitesTMP2[metabolitesTMP2[,2]==peakNameTMP,3]
+																					
+																					if(length(columnsBinNamesTMP)>1){
+																						for(iOtherPeaks in setdiff(columnsBinNamesTMP,correlatedBinsTMP)#[-which.max(resultsCorTestTMPMatrix)]
+																						){#for all other bins of this peak
+																							resultsCorTestTMP <- stats::cor(
+																							  mrbinObject$bins[,iOtherPeaks],
+																							  mrbinObject$bins[,columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]])
+																							if(!resultsCorTestTMP>=peakRthreshold){#then, remove this from bin matrix
+																								metabolitesTMP<-metabolitesTMP[!(metabolitesTMP[,1]==j&metabolitesTMP[,3]==iOtherPeaks
+																								),,drop=FALSE]
+																							} else {
+																								#if this bin is significant, keep it in results
+																								if(iOtherPeaks %in% significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]){
+																									correlatedBinsTMP<-c(correlatedBinsTMP,iOtherPeaks)
+																								}
+																							}
+																						}#remove all but top from correlation list
+																						significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]<-
+																							correlatedBinsTMP#columnsBinNamesTMP[which.max(resultsCorTestTMPMatrix)]])#iOtherPeaks
+																					}	
+																				}
+																				
+																				correlatedPeakBinsTMP<-c(correlatedPeakBinsTMP,
+																					correlatedBinsTMP
+																					#significantTMP2List[[isignificantTMP2List]][[i2significantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 1 as well but it doesn't matter
+																					)
+																			}
+																			#only do this if one bin was already identified
+																			binIDdTMP<-FALSE
+																			iConfirmedList <- unique(correlatedPeakBinsTMP)
+																			iConfirmedList <- iConfirmedList[!is.na(iConfirmedList)]
+																			if(length(iConfirmedList)>0){
+																				if(any(annotationsTiers1[iConfirmedList]==names(jAll)[jAll==j])|#unique(metabolitesTMP[,1])[j])|
+																					any(annotationsTiers2[iConfirmedList]==names(jAll)[jAll==j])#|#unique(metabolitesTMP[,1])[j])|
+																					#any(annotationsTiers3[iConfirmedList]==names(jAll)[jAll==j])#unique(metabolitesTMP[,1])[j])
+																					){
+																						binIDdTMP<-TRUE
+																				}
+																			}
+																			if(binIDdTMP){
+																				#message(names(jAll)[j])
+																				#message(print(correlatedPeakBinsTMP))
+																				for(iConfirmed in iConfirmedList#unlist(correlatedPeakBinsTMP, use.names = FALSE)
+																				  ){
+																					if(!is.na(iConfirmed)){
+																						if(annotationsTiers1[iConfirmed]==""&
+																							annotationsTiers2[iConfirmed]==""#&
+																							#annotationsTiers3[iConfirmed]==""
+																							){#do not double annotate
+																							  binsPerMetaboliteSparseMatrix[iConfirmed,j]<-1
+																							  annotationsTiers2[iConfirmed]<-names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																							  annotationNumbers2Tiers[iConfirmed]<-sumlengthListTMP[itopTMP]+1
+																							  annotationNumbers2Tiers2[iConfirmed]<-
+																								paste("/",length(unique(metabolitesTMP2[,2])),")",sep="")
+																							  #repeat the calculation for this metabolite now, because there was a change
+																							  changeFlag<-TRUE	
+																							  changeFlag2<-TRUE
+																							  changeFlag4<-TRUE
+																							  alreadyChecked<-c(alreadyChecked,itopTMP)
+																						} else {#replace if better number or tier found this time
+																							if(annotationsTiers2[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																							){
+																								if(annotationNumbers2Tiers[iConfirmed]<sumlengthListTMP[itopTMP]+1){
+																									annotationNumbers2Tiers[iConfirmed]<-sumlengthListTMP[itopTMP]+1
+																								}
+																							} else {
+																								if(annotationsTiers1[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																								){
+																									if(annotationNumbers1Tiers[iConfirmed]<sumlengthListTMP[itopTMP]+1){
+																										annotationNumbers1Tiers[iConfirmed]<-sumlengthListTMP[itopTMP]+1
+																										#is this a good idea? replacing tier 1 by tier 2 if exceeding by 1 peak
+																									}
+																								}# else {
+																								#	if(annotationsTiers3[iConfirmed]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																								#	){
+																								#		annotationsTiers2[iConfirmed]<-names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+																								#		annotationNumbers2Tiers[iConfirmed]<-sumlengthListTMP[itopTMP]+1
+																								#		annotationNumbers2Tiers2[iConfirmed]<-
+																								#			paste("/",length(unique(metabolitesTMP0[metabolitesTMP0[,1]==j,2])),")",sep="")
+																								#		annotationsTiers3[iConfirmed]<-""
+																								#		annotationNumbers3Tiers[iConfirmed]<-0
+																								#		annotationNumbers3Tiers2[iConfirmed]<-""
+																								#	}
+																								#}
+																							}
+																						}
+																					}
+																				}	
+																			}
+																		}
+																	}
+																}
+															}
+														}
+														if(changeFlag4){
+															unlistTMP<-which(binsPerMetaboliteSparseMatrix[,j]>0)#]
+															unlistTMP2<-which(metabolitesTMP[,3]%in%unlistTMP&
+																	 !metabolitesTMP[,1]==j)
+															if(length(unlistTMP2)>0){
+																junlistTMP2List<-unique(metabolitesTMP[unlistTMP2,1])
+																metabolitesTMP<-metabolitesTMP[-unlistTMP2,]
+																for(junlistTMP2 in junlistTMP2List){
+																	numberOfPeaks2[junlistTMP2]<-length(unique(metabolitesTMP[metabolitesTMP[,1]==junlistTMP2,2]))
+																}
+															}
+															changeFlag4<-FALSE
+														}												
+													}
+												}
+											}
+										  }
 										}
 									}
 								}
-	
 							}
 						}
-						#remove all bins of this significant peak that were NOT significant - these belong to another metabolite!
-						deleteNotIdentifiedTMP<-NULL
-						for(icorrelatedPeakBinsTMP in 1:length(correlatedPeakBinsTMP)){
-							if(length(correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]])>0){
-								#find remaining bins of this peak:
-								deleteNotIdentifiedTMP<-unique(c(deleteNotIdentifiedTMP,
-									setdiff(metabolitesTMP2[[j]][[icorrelatedPeakBinsTMP]],
-										correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]]
-								)))	
-							}
-						}
-						#now remove these from all instances of this metabolite:
-						namesMatchesTMP<-which(names(metabolitesAllNamesTMP)==
-							names(metabolitesAllNamesTMP)[j])
-						for(iMetaboliteTMP in namesMatchesTMP){
-							if(length(metabolitesTMP[[iMetaboliteTMP]])>0){
-								for(jMetaboliteTMP in 1:length(metabolitesTMP[[iMetaboliteTMP]])){
-									deleteListTMP<-metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]%in%
-										deleteNotIdentifiedTMP
-									if(sum(deleteListTMP)>0){
-										#this means some bins of this peak are in the to-delete list
-										metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]<-
-											metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]][-which(
-												deleteListTMP)]								
-									}
-								
-								}
-							}
-						}
-						if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
-							metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
-						}						
 					}
 				}
 			}
-		  }
-		}
-		#Tier 2 (L1)
-		if(2%in%tiers){
-		  for(j in 1:length(metabolitesTMP)){
-			if(length(metabolitesTMP[[j]])>2){#check if 3 peaks are available
-				#remove tier 1 and tier 2 bins
-				#EXCEPT BINS of this metabolite
-				#deleteTMPj<-NULL
-				#message(paste("Tier2, ",names(metabolitesTMP)[j]))
-				metabolitesTMP2<-metabolitesTMP
-				deleteTMPi<-NULL
-				for(jExcludeMultiple2 in 1:length(metabolitesTMP2[[j]])){
-				  if(length(metabolitesTMP2[[j]][[jExcludeMultiple2]])>0){
-					for(iExcludeMultiple in 1:length(metabolitesTMP2[[j]][[jExcludeMultiple2]])){
-						unlistTMP<-c(unlist(annotationsTiers[[1]]),
-							unlist(annotationsTiers[[2]]))
-						if(names(metabolitesTMP2)[j]%in%unlistTMP){
-							unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
-						}
-						if(names(metabolitesTMP2[[j]][[jExcludeMultiple2]][iExcludeMultiple]) %in% 
-							names(unlistTMP)
-							#c(names(unlist(annotationsTiers[[1]])),
-							#names(unlist(annotationsTiers[[2]])))
+			#remove all bins of a significant peak that were NOT significant - these belong to another metabolite!
+			#to avoid having bins that clearly do not belong to a metabolite to be tentatively assigned (L2 or L3)
+			for(j in unique(metabolitesTMP[,1])){
+				deleteNotIdentifiedTMP<-NULL
+				#for each peak: compare all bins to assigned metabolites (tiers 1,2,3)
+				peaksTMPIndex<-unique(metabolitesTMP[which(metabolitesTMP[,1]==j),2])
+				if(length(peaksTMPIndex)>0){
+					for(iPeaks in peaksTMPIndex){
+						identifiedTMP<-NULL
+						binsTMPIndex<-metabolitesTMP[,1]==j&metabolitesTMP[,2]==iPeaks
+						if(sum(binsTMPIndex)>0){
+							for(iBins in metabolitesTMP[binsTMPIndex,3]#1:length(metabolitesTMP[[j]][[iPeaks]])
 							){
-							#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
-							#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
-							deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
-						}
-					}
-				  	if(length(deleteTMPi)>0){
-						metabolitesTMP2[[j]][[jExcludeMultiple2]]<-
-							metabolitesTMP2[[j]][[jExcludeMultiple2]][-deleteTMPi]
-					}
-				  }
-				}
-				if(0 %in% lapply(metabolitesTMP2[[j]],length)){#now remove empty entries:
-					metabolitesTMP2[[j]][which(lapply(metabolitesTMP2[[j]],length)==0)]<-NULL
-				}						  
-				#re-check if 3 peaks are still available
-				if(length(metabolitesTMP2[[j]])>2){
-					correlatedPeakBinsTMP<-vector("list",length(metabolitesTMP2[[j]]))
-					#find all possible pairs - peak1-peak2, peak1-peak3, etc.
-					significantTMP2List<-vector("list",(length(metabolitesTMP2[[j]])))
-					for(i_peak1 in 1:(length(metabolitesTMP2[[j]])-1)){
-						significantTMP2List[[i_peak1]]<-vector("list",(length(metabolitesTMP2[[j]])))
-						for(i_peak2 in (i_peak1+1):length(metabolitesTMP2[[j]])){
-							colnamesTMP<-metabolitesTMP2[[j]][[i_peak1]]
-							rownamesTMP<-metabolitesTMP2[[j]][[i_peak2]]							
-							resultMatrixTMP<-matrix(1,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-								),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-								))#save p-values here
-							correlationMatrix<-matrix(0,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-								),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-								))#save correlation coefficients here
-							colnames(resultMatrixTMP)<-colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-							rownames(resultMatrixTMP)<-rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-							for(j_bin1 in 1:length(metabolitesTMP2[[j]][[i_peak1]])){
-								#calculate correlation between baseline and peak 1, bin j_bin1
-								#baselineCorr1<-stats::cor.test(mrbinObject$bins[,
-								#	  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
-									  #mrbinObject$parameters$
-								#	  baseline)
-								for(j_bin2 in 1:length(metabolitesTMP2[[j]][[i_peak2]])){
-									#calculate correlation between baseline and peak 2
-									#baselineCorr2<-stats::cor.test(mrbinObject$bins[,
-									#	metabolitesTMP[[j]][[i_peak2]][j_bin2]],
-										#mrbinObject$parameters$
-									#	baseline[,j])
-									resultsCorTestTMP<-stats::cor.test(mrbinObject$bins[,
-									  metabolitesTMP2[[j]][[i_peak1]][j_bin1]],
-									  mrbinObject$bins[,
-									  metabolitesTMP2[[j]][[i_peak2]][j_bin2]])
-									resultMatrixTMP[j_bin2,j_bin1]<-resultsCorTestTMP$p.value
-									correlationMatrix[j_bin2,j_bin1]<-resultsCorTestTMP$estimate
-									#make sure the correlation is positive! 
-								}
+								#message(paste(unique(metabolitesTMP[,1])[j], iBins, length(annotationsTiers1),sep=", ",collapse=", "))
+								if(annotationsTiers1[iBins]==names(jAll)[jAll==j]|#rownames(metabolitesTMP)[which(metabolitesTMP[,1]==j)[1]]|
+									annotationsTiers2[iBins]==names(jAll)[jAll==j]#|#rownames(metabolitesTMP)[which(metabolitesTMP[,1]==j)[1]]|
+									#annotationsTiers3[iBins]==names(jAll)[jAll==j]
+									){#rownames(metabolitesTMP)[which(metabolitesTMP[,1]==j)[1]]){
+										identifiedTMP<-c(identifiedTMP,iBins)
+									}					
 							}
-							#check for significance using p-value threshold
-							significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
-									correlationMatrix>confirmationRthreshold,arr.ind=TRUE)
-							#now search if 3 peaks are significant!
-							significantTMP2<-as.numeric(c(rownames(resultMatrixTMP)[unique(significantTMP[,1])],
-										colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
-							significantTMP2List[[i_peak1]][[i_peak2]]<-significantTMP2
-						}
-					}	
-					#now check for each peak if at least 2 other peaks are correlated, and save those
-					for(isignificantTMP2List in 1:length(significantTMP2List)){
-						lengthListTMP<-lapply(significantTMP2List[[isignificantTMP2List]],length)
-						if(sum(lengthListTMP>0)>1){#more than 0 bins found for more than 1 peak
-							for(jsignificantTMP2List in which(lengthListTMP>1)){
-								correlatedPeakBinsTMP[[isignificantTMP2List]]<-unique(c(correlatedPeakBinsTMP[[isignificantTMP2List]],
-									#colnames(resultMatrixTMP)[unique(significantTMP[,2])]
-									significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 2 as well but it doesn't matter
-									))
-								#find peak number
-								correlatedPeakBinsTMP[[jsignificantTMP2List]]<-unique(c(correlatedPeakBinsTMP[[jsignificantTMP2List]],
-									#rownames(resultMatrixTMP)[unique(significantTMP[,1])]
-									significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]]#this includes the bins of peak 1 as well but it doesn't matter
-									))
-								for(iConfirmed in significantTMP2List[[isignificantTMP2List]][[jsignificantTMP2List]]){
-									if(is.null(annotationsTiers[[2]][[iConfirmed]])&
-										is.null(annotationsTiers[[1]][[iConfirmed]])
-										){
-										annotationsTiers[[2]][[iConfirmed]]<-c(annotationsTiers[[2]][[iConfirmed]],
-											names(metabolitesTMP2)[j])
+							if(length(identifiedTMP)>0){
+								if(length(identifiedTMP)<length(binsTMPIndex)){
+									for(iBins in setdiff(metabolitesTMP[binsTMPIndex,3],identifiedTMP)){
+										deleteNotIdentifiedTMP<-c(deleteNotIdentifiedTMP,
+											iBins)
 									}
-								}	
-							}
-						}
-					}
-					#remove all bins of this significant peak that were NOT significant - these belong to another metabolite!
-					deleteNotIdentifiedTMP<-NULL
-					for(icorrelatedPeakBinsTMP in 1:length(correlatedPeakBinsTMP)){
-						if(length(correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]])>0){
-							#find remaining bins of this peak:
-							deleteNotIdentifiedTMP<-unique(c(deleteNotIdentifiedTMP,
-								setdiff(metabolitesTMP2[[j]][[icorrelatedPeakBinsTMP]],
-									correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]]
-							)))	
-						}
-					}
-					#now remove these from all instances of this metabolite:
-					namesMatchesTMP<-which(names(metabolitesAllNamesTMP)==
-						names(metabolitesAllNamesTMP)[j])
-					for(iMetaboliteTMP in namesMatchesTMP){
-						if(length(metabolitesTMP[[iMetaboliteTMP]])>0){
-							for(jMetaboliteTMP in 1:length(metabolitesTMP[[iMetaboliteTMP]])){
-								deleteListTMP<-metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]%in%
-									deleteNotIdentifiedTMP
-								if(sum(deleteListTMP)>0){
-									#this means some bins of this peak are in the to-delete list
-									metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]<-
-										metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]][-which(
-											deleteListTMP)]								
 								}
 							}
 						}
-					}	
-					if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
-						metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
-					}						
+					}
+				}
+				#now remove these from all instances of this metabolite:
+				if(length(deleteNotIdentifiedTMP)>0){
+					peaksTMPIndex<-metabolitesTMP[,1]==j&metabolitesTMP[,3]%in%deleteNotIdentifiedTMP
+					metabolitesTMP<-metabolitesTMP[!peaksTMPIndex,]
+				}		
+			}
+			#Remove tier 1-3 ids
+			unlistTMP<-which(rowSums(as.matrix(binsPerMetaboliteSparseMatrix))>0)#]
+			metabolitesTMP<-metabolitesTMP[!metabolitesTMP[,3]%in%unlistTMP,]
+			##Tier 4 (L2) #single peaks cannot be confirmed by using correlation to a separate peak
+			if(4 %in% tiers){
+				#progressStepsTMP<-progressStepsTMP+1
+				#if(verbose){
+				#	message(round(100*progressStepsTMP/progressSteps),"% ",appendLF = FALSE)
+				#	utils::flush.console()		
+				#}	
+				for(j in unique(metabolitesTMP[,1])){
+					if(numberOfPeaks[j]==1#&#use original metabolite list for this comparison, so we don't use metabolite where other peaks were identified at tier 1-3
+					  #length(grep("_doNotUse_",names(metabolitesTMP)[[j]]))==0  
+					  ) {#& does not contain _donotuse
+						peaksTMPIndex<-metabolitesTMP[,1]==j
+						if(sum(peaksTMPIndex)>0){
+							for(jSinglePeaks in metabolitesTMP[peaksTMPIndex,3]){
+								if(!any(annotationsTiers[[4]][[ jSinglePeaks ]]==names(jAll)[jAll==j]#names(metabolitesAllNamesTMP)[j])
+								)){
+									annotationsTiers[[4]][[ jSinglePeaks ]]<-c(
+										annotationsTiers[[4]][[ jSinglePeaks ]],names(jAll)[jAll==j]#names(metabolitesAllNamesTMP)[j]
+										)
+									annotationNumbersTiers[[4]][[ jSinglePeaks ]]<-c(
+										annotationNumbersTiers[[4]][[ jSinglePeaks ]],"(1/1)")
+								}
+							}
+						 }
+					}
 				}
 			}
-		  }
-		}
-		##Tier 3 (L1-)
-		if(3 %in% tiers){
-		  for(j in 1:length(metabolitesTMP)){
-			#check if 2 peaks are available
-			if(length(metabolitesTMP[[j]])>1){
-				#remove tier 1 - 3 bins
-				#EXCEPT BINS of this metabolite
-				#deleteTMPj<-NULL
-				metabolitesTMP2<-metabolitesTMP
-				deleteTMPi<-NULL
-				for(jExcludeMultiple3 in 1:length(metabolitesTMP2[[j]])){#peaks one by one
-				  if(length(metabolitesTMP2[[j]][[jExcludeMultiple3]])>0){
-					#bins of one peak one by one
-					for(iExcludeMultiple in 1:length(metabolitesTMP2[[j]][[jExcludeMultiple3]])){
-						unlistTMP<-c(unlist(annotationsTiers[[1]]),
-							unlist(annotationsTiers[[2]]),
-							unlist(annotationsTiers[[3]]))
-						if(names(metabolitesTMP2)[j]%in%unlistTMP){
-							unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
+			##Tier 5 (L3)
+			if(5 %in% tiers){
+				uniqueTMP<-unique(metabolitesTMP[,1])
+				#firs check whether only 1 peak is left but no others were found
+				deleteTMPTier5<-NULL
+				for(j in uniqueTMP){
+					if(numberOfPeaks[j]>1#&
+					  #length(grep("_doNotUse_",names(metabolitesTMP)[[j]]))==0
+					  ){#check only metabolites where at least 1 peak was identified	
+						peaksTMPIndex<-metabolitesTMP[,1]==j
+						if(sum(peaksTMPIndex)>0){
+						#if(length(metabolitesTMP[[j]])>0){
+							if(length(unique(metabolitesTMP[peaksTMPIndex,2]))==1){
+								if(sum(binsPerMetaboliteSparseMatrix[,j])==0){#if metbaolite has not been fund before
+									for(jPeaks in metabolitesTMP[peaksTMPIndex,3]#1:length(metabolitesTMP[[j]])
+									){
+									  #for(jSinglePeaks in 1:length(metabolitesTMP[[j]][[jPeaks]])){
+										if(!any(annotationsTiers[[5]][[ jPeaks ]]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j] )
+										)){
+											annotationsTiers[[5]][[ jPeaks ]]<-c(
+												annotationsTiers[[5]][[ jPeaks ]],names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+												)
+											annotationNumbersTiers[[5]][[ jPeaks ]]<-c(
+												annotationNumbersTiers[[5]][[ jPeaks ]],paste("(1/",numberOfPeaks[j],")",sep=""))
+											deleteTMPTier5<-c(deleteTMPTier5,j)
+										}
+									  #}
+									}
+								}
+							}
 						}
-						if(names(metabolitesTMP2[[j]][[jExcludeMultiple3]][iExcludeMultiple]) %in% 
-							names(unlistTMP)
-							#c(names(unlist(annotationsTiers[[1]])),
-							#  names(unlist(annotationsTiers[[2]])),
-							#  names(unlist(annotationsTiers[[3]])))
+					}
+				}
+				if(!is.null(deleteTMPTier5)){
+					uniqueTMP<-setdiff(uniqueTMP,deleteTMPTier5)
+				}
+				for(j in uniqueTMP){
+					if(numberOfPeaks[j]>1#&
+					  #length(grep("_doNotUse_",names(metabolitesTMP)[[j]]))==0
+					  ){#check only metabolites where at least 1 peak was identified	
+						peaksTMPIndex<-metabolitesTMP[,1]==j
+						if(sum(peaksTMPIndex)>0){
+						#if(length(metabolitesTMP[[j]])>0){
+							for(jPeaks in metabolitesTMP[peaksTMPIndex,3]#1:length(metabolitesTMP[[j]])
 							){
-							#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
-							#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
-							deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
+							  #for(jSinglePeaks in 1:length(metabolitesTMP[[j]][[jPeaks]])){
+								if(!any(annotationsTiers[[5]][[ jPeaks ]]==names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j] )
+								)){
+									annotationsTiers[[5]][[ jPeaks ]]<-c(
+										annotationsTiers[[5]][[ jPeaks ]],names(jAll)[jAll==j]#unique(metabolitesTMP[,1])[j]
+										)
+									annotationNumbersTiers[[5]][[ jPeaks ]]<-c(
+										annotationNumbersTiers[[5]][[ jPeaks ]],paste("(0/",numberOfPeaks[j],")",sep=""))
+								}
+							  #}
+							}
 						}
 					}
-					if(length(deleteTMPi)>0){
-						metabolitesTMP2[[j]][[jExcludeMultiple3]]<-
-							metabolitesTMP2[[j]][[jExcludeMultiple3]][-deleteTMPi]
-					}					
-				  }
-				}					
-				if(0 %in% lapply(metabolitesTMP2[[j]],length)){#now remove empty entries:
-					metabolitesTMP2[[j]][which(lapply(metabolitesTMP2[[j]],length)==0)]<-NULL
 				}
-				#re-check if 2 peaks are still available
-				if(length(metabolitesTMP2[[j]])>1){
-					correlatedPeakBinsTMP<-vector("list",length(metabolitesTMP2[[j]]))
-					#find all possible pairs - peak1-peak2, peak1-peak3, etc.
-					for(i_peak1 in 1:(length(metabolitesTMP2[[j]])-1)){
-						for(i_peak2 in (i_peak1+1):length(metabolitesTMP2[[j]])){
-							colnamesTMP<-metabolitesTMP2[[j]][[i_peak1]]
-							rownamesTMP<-metabolitesTMP2[[j]][[i_peak2]]							
-							resultMatrixTMP<-matrix(1,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-								),nrow=length(rownamesTMP#metabolitesTMP2[[j]][[i_peak2]]
-								))#save p-values here
-							correlationMatrix<-matrix(0,ncol=length(colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-								),nrow=length(rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-								))#save correlation coefficients here
-							colnames(resultMatrixTMP)<-colnamesTMP#metabolitesTMP[[j]][[i_peak1]]
-							rownames(resultMatrixTMP)<-rownamesTMP#metabolitesTMP[[j]][[i_peak2]]
-							for(j_bin1 in 1:length(metabolitesTMP2[[j]][[i_peak1]])){
-								#calculate correlation between baseline and peak 1, bin j_bin1
-								#baselineCorr1<-stats::cor.test(mrbinObject$bins[,
-								#	  metabolitesTMP[[j]][[i_peak1]][j_bin1]],
-									  #mrbinObject$parameters$
-								#	  baseline)
-								for(j_bin2 in 1:length(metabolitesTMP2[[j]][[i_peak2]])){
-									#calculate correlation between baseline and peak 2
-									#baselineCorr2<-stats::cor.test(mrbinObject$bins[,
-									#	metabolitesTMP[[j]][[i_peak2]][j_bin2]],
-										#mrbinObject$parameters$
-									#	baseline[,j])
-									resultsCorTestTMP<-stats::cor.test(mrbinObject$bins[,
-									  metabolitesTMP2[[j]][[i_peak1]][j_bin1]],
-									  mrbinObject$bins[,
-									  metabolitesTMP2[[j]][[i_peak2]][j_bin2]])
-									resultMatrixTMP[j_bin2,j_bin1]<-resultsCorTestTMP$p.value
-									correlationMatrix[j_bin2,j_bin1]<-resultsCorTestTMP$estimate
-									#make sure the correlation is positive! 
+			}
+			#Create a character vector of all annotations
+			annotationsCharacter<-rep("",length(annotationsTiers[[5]]))
+			#first add tier 1 ids, then tier 2 etc.
+			for(iannotationsTiers in tiers){
+				if(iannotationsTiers<4) bracketTMP<-"("
+				if(iannotationsTiers>=4) bracketTMP<-""
+				for(i in 1:length(annotationsCharacter)){
+					if(iannotationsTiers<4){
+						if(iannotationsTiers==1){
+							annotationsTiersTMP<-annotationsTiers1
+							annotationNumbersTiersTMP<-annotationNumbers1Tiers
+							annotationNumbersTiers2TMP<-annotationNumbers1Tiers2
+						}
+						if(iannotationsTiers==2){
+							annotationsTiersTMP<-annotationsTiers2
+							annotationNumbersTiersTMP<-annotationNumbers2Tiers
+							annotationNumbersTiers2TMP<-annotationNumbers2Tiers2
+						}
+						#if(iannotationsTiers==3){
+						#	annotationsTiersTMP<-annotationsTiers3
+						#	annotationNumbersTiersTMP<-annotationNumbers3Tiers
+						#	annotationNumbersTiers2TMP<-annotationNumbers3Tiers2
+						#}
+						if(!is.null(annotationsTiersTMP[i])){
+							if(length(annotationsTiersTMP[i])>0){
+								#remove empty entries ("")
+								if(sum(annotationsTiersTMP[i]=="")>0){
+									indexTMP<-which(!annotationsTiersTMP[i]=="")
+								} else {
+									indexTMP<-1:length(annotationsTiersTMP[i])
 								}
-							}
-							#check for significance using p-value threshold
-							significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
-									correlationMatrix>confirmationRthreshold,arr.ind=TRUE)
-							#if(checkBaselineCorrelation){
-							#		significantTMP<-which(resultMatrixTMP<=confirmationPthreshold&
-							#			correlationMatrix>confirmationRthreshold#&(
-										#resultMatrixTMP<baselineCorr1$p.value&#p-value must be smaller than p-value of correlation to baseline
-										#resultMatrixTMP<baselineCorr2$p.value)&(
-										#correlationMatrix^2>baselineCorr1$estimate^2&#R must be greater than R of correlation to baseline
-										#correlationMatrix>baselineCorr2$estimate
-							#			),
-							#			arr.ind=TRUE)
-							#}
-							if(nrow(significantTMP)>0){
-								correlatedPeakBinsTMP[[i_peak1]]<-unique(c(correlatedPeakBinsTMP[[i_peak1]],
-									colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
-								correlatedPeakBinsTMP[[i_peak2]]<-unique(c(correlatedPeakBinsTMP[[i_peak2]],
-									rownames(resultMatrixTMP)[unique(significantTMP[,1])]))
-								significantTMP2<-as.numeric(c(rownames(resultMatrixTMP)[unique(significantTMP[,1])],
-									colnames(resultMatrixTMP)[unique(significantTMP[,2])]))
-								for(iConfirmed in significantTMP2){
-									if(is.null(annotationsTiers[[3]][[iConfirmed]])&
-										is.null(annotationsTiers[[2]][[iConfirmed]])&
-										is.null(annotationsTiers[[1]][[iConfirmed]])
-										){
-										annotationsTiers[[3]][[iConfirmed]]<-c(annotationsTiers[[3]][[iConfirmed]],
-											names(metabolitesTMP2)[j])
+								if(length(indexTMP)>0){
+									if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bin, add a comma
+										annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
 									}
-								}	
-							}
-						}
-					}
-					#remove all bins of this significant peak that were NOT significant - these belong to another metabolite!
-					deleteNotIdentifiedTMP<-NULL
-					for(icorrelatedPeakBinsTMP in 1:length(correlatedPeakBinsTMP)){
-						if(length(correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]])>0){
-							#find remaining bins of this peak:
-							deleteNotIdentifiedTMP<-unique(c(deleteNotIdentifiedTMP,
-								setdiff(metabolitesTMP2[[j]][[icorrelatedPeakBinsTMP]],
-									correlatedPeakBinsTMP[[icorrelatedPeakBinsTMP]]
-							)))	
-						}
-					}
-					#now remove these from all instances of this metabolite:
-					namesMatchesTMP<-which(names(metabolitesAllNamesTMP)==
-						names(metabolitesAllNamesTMP)[j])
-					for(iMetaboliteTMP in namesMatchesTMP){
-						if(length(metabolitesTMP[[iMetaboliteTMP]])>0){
-							for(jMetaboliteTMP in 1:length(metabolitesTMP[[iMetaboliteTMP]])){
-								deleteListTMP<-metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]%in%
-									deleteNotIdentifiedTMP
-								if(sum(deleteListTMP)>0){
-									#this means some bins of this peak are in the to-delete list
-									metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]]<-
-										metabolitesTMP[[iMetaboliteTMP]][[jMetaboliteTMP]][-which(
-											deleteListTMP)]								
+									annotationsCharacter[i]<-paste(annotationsCharacter[i],
+										paste(annotationsTiersTMP[i][indexTMP],
+										#paste("[",tierNames[iannotationsTiers],"]",sep=""),
+										bracketTMP,
+										annotationNumbersTiersTMP[i][indexTMP],
+										annotationNumbersTiers2TMP[i][indexTMP],
+										sep="",collapse=", "),sep="")
 								}
-							
 							}
 						}
-					}
-					if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
-						metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
-					}					
-				}
-			}
-		  }
-		}
-		#Remove tier 1-3 ids
-		#deleteTMPj<-NULL
-		deleteTMPi<-NULL
-		for(jDel in 1:length(metabolitesTMP)){
-			if(length(metabolitesTMP[[jDel]])>0){
-				for(jExcludeMultiple in 1:length(metabolitesTMP[[jDel]])){
-					if(length(metabolitesTMP[[jDel]][[jExcludeMultiple]])>0){
-						for(iExcludeMultiple in 1:length(metabolitesTMP[[jDel]][[jExcludeMultiple]])){
-							unlistTMP<-c(unlist(annotationsTiers[[1]]),
-								unlist(annotationsTiers[[2]]),
-								unlist(annotationsTiers[[3]]))
-							#if(names(metabolitesTMP2)[j]%in%unlistTMP){
-							#	unlistTMP<-unlistTMP[-which(unlistTMP==names(metabolitesTMP2)[j])]
-							#}
-							if(names(metabolitesTMP[[jDel]][[jExcludeMultiple]][iExcludeMultiple]) %in% 
-								names(unlistTMP)
-								#c(names(unlist(annotationsTiers[[1]])),
-								#  names(unlist(annotationsTiers[[2]])),
-								#  names(unlist(annotationsTiers[[3]])))
-								){
-								#metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
-								#deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
-								deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
-							}
-						}
-						if(length(deleteTMPi)>0){
-							metabolitesTMP[[jDel]][[jExcludeMultiple]]<-
-								metabolitesTMP[[jDel]][[jExcludeMultiple]][-deleteTMPi]
-						}					
-					}
-				}
-				if(0 %in% lapply(metabolitesTMP[[jDel]],length)){#now remove empty entries:
-					metabolitesTMP[[jDel]][which(lapply(metabolitesTMP[[jDel]],length)==0)]<-NULL
-				}	
-			}
-		}
-		##Tier 4 (L2) #single peaks cannot be confirmed by using correlation to a separate peak
-		if(4 %in% tiers){
-		  for(j in 1:length(metabolitesTMP)){
-			if(length(metabolitesTMP0[[j]])==1&#use original metabolite list for this comparison, so we don't use metabolite where other peaks were identified at tier 1-3
-		      length(grep("_doNotUse_",names(metabolitesTMP[[j]])))==0  ) {#& does not contain _donotuse
-				#remove tier 1 - 3 bins
-				#deleteTMPj<-NULL
-				# deleteTMPi<-NULL
-				# for(jExcludeMultiple in 1:length(metabolitesTMP[[j]])){
-				  # if(length(metabolitesTMP[[j]][[jExcludeMultiple]])>0){
-					# for(iExcludeMultiple in 1:length(metabolitesTMP[[j]][[jExcludeMultiple]])){
-						# if(names(metabolitesTMP[[j]][[jExcludeMultiple]][iExcludeMultiple]) %in% 
-							# c(names(unlist(annotationsTiers[[1]])),
-							  # names(unlist(annotationsTiers[[2]])),
-							  # names(unlist(annotationsTiers[[3]])))){
-							# #metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
-							# #deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
-							# deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
-						# }
-					# }
-					# if(length(deleteTMPi)>0){
-						# metabolitesTMP[[j]][[jExcludeMultiple]]<-
-							# metabolitesTMP[[j]][[jExcludeMultiple]][-deleteTMPi]
-					# }
-				  # }
-				# }	
-				
-				# if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
-					# metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
-				# }
-				if(length(metabolitesTMP[[j]])>0){
-				  if(length(metabolitesTMP[[j]][[1]])>0){
-					for(jSinglePeaks in 1:length(metabolitesTMP[[j]][[1]])){
-						if(!names(metabolitesAllNamesTMP)[j] %in% annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]]){
-							#message(paste(names(metabolitesTMP)[j],"--",annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]],
-							#sep=", ",collapse=" ,"))
-							annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]]<-c(
-								annotationsTiers[[4]][[ metabolitesTMP[[j]][[1]][jSinglePeaks] ]],names(metabolitesAllNamesTMP)[j])
-						}
-					}
-				  }
-				}
-			}
-		  }
-		}
-		##Tier 5 (L3)
-		if(5 %in% tiers){
-		  for(j in 1:length(metabolitesTMP)){
-			if(length(metabolitesTMP[[j]])>0){#check only metabolites where at least 1 peak was identified	
-				#remove tier 1 - 3 bins
-				#deleteTMPj<-NULL
-				# deleteTMPi<-NULL
-				# for(jExcludeMultiple in 1:length(metabolitesTMP[[j]])){
-				  # if(length(metabolitesTMP[[j]][[jExcludeMultiple]])>0){
-					# for(iExcludeMultiple in 1:length(metabolitesTMP[[j]][[jExcludeMultiple]])){
-						# if(names(metabolitesTMP[[j]][[jExcludeMultiple]][iExcludeMultiple]) %in% 
-							# c(names(unlist(annotationsTiers[[1]]))
-							  # ,names(unlist(annotationsTiers[[2]])),
-							  # names(unlist(annotationsTiers[[3]])))){
-							# #metabolitesTMP[[j]][[jExcludeMultiple]][[iExcludeMultiple]]<-NULL
-							# #deleteTMPj<-c(deleteTMPj,jExcludeMultiple)
-							# deleteTMPi<-c(deleteTMPi,iExcludeMultiple)
-						# }
-					# }
-					# if(length(deleteTMPi)>0){
-						# metabolitesTMP[[j]][[jExcludeMultiple]]<-
-							# metabolitesTMP[[j]][[jExcludeMultiple]][-deleteTMPi]
-					# }
-				  # }
-				# }				
-				# if(0 %in% lapply(metabolitesTMP[[j]],length)){#now remove empty entries:
-					# metabolitesTMP[[j]][which(lapply(metabolitesTMP[[j]],length)==0)]<-NULL
-				# }
-				if(length(metabolitesTMP[[j]])>0){
-				  for(jPeaks in 1:length(metabolitesTMP[[j]])){
-					for(jSinglePeaks in 1:length(metabolitesTMP[[j]][[jPeaks]])){
-						if(!names(metabolitesTMP)[j] %in% annotationsTiers[[5]][[ metabolitesTMP[[j]][[jPeaks]][jSinglePeaks] ]]){
-							annotationsTiers[[5]][[ metabolitesTMP[[j]][[jPeaks]][jSinglePeaks] ]]<-c(
-								annotationsTiers[[5]][[ metabolitesTMP[[j]][[jPeaks]][jSinglePeaks] ]],names(metabolitesTMP)[j])
-						}
-					}
-				  }
-				}
-			}
-		  }
-		}
-		#Create a character vector of all annotations
-		#Remove metabolite name extensions for unused peaks
-		for(iCleanUp in 1:length(annotationsTiers)){
-			for(iannotationsConfirmed in 1:length(annotationsTiers[[iCleanUp]])){
-				if(!is.null(annotationsTiers[[iCleanUp]][[iannotationsConfirmed]])){
-					isuffixTMP<-1
-					while(length(grep("_doNotUse_",annotationsTiers[[iCleanUp]][[iannotationsConfirmed]]))>0){
-						suffixTMP<-sprintf("%03d",isuffixTMP)
-						annotationsTiers[[iCleanUp]][[iannotationsConfirmed]]<-gsub(
-							paste("_doNotUse_",suffixTMP,sep=""),"",
-							annotationsTiers[[iCleanUp]][[iannotationsConfirmed]])
-						isuffixTMP<-isuffixTMP+1
-					}
-				}
-			}
-		}
-		#Remove all confirmed annotations from the list of tentative ids 
-		for(iCleanUp in 1:3){
-			for(iannotationsConfirmed in 1:length(annotationsTiers[[iCleanUp]])){
-				if(!is.null(annotationsTiers[[iCleanUp]][[iannotationsConfirmed]])){
-					for(jannotationsConfirmed in annotationsTiers[[iCleanUp]][[iannotationsConfirmed]]){
-						if(jannotationsConfirmed %in% annotationsTiers[[4]][[iannotationsConfirmed]]){
-							annotationsTiers[[4]][[iannotationsConfirmed]]<-annotationsTiers[[4]][[iannotationsConfirmed]][-
-							  which(annotationsTiers[[4]][[iannotationsConfirmed]]==jannotationsConfirmed)]
-						}
-						if(jannotationsConfirmed %in% annotationsTiers[[5]][[iannotationsConfirmed]]){
-							annotationsTiers[[5]][[iannotationsConfirmed]]<-annotationsTiers[[5]][[iannotationsConfirmed]][-
-							  which(annotationsTiers[[5]][[iannotationsConfirmed]]==jannotationsConfirmed)]
-						}
-					}
-				}
-			}
-		}
-		#Remove not-to-be-used annotations from the list of single-peak ids 
-		#for(iannotationsL2 in 1:length(annotationsTiers[[4]])){
-		#	if(!is.null(annotationsTiers[[4]][[iannotationsL2]])){
-		#		if(sum(grepl("_doNotUse_",annotationsTiers[[4]][[iannotationsL2]]))>0){
-		#		annotationsTiers[[4]][[iannotationsL2]]<-annotationsTiers[[4]][[iannotationsL2]][!
-		#		  grepl("_doNotUse_",annotationsTiers[[4]][[iannotationsL2]])]
-		#		}
-		#	}
-		#}
-		#Remove all single-peak annotations from the list of tentative ids 
-		for(iannotationsL2 in 1:length(annotationsTiers[[4]])){
-			if(!is.null(annotationsTiers[[4]][[iannotationsL2]])){
-				for(jannotationsL2 in annotationsTiers[[4]][[iannotationsL2]]){
-					if(jannotationsL2 %in% annotationsTiers[[5]][[iannotationsL2]]){
-						annotationsTiers[[5]][[iannotationsL2]]<-annotationsTiers[[5]][[iannotationsL2]][-
-						  which(annotationsTiers[[5]][[iannotationsL2]]==jannotationsL2)]
-					}
-				}
-			}
-		}
-		#annotationsTMP<-annotationsTiers[[5]]
-		#annotationsConfirmedTMP<-annotationsTiers[[1]]
-		annotationsCharacter<-rep("",length(annotationsTiers[[5]]))
-
-		#first add tier 1 ids, then tier 2 etc.
-		for(iannotationsTiers in 1:length(annotationsTiers)){
-			for(i in 1:length(annotationsCharacter)){
-				if(!is.null(annotationsTiers[[iannotationsTiers]][[i]])){
-					if(length(annotationsTiers[[iannotationsTiers]][[i]])>0){
-						#remove empty entries ("")
-						if(sum(annotationsTiers[[iannotationsTiers]][[i]]=="")>0){
-							indexTMP<-which(!annotationsTiers[[iannotationsTiers]][[i]]=="")
-						} else {
-							indexTMP<-1:length(annotationsTiers[[iannotationsTiers]][[i]])
-						}
-						if(length(indexTMP)>0){
-							if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bin, add a comma
-								annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
-							}
-							annotationsCharacter[i]<-paste(annotationsCharacter[i],
-								paste(annotationsTiers[[iannotationsTiers]][[i]][indexTMP],
-								paste("[",tierNames[iannotationsTiers],"]",sep=""),
-								sep="",collapse=", "),sep="")
-						}
-					}
-				}
-			}
-		}
-		if(FALSE){
-		  #then add single-peak ids
-		  if(!is.null(annotationsTiers[[4]][[i]])){
-		    if(length(annotationsTiers[[4]][[i]])>0){
-				if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bins, add a comma
-					annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
-				}
-				#remove empty entries ("")
-				if(sum(annotationsTiers[[4]][[i]]=="")>0){
-					indexTMP<-which(!annotationsTiers[[4]][[i]]=="")
-				} else {
-					indexTMP<-1:length(annotationsTiers[[4]][[i]])
-				}
-				if(length(indexTMP)>0){
-					annotationsCharacter[i]<-paste(annotationsCharacter[i],
-						paste(annotationsTiers[[4]][[i]][indexTMP],"[L2]",sep="",collapse=", "),#"Y",sep="",collapse="?, "),
-						sep="",collapse="")
-				}
-			}
-		  }
-		  #then add tentative ids 
- 		  if(!hideTentativeIds){
-			if(!is.null(annotationsTiers[[5]][[i]])){
-				if(length(annotationsTiers[[5]][[i]])>0){
-					if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bins, add a comma
-						annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
-					}
-					#remove empty entries ("")
-					if(sum(annotationsTiers[[5]][[i]]=="")>0){
-						indexTMP<-which(!annotationsTiers[[5]][[i]]=="")
 					} else {
-						indexTMP<-1:length(annotationsTiers[[5]][[i]])
-					}
-					if(length(indexTMP)>0){
-						annotationsCharacter[i]<-paste(annotationsCharacter[i],
-							paste(annotationsTiers[[5]][[i]][indexTMP],"[L2-]",sep="",collapse=", "),
-							sep="",collapse="")
+						if(!is.null(annotationsTiers[[iannotationsTiers]][[i]])){
+							
+							if(length(annotationsTiers[[iannotationsTiers]][[i]])>0){
+								#remove empty entries ("")
+								if(sum(annotationsTiers[[iannotationsTiers]][[i]]=="")>0){
+									indexTMP<-which(!annotationsTiers[[iannotationsTiers]][[i]]=="")
+								} else {
+									indexTMP<-1:length(annotationsTiers[[iannotationsTiers]][[i]])
+								}
+								if(length(indexTMP)>0){
+									if(nchar(annotationsCharacter[i])>0){#if there is already a confirmed id for this bin, add a comma
+										annotationsCharacter[i]<-paste(annotationsCharacter[i],", ",sep="",collapse="")
+									}
+									annotationsCharacter[i]<-paste(annotationsCharacter[i],
+										paste(annotationsTiers[[iannotationsTiers]][[i]][indexTMP],
+										#paste("[",tierNames[iannotationsTiers],"]",sep=""),
+										bracketTMP,
+										annotationNumbersTiers[[iannotationsTiers]][[i]][indexTMP],
+										annotationNumbersTiers2[[iannotationsTiers]][[i]][indexTMP],
+										sep="",collapse=", "),sep="")
+								}
+							}
+						}
 					}
 				}
 			}
-		  }
-		}
-		#Remove the name extension that differentiates identically-named metabolites
-		#from the internal id file and user provided information
-		#annotationsCharacter<-gsub("__internal__","",annotationsCharacter)
-		#isuffixTMP<-1
-		#while(length(grep("_doNotUse_",annotationsCharacter))>0){
-		#	suffixTMP<-sprintf("%03d",isuffixTMP)
-		#	annotationsCharacter<-gsub(paste("_doNotUse_",suffixTMP,sep=""),"",annotationsCharacter)
-		#	isuffixTMP<-isuffixTMP+1
-		#}
-		annotations<-annotationsCharacter
-		if(hideChemicalShift){
-			if(sum(annotations=="")>0) annotations[annotations==""]<-colnames(mrbinObject$bins)[annotations==""]
-		} else {
-			annotations<-paste(colnames(mrbinObject$bins),annotations,sep=" ")
-		}
-		mrbinObject<-editmrbin(mrbinObject,functionName="mrbin::annotatemrbin",
-				versionNumber=as.character(utils::packageVersion("mrbin")),
-				metadata=list(annotations=trimws(annotations)),verbose=FALSE)
-		if(verbose){
-			if(!is.null(additionalIdentities)){
-				message(paste("Sample type: ",additionalIdentities
-				), appendLF = TRUE)
+			#Remove the name extension that differentiates identically-named metabolites
+			#from the internal id file and user provided information
+			annotations<-annotationsCharacter
+			if(hideChemicalShift){
+				if(sum(annotations=="")>0) annotations[annotations==""]<-colnames(mrbinObject$bins)[annotations==""]
+			} else {
+				annotations<-paste(colnames(mrbinObject$bins),annotations,sep=" ")
 			}
-			for(itierNames in 1:length(tierNames)){
-				confirmedTMP<-unique(unlist(annotationsTiers[[itierNames]]))
-				if(length(confirmedTMP)>0){
-					message(paste(length(confirmedTMP)," metabolites identified at level ",
-						tierNames[itierNames],":\n",
-						paste(confirmedTMP,sep=", ",collapse=", "),
-						sep=""), appendLF = TRUE)
-					utils::flush.console()
+			mrbinObject<-editmrbin(mrbinObject,functionName="mrbin::annotatemrbin",
+					versionNumber=as.character(utils::packageVersion("mrbin")),
+					metadata=list(annotations=trimws(annotations)),verbose=FALSE)
+			if(verbose){
+				if(!is.null(additionalIdentities)){
+					message(paste("\nSample type: ",additionalIdentities
+					), appendLF = TRUE)
+				} 
+				message(paste("Peak data avaliable for",length(unique(metabolitesTMP0[,1])),"metabolites"))
+				noIDflag<-TRUE
+				messageTiers<-c(" metabolites annotated in total by correlation:\n",
+				" metabolites annotated by correlation to unique peaks:\n",
+				" metabolites annotated by correlation:\n",
+				" metabolites annotated using two correlated peaks:\n",
+				" metabolites tentatively annotated (single peaks):\n",
+				" metabolite suggestions (non-significant):\n")
+				for(itierNames in 0:length(tierNames)){
+					if(itierNames==0&(1%in%tierNames&2%in%tierNames)){
+						confirmedTMP<-unique(c(annotationsTiers1[!annotationsTiers1==""],annotationsTiers2[!annotationsTiers2==""]))
+					}
+					if(itierNames==1){
+						confirmedTMP<-unique(annotationsTiers1[!annotationsTiers1==""])
+					}
+					if(itierNames==2){
+						confirmedTMP<-unique(annotationsTiers2[!annotationsTiers2==""])
+					}
+					if(itierNames==3){
+						confirmedTMP<-unique(annotationsTiers3[!annotationsTiers3==""])
+					}
+					if(itierNames>3){
+						confirmedTMP<-unique(unlist(annotationsTiers[[itierNames]]))
+					}
+					if(length(confirmedTMP)>0){
+						message(paste(length(confirmedTMP),#" metabolites annotated at level ",
+							#tierNames[itierNames],":\n",
+							messageTiers[itierNames+1],
+							paste(confirmedTMP,sep=", ",collapse=", "),
+							sep=""), appendLF = TRUE)
+						noIDflag<-FALSE
+					} 			
 				}
+				if(noIDflag) message("No metabolites identified.")
+				utils::flush.console()
 			}
 		}
-		# tentativeTMP<-unique(unlist(annotationsL2))
-		# if(length(grep("_doNotUse_",tentativeTMP))>0){
-			# tentativeTMP<-tentativeTMP[-grep("_doNotUse_",tentativeTMP)]
-		# }
-		# if(verbose&length(tentativeTMP)>0){
-			# message(paste(length(tentativeTMP),"tentatively identified (only 1 peak available):\n",
-				# paste(tentativeTMP,sep=", ",collapse=", ")
-				# ), appendLF = TRUE)
-			# utils::flush.console()
-		# }
 	}
-  }
-  invisible(mrbinObject)
+	invisible(mrbinObject)
 }
+
 
 
 #' A function for editing mrbin objects.
@@ -8413,6 +9177,7 @@ editmrbin<-function(mrbinObject,functionName="mrbin::editmrbin",
       if(is.null(transformations)){
         message("Changes to bin data should be accompanied by a brief explanation in the parameter transformations")
       }
+	  if(is.null(bins)) bins<-list(NULL)
       mrbinObject$bins<-bins
       parametersTMP<-c(parametersTMP,"bins")
       if(is.null(transformations)){
@@ -8434,7 +9199,11 @@ editmrbin<-function(mrbinObject,functionName="mrbin::editmrbin",
   if(!is.null(parameters)){
     for(i in 1:length(parameters)){
       if(!identical(parameters[[i]],mrbinObject$parameters[[names(parameters)[i]]])){
-        mrbinObject$parameters[[names(parameters)[i]]]<-parameters[[i]]
+        if(is.null(parameters[[i]])){
+			mrbinObject$parameters[names(parameters)[i]]<-list(NULL)
+		} else {
+			mrbinObject$parameters[[names(parameters)[i]]]<-parameters[[i]]
+		}
         parametersTMP<-c(parametersTMP,names(parameters)[i])
       }
     }
@@ -8442,7 +9211,11 @@ editmrbin<-function(mrbinObject,functionName="mrbin::editmrbin",
   if(!is.null(metadata)){
     for(i in 1:length(metadata)){
       if(!identical(metadata[[i]],mrbinObject$metadata[[names(metadata)[i]]])){
-        mrbinObject$metadata[[names(metadata)[i]]]<-metadata[[i]]
+        if(is.null(metadata[[i]])){
+			mrbinObject$metadata[names(metadata)[i]]<-list(NULL)
+		} else {
+			mrbinObject$metadata[[names(metadata)[i]]]<-metadata[[i]]
+		}
         parametersTMP<-c(parametersTMP,names(metadata)[i])
       }
     }
@@ -8999,7 +9772,7 @@ plotMultiNMR<-function(region=NULL,rectangleRegions=NULL,
 #'        plotTitle="Significant Bins",intensity1D=24,hideMenu=TRUE)
 
 mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
-  dimensions=NULL,intensity1D=NULL,
+  dimensions="1D",intensity1D=NULL,
   zoom=NULL,color=NULL,background=NULL,lwd=1,plotTitle="",showNames="Spectrum titles",
   graphics= TRUE,highlight=NULL,
   binlist=NULL,annotate=NULL,metaboliteIdentities=NULL,
@@ -9008,10 +9781,13 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
   annotateAngles=c(35,-35,20,-20,45,-45,60,-60,75,-75,15,-15),#35*1:21,
   hideExcludedAnnotations=FALSE,
   ...){
-  mrbin.env$mrbinTMP$currentSpectrumOriginal<-NULL
+  mrbin.env$mrbinTMP[["currentSpectrumOriginal"]]<-NULL
   region<-NULL
   commandHistory<-NULL
   setContours<-TRUE
+  if(!is.null(metaboliteIdentities)){#if metabolite IDs are provided but parameter "annotate" is not set, assume user wants to show them
+	if(is.null(annotate)) annotate<-TRUE
+  }
   if(plotTitle==""){
     if(!is.null(mrbin.env$mrbinTMP$plotTitle)){
       plotTitle<-mrbin.env$mrbinTMP$plotTitle
@@ -9063,7 +9839,7 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
   }
   if(!is.null(additionalIdentities)){#read predefined metabolite ids from file and add them
 		metaboliteIDs<-NULL
-		load(system.file("extdata/TMP/3ADE68B1.000",package="mrbin"))
+		load(system.file("extdata/def",package="mrbin"))
 		if(additionalIdentities%in%names(metaboliteIDs)){
 			additionalIdentitiesTMP<-metaboliteIDs[[additionalIdentities]]
 		   # additionalIdentitiesTMP<-utils::read.csv(system.file(paste("extdata/data/",additionalIdentities,".csv",sep=""),
@@ -9122,10 +9898,10 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
 	#		stop("Length of NMRvendor needs to be 1 or equal to number of spectra.")
 	#	}
 	#}
-    mrbin.env$mrbinTMP$additionalPlots1D<-NULL
-	mrbin.env$mrbinTMP$additionalPlots2D<-NULL
-    mrbin.env$mrbinTMP$additionalPlots1DMetadata<-NULL
-	mrbin.env$mrbinTMP$additionalPlots2DMetadata<-NULL
+    mrbin.env$mrbinTMP[["additionalPlots1D"]]<-NULL
+	mrbin.env$mrbinTMP[["additionalPlots2D"]]<-NULL
+    mrbin.env$mrbinTMP[["additionalPlots1DMetadata"]]<-NULL
+	mrbin.env$mrbinTMP[["additionalPlots2DMetadata"]]<-NULL
 	setParam(parameters=list(NMRfolders=folders,dimension=dimensions[1],
 		NMRvendor=NMRvendor))
     for(iTMP in 1:length(folders)){
@@ -9168,7 +9944,7 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
 		 }
 		}
 		rownames(rectangleRegions)<-rep("",nrow(rectangleRegions))
-		rectangleColors<-c(rectangleColors,rep("orange"#"darkseagreen3"
+		rectangleColors<-c(rectangleColors,rep("darkseagreen3"#"orange"#
 			,length(binlist)))
 		density<-rep(-1,nrow(rectangleRegions))
 	  }
@@ -9237,10 +10013,12 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
 		  titles<-c(#mrbin.env$mrbinTMP$currentSpectrumTitle,
 		    mrbin.env$mrbinTMP$additionalPlots1DMetadata[,2]#title
 		  )
+		  if(""%in%titles) titles[titles==""]<-mrbin.env$mrbinTMP$additionalPlots1DMetadata[titles=="",3]#folder
 		} else {
 		  titles<-c(#mrbin.env$mrbinTMP$currentSpectrumTitle,
 		    mrbin.env$mrbinTMP$additionalPlots2DMetadata[,2]#title
 		  )
+		  if(""%in%titles) titles[titles==""]<-mrbin.env$mrbinTMP$additionalPlots2DMetadata[titles=="",3]#folder
 		}
 	  }
 	  if(showNames=="Folder names"){
@@ -9248,10 +10026,12 @@ mrplot<-function(hideMenu=FALSE,folders=NULL,NMRvendor="Bruker",
 		  titles<-c(#mrbin.env$mrbinTMP$currentSpectrumFolderName,#add first spectrum title
 		    mrbin.env$mrbinTMP$additionalPlots1DMetadata[,3]#folder
 		   )
+		  if(""%in%titles) titles[titles==""]<-mrbin.env$mrbinTMP$additionalPlots1DMetadata[titles=="",2]#
 		} else {
 		  titles<-c(#mrbin.env$mrbinTMP$currentSpectrumFolderName,#add first spectrum title
 		    mrbin.env$mrbinTMP$additionalPlots2DMetadata[,3]#folder
 		   )
+		  if(""%in%titles) titles[titles==""]<-mrbin.env$mrbinTMP$additionalPlots2DMetadata[titles=="",2]#
 		}
 	  }
 	  do.call(plotMultiNMR,append(list(background=background,plotTitle=plotTitle,
