@@ -1,47 +1,58 @@
 ### R code from vignette source 'mrbin.Rnw'
 
 ###################################################
-### code chunk number 1: mrbin.Rnw:53-54 (eval = FALSE)
+### code chunk number 1: mrbin.Rnw:26-27
 ###################################################
-## install.packages("mrbin")
+	cat(paste("Version",as.character(utils::packageVersion("mrbin"))))
 
 
 ###################################################
-### code chunk number 2: mrbin.Rnw:59-60
+### code chunk number 2: mrbin.Rnw:88-89
 ###################################################
 library(mrbin)
 
 
 ###################################################
-### code chunk number 3: mrbin.Rnw:100-101 (eval = FALSE)
+### code chunk number 3: mrbin.Rnw:91-92 (eval = FALSE)
 ###################################################
-## mrbinResults<-mrbin()
+## results<-mrbin()
 
 
 ###################################################
-### code chunk number 4: mrbin.Rnw:167-182 (eval = FALSE)
+### code chunk number 4: mrbin.Rnw:99-119
 ###################################################
-## mrbinResults<-mrbin(parameters=list(dimension="1D",
-##              binwidth1D=.02,
-##              referenceScaling="Yes",
-##              removeSolvent="Yes",
-##              solventRegion=c(4.95,4.65),
-##              noiseRemoval="Yes",
-##              signal_to_noise1D=35,
-##              noiseThreshold=0.75,
-##              PQNScaling="No",
-##              fixNegatives="No",
-##              logTrafo="No",
-##              NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-##                           system.file("extdata/2/10/pdata/10",package="mrbin"),
-##                           system.file("extdata/3/10/pdata/10",package="mrbin"))
-##      ))
+results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
+     setDefault=FALSE,
+     parameters=list(verbose=FALSE,
+             dimension="1D",
+             binwidth1D=.02,
+             referenceScaling="Yes",
+             removeSolvent="Yes",
+             solventRegion=c(4.95,4.65),
+             noiseRemoval="Yes",
+             signal_to_noise1D=35,
+             noiseThreshold=0.75,
+             PQNScaling="No",
+             fixNegatives="No",
+             logTrafo="No",
+			 PCA="No",NMRvendor="mrbin",
+			 useAsNames="Spectrum titles",
+             NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+                          system.file("extdata/2.mr1",package="mrbin"),
+                          system.file("extdata/3.mr1",package="mrbin"))
+     ))
 
 
 ###################################################
-### code chunk number 5: mrbin.Rnw:185-203
+### code chunk number 5: mrbin.Rnw:130-131
 ###################################################
-mrbinResults<-mrbin(silent=TRUE,#this suppresses all interactive prompts
+setNoiseLevels(results,plotOnly=TRUE)
+
+
+###################################################
+### code chunk number 6: mrbin.Rnw:150-170
+###################################################
+results<-mrbin(silent=TRUE,#this suppresses all interactive prompts
      setDefault=FALSE,
      parameters=list(verbose=TRUE,
              dimension="1D",
@@ -55,129 +66,142 @@ mrbinResults<-mrbin(silent=TRUE,#this suppresses all interactive prompts
              PQNScaling="No",
              fixNegatives="No",
              logTrafo="No",
-             NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-                          system.file("extdata/2/10/pdata/10",package="mrbin"),
-                          system.file("extdata/3/10/pdata/10",package="mrbin"))
+			 PCA="Yes",NMRvendor="mrbin",
+			 useAsNames="Spectrum titles",
+             NMRfolders=c(system.file("extdata/1.mr1",package="mrbin"),
+                          system.file("extdata/2.mr1",package="mrbin"),
+                          system.file("extdata/3.mr1",package="mrbin"))
      ))
 
 
 ###################################################
-### code chunk number 6: mrbin.Rnw:211-212
+### code chunk number 7: mrbin.Rnw:218-234 (eval = FALSE)
 ###################################################
-setNoiseLevels(mrbinResults,plotOnly=TRUE)
+## results<-mrbin(parameters=list(dimension="1D",
+##              binwidth1D=.02,
+##              referenceScaling="Yes",
+##              removeSolvent="Yes",
+##              solventRegion=c(4.95,4.65),
+##              noiseRemoval="Yes",
+##              signal_to_noise1D=35,
+##              noiseThreshold=0.75,
+##              PQNScaling="No",
+##              fixNegatives="No",
+##              logTrafo="No",NMRvendor="mrbin",
+##              useAsNames="Spectrum titles",
+##              NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+##                           "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+##                           "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10")
+##      ))
 
 
 ###################################################
-### code chunk number 7: mrbin.Rnw:222-227 (eval = FALSE)
+### code chunk number 8: mrbin.Rnw:242-245 (eval = FALSE)
 ###################################################
-## mrbinResults<-mrbin(parameters=list(
-##    NMRfolders=c("C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_1/10/pdata/10",
-##              "C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_2/10/pdata/10",
-##              "C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_3/10/pdata/10")
-##    ))
+##    NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+##              "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+##              "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10")
 
 
 ###################################################
-### code chunk number 8: mrbin.Rnw:246-247 (eval = FALSE)
+### code chunk number 9: mrbin.Rnw:264-265 (eval = FALSE)
 ###################################################
-## mrbinResults<-setNoiseLevels(mrbinResults)
+## results<-setNoiseLevels(results)
 
 
 ###################################################
-### code chunk number 9: mrbin.Rnw:259-260 (eval = FALSE)
+### code chunk number 10: mrbin.Rnw:277-278 (eval = FALSE)
 ###################################################
-## mrbinResults<-removeNoise(mrbinResults)
+## results<-removeNoise(results)
 
 
 ###################################################
-### code chunk number 10: mrbin.Rnw:265-266 (eval = FALSE)
+### code chunk number 11: mrbin.Rnw:283-284 (eval = FALSE)
 ###################################################
-## mrbinResults<-atnv(mrbinResults)
+## results<-atnv(results)
 
 
 ###################################################
-### code chunk number 11: mrbin.Rnw:273-275 (eval = FALSE)
+### code chunk number 12: mrbin.Rnw:291-293 (eval = FALSE)
 ###################################################
-## mrbinResults<-setDilutionFactors(mrbinResults)
-## mrbinResults<-dilutionCorrection(mrbinResults)
+## results<-setDilutionFactors(results)
+## results<-dilutionCorrection(results)
 
 
 ###################################################
-### code chunk number 12: mrbin.Rnw:281-282 (eval = FALSE)
+### code chunk number 13: mrbin.Rnw:299-300 (eval = FALSE)
 ###################################################
-## mrbinResults<-PQNScaling(mrbinResults)
+## results<-PQNScaling(results)
 
 
 ###################################################
-### code chunk number 13: mrbin.Rnw:289-290 (eval = FALSE)
+### code chunk number 14: mrbin.Rnw:307-308 (eval = FALSE)
 ###################################################
-## mrbinResults<-logTrafo(mrbinResults)
+## results<-logTrafo(results)
 
 
 ###################################################
-### code chunk number 14: mrbin.Rnw:297-298 (eval = FALSE)
+### code chunk number 15: mrbin.Rnw:315-316 (eval = FALSE)
 ###################################################
-## mrbinResults<-unitVarianceScaling(mrbinResults)
+## results<-unitVarianceScaling(results)
 
 
 ###################################################
-### code chunk number 15: mrbin.Rnw:303-304 (eval = FALSE)
+### code chunk number 16: mrbin.Rnw:321-322 (eval = FALSE)
 ###################################################
-## plotResults(mrbinResults)
+## plotResults(results)
 
 
 ###################################################
-### code chunk number 16: mrbin.Rnw:312-313 (eval = FALSE)
+### code chunk number 17: mrbin.Rnw:330-331 (eval = FALSE)
 ###################################################
-## mrbinResults<-removeSpectrum(mrbinResults)
+## results<-removeSpectrum(results)
 
 
 ###################################################
-### code chunk number 17: mrbin.Rnw:321-322 (eval = FALSE)
+### code chunk number 18: mrbin.Rnw:339-340 (eval = FALSE)
 ###################################################
-## mrbinResults<-metadatamrbin(mrbinResults)
+## results<-metadatamrbin(results)
 
 
 ###################################################
-### code chunk number 18: mrbin.Rnw:331-334
+### code chunk number 19: mrbin.Rnw:349-352
 ###################################################
-mrbinResults<-metadatamrbin(mrbinResults,metadata=list(
+results<-metadatamrbin(results,metadata=list(
   projectTitle="Test project",
   factors=factor(c("Control","Control","Treatment"))))
 
 
 ###################################################
-### code chunk number 19: mrbin.Rnw:340-341
+### code chunk number 20: mrbin.Rnw:358-359
 ###################################################
-plotPCA(mrbinResults)
+plotPCA(results)
 
 
 ###################################################
-### code chunk number 20: mrbin.Rnw:351-360
+### code chunk number 21: mrbin.Rnw:369-376
 ###################################################
-mrbinResults<-editmetabolitesmrbin(mrbinResults,borders=matrix(c(
-      1.346,1.324,21,23,
-      3.052,3.043,30.5,33.5,
-      4.066,4.059,57,59.5
-    ),ncol=4,byrow=TRUE),metabolitenames=c(
-    "Lactate",
-    "Creatinine",
-    "Creatinine"
-    ))
+#Annotate the dataset with signal identities
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              3.052,3.043,30.5,33.5,
+                              5.7,6.0,0,150),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Creatinine","Urea")
+results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
 
 
 ###################################################
-### code chunk number 21: mrbin.Rnw:365-366
+### code chunk number 22: mrbin.Rnw:381-382
 ###################################################
-plotPCA(mrbinResults,loadings=TRUE,annotate=TRUE)
+plotPCA(results,loadings=TRUE,annotate=TRUE)
 
 
 ###################################################
-### code chunk number 22: mrbin.Rnw:377-385 (eval = FALSE)
+### code chunk number 23: mrbin.Rnw:393-401 (eval = FALSE)
 ###################################################
-## mrbinResults<-editmrbin(
-##   mrbinResults,
-##   bins=mrbinResults$bins,#omit this line if no changes are made to bins
+## results<-editmrbin(
+##   results,
+##   bins=results$bins,#omit this line if no changes are made to bins
 ##   parameters=list(noiseThreshold=0.75),
 ##   metadata=list(projectTitle="Test project"),
 ##   comment="Changed title and noise parameters",
@@ -186,21 +210,21 @@ plotPCA(mrbinResults,loadings=TRUE,annotate=TRUE)
 
 
 ###################################################
-### code chunk number 23: mrbin.Rnw:390-391 (eval = FALSE)
+### code chunk number 24: mrbin.Rnw:406-407 (eval = FALSE)
 ###################################################
-## mrbinResults$changeLog
+## results$changeLog
 
 
 ###################################################
-### code chunk number 24: mrbin.Rnw:397-398
+### code chunk number 25: mrbin.Rnw:413-414
 ###################################################
-checkmrbin(mrbinResults)
+checkmrbin(results)
 
 
 ###################################################
-### code chunk number 25: mrbin.Rnw:406-421 (eval = FALSE)
+### code chunk number 26: mrbin.Rnw:422-438 (eval = FALSE)
 ###################################################
-## mrbinResults2D<-mrbin(setDefault=TRUE,parameters=list(dimension="2D",
+## results2D<-mrbin(setDefault=TRUE,parameters=list(dimension="2D",
 ##                binwidth2D=0.3,
 ##                binheight=4,
 ##                removeSolvent="Yes",
@@ -211,16 +235,17 @@ checkmrbin(mrbinResults)
 ##                PQNScaling="No",
 ##                fixNegatives="No",
 ##                logTrafo="No",
-##                NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-##                        system.file("extdata/2/12/pdata/10",package="mrbin"),
-##                        system.file("extdata/3/12/pdata/10",package="mrbin"))
-##                ))
+##                useAsNames="Spectrum titles",
+##                NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+##                 "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+##                 "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10"),
+##                NMRvendor="mrbin"))
 
 
 ###################################################
-### code chunk number 26: mrbin.Rnw:423-441
+### code chunk number 27: mrbin.Rnw:440-459
 ###################################################
-mrbinResults2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
+results2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
      setDefault=TRUE,
      parameters=list(verbose=TRUE,
                dimension="2D",
@@ -234,60 +259,59 @@ mrbinResults2D<-mrbin(silent=TRUE,#this suppresses all interactive prompts
                PQNScaling="No",
                fixNegatives="No",
                logTrafo="No",
-               NMRfolders=c(system.file("extdata/1/12/pdata/10",package="mrbin"),
-                       system.file("extdata/2/12/pdata/10",package="mrbin"),
-                       system.file("extdata/3/12/pdata/10",package="mrbin"))
-               ))
+			   useAsNames="Spectrum titles",
+			   NMRfolders=c(system.file("extdata/1.mr2",package="mrbin"),
+			                system.file("extdata/2.mr2",package="mrbin"),
+			                system.file("extdata/3.mr2",package="mrbin")),
+			   NMRvendor="mrbin"))
 
 
 ###################################################
-### code chunk number 27: mrbin.Rnw:448-449
+### code chunk number 28: mrbin.Rnw:466-467
 ###################################################
-setNoiseLevels(mrbinResults2D,plotOnly=TRUE)
+setNoiseLevels(results2D,plotOnly=TRUE)
 
 
 ###################################################
-### code chunk number 28: mrbin.Rnw:461-462 (eval = FALSE)
+### code chunk number 29: mrbin.Rnw:479-480 (eval = FALSE)
 ###################################################
 ## load("C:/Users/User/Documents/mrbin.Rdata")
 
 
 ###################################################
-### code chunk number 29: mrbin.Rnw:470-473
+### code chunk number 30: mrbin.Rnw:488-491
 ###################################################
-mrbinResults2D<-metadatamrbin(mrbinResults,metadata=list(
+results2D<-metadatamrbin(results2D,metadata=list(
   projectTitle="Test project",
   factors=factor(c("Control","Control","Treatment"))))
 
 
 ###################################################
-### code chunk number 30: mrbin.Rnw:479-480
+### code chunk number 31: mrbin.Rnw:497-498
 ###################################################
-plotPCA(mrbinResults2D)
+plotPCA(results2D)
 
 
 ###################################################
-### code chunk number 31: mrbin.Rnw:486-495
+### code chunk number 32: mrbin.Rnw:504-511
 ###################################################
-mrbinResults2D<-editmetabolitesmrbin(mrbinResults2D,borders=matrix(c(
-      1.346,1.324,21,23,
-      3.052,3.043,30.5,33.5,
-      4.066,4.059,57,59.5
-    ),ncol=4,byrow=TRUE),metabolitenames=c(
-    "Lactate",
-    "Creatinine",
-    "Creatinine"
-    ))
+#Annotate the dataset with signal identities
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              3.052,3.043,30.5,33.5,
+                              5.7,6.0,0,150),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Creatinine","Urea")
+results2D<-annotatemrbin(results2D,metaboliteIdentities=metaboliteIdentities)
 
 
 ###################################################
-### code chunk number 32: mrbin.Rnw:500-501
+### code chunk number 33: mrbin.Rnw:516-517
 ###################################################
-plotPCA(mrbinResults2D,loadings=TRUE,annotate=TRUE)
+plotPCA(results2D,loadings=TRUE,annotate=TRUE)
 
 
 ###################################################
-### code chunk number 33: mrbin.Rnw:510-533 (eval = FALSE)
+### code chunk number 34: mrbin.Rnw:526-549 (eval = FALSE)
 ###################################################
 ## results <- mrbin(parameters=list(dimension="1D",binMethod="Custom bin list",
 ##  specialBinList=matrix(c(5.45,5.2,0,160,
@@ -308,56 +332,116 @@ plotPCA(mrbinResults2D,loadings=TRUE,annotate=TRUE)
 ##                          ),NULL)),
 ##  referenceScaling="Yes",reference1D=c(0.03,-0.03),removeSolvent="No",
 ##  noiseRemoval="No",PQNScaling="No",fixNegatives="Yes",logTrafo="No",
-##  NMRfolders=c(system.file("extdata/1/10/pdata/10",package="mrbin"),
-##               system.file("extdata/2/10/pdata/10",package="mrbin"),
-##               system.file("extdata/3/10/pdata/10",package="mrbin"))
+##  NMRfolders=c("C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10",
+##               "C:/Bruker/TopSpin/data/guest/nmr/2/10/pdata/10",
+##               "C:/Bruker/TopSpin/data/guest/nmr/3/10/pdata/10")
 ##  ))
 
 
 ###################################################
-### code chunk number 34: mrbin.Rnw:553-554 (eval = FALSE)
+### code chunk number 35: mrbin.Rnw:569-570 (eval = FALSE)
 ###################################################
-## mrbinResults<-mrbin()
-
-
-###################################################
-### code chunk number 35: mrbin.Rnw:613-614 (eval = FALSE)
-###################################################
-## atnv(NMRdataMatrix,noiseLevelVector)
+## results<-mrbin()
 
 
 ###################################################
 ### code chunk number 36: mrbin.Rnw:629-630 (eval = FALSE)
 ###################################################
+## atnv(NMRdataMatrix,noiseLevelVector)
+
+
+###################################################
+### code chunk number 37: mrbin.Rnw:645-646 (eval = FALSE)
+###################################################
 ## mrplot()
 
 
 ###################################################
-### code chunk number 37: mrbin.Rnw:639-642 (eval = FALSE)
+### code chunk number 38: mrbin.Rnw:684-704
 ###################################################
-## readBruker(dimension="1D",
-##   folder=system.file("extdata/1/10/pdata/10",package="mrbin"))
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              4.12,4.1,70.8578,71.653,
+                              3.052,3.043,30.5,33.5,
+                              4.066,4.059,57,59.5,
+                              2.582,2.479,46,49,
+                              2.737,2.634,46,49),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Lactate","Creatinine","Creatinine",
+        "Citrate","Citrate")
+mrplot(folders=c(system.file("extdata/1.mr2",package="mrbin"),
+                 system.file("extdata/1.mr1",package="mrbin"),
+                 system.file("extdata/2.mr1",package="mrbin"),
+                 system.file("extdata/3.mr1",package="mrbin")),
+       NMRvendor="mrbin",#default is "Bruker"
+       dimensions=c("2D","1D","1D","1D"),
+	   zoom=c(2.8,2.4,20,60),
+       highlight=c(2.564,2.537),
+       binlist=c("2.725,2.675","2.575,2.525"),
+       annotate=TRUE,metaboliteIdentities=metaboliteIdentities,
+       plotTitle="Significant Bins",intensity1D=24,hideMenu=TRUE)
+
+
+###################################################
+### code chunk number 39: mrbin.Rnw:711-743
+###################################################
+# First create NMR bin data, then plot some differential bins.
+results<-mrbin(silent=TRUE,setDefault=TRUE,parameters=list(verbose=FALSE,
+                dimension="1D",binwidth1D=0.01,PCA="No",
+				showSpectrumPreview="No",
+                signal_to_noise1D=25,noiseThreshold=0.75,
+				useAsNames="Spectrum titles",
+                NMRvendor="mrbin",#default is "Bruker"
+                NMRfolders=c(
+                system.file("extdata/1.mr1",package="mrbin"),
+                system.file("extdata/2.mr1",package="mrbin"),
+                system.file("extdata/3.mr1",package="mrbin"))
+                ))
+metadata<-c(0,0,1)
+#Find significant signals
+pvalues<-rep(NA,ncol(results$bins))
+names(pvalues)<-colnames(results$bins)
+for(i in 1:ncol(results$bins)){
+	model<-stats::lm(intensity~treatment, 
+     data=data.frame(intensity=results$bins[,i],treatment=metadata))
+	pvalues[i]<-stats::anova(model)$"Pr(>F)"[1]
+}
+significantBins<-names(sort(pvalues)[1:30]) 
+#Annotate the dataset with signal identities
+metaboliteIdentities<-matrix(c(1.346,1.324,21,23,
+                              3.052,3.043,30.5,33.5,
+                              5.7,6.0,0,150),
+                   ncol=4,byrow=TRUE)
+rownames(metaboliteIdentities)<-c("Lactate","Creatinine","Urea")
+results<-annotatemrbin(results,metaboliteIdentities=metaboliteIdentities)
+mrheatmap(results=results,
+    binlist=significantBins,annotate=TRUE,
+    main="Significant signals",closeDevice=FALSE)
+
+
+###################################################
+### code chunk number 40: mrbin.Rnw:755-757 (eval = FALSE)
+###################################################
+## readBruker(dimension="1D",folder="C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10")
 ## plotNMR()
 
 
 ###################################################
-### code chunk number 38: mrbin.Rnw:648-651 (eval = FALSE)
+### code chunk number 41: mrbin.Rnw:763-765 (eval = FALSE)
 ###################################################
-## addToPlot(dimension="1D",
-##   folder="C:/Bruker/TopSpin3.6.1/data/guest/nmr/sample_1/12/pdata/10")
+## addToPlot(dimension="1D",folder="C:/Bruker/TopSpin/data/guest/nmr/1/10/pdata/10")
 ## plotNMR()
 
 
 ###################################################
-### code chunk number 39: mrbin.Rnw:657-660 (eval = FALSE)
+### code chunk number 42: mrbin.Rnw:771-774 (eval = FALSE)
 ###################################################
-## addToPlot(dimension="2D",
-##   folder=system.file("extdata/1/12/pdata/10",package="mrbin"))
+## addToPlot(dimension="2D",NMRvendor="mrbin",
+##   folder="C:/Bruker/TopSpin/data/guest/nmr/1/12/pdata/10")
 ## plotNMR()
 
 
 ###################################################
-### code chunk number 40: mrbin.Rnw:665-672 (eval = FALSE)
+### code chunk number 43: mrbin.Rnw:779-786 (eval = FALSE)
 ###################################################
 ## zoom(left=4.6, right=2, top=10, bottom=150) #Exact zoom
 ## zoomIn() #Zoom in
@@ -369,7 +453,7 @@ plotPCA(mrbinResults2D,loadings=TRUE,annotate=TRUE)
 
 
 ###################################################
-### code chunk number 41: mrbin.Rnw:677-681 (eval = FALSE)
+### code chunk number 44: mrbin.Rnw:791-795 (eval = FALSE)
 ###################################################
 ## contMin() #Decrease minimum contour level (show more small peaks)
 ## contPlus() #Increase minimum contour level (remove small peaks)
@@ -378,7 +462,7 @@ plotPCA(mrbinResults2D,loadings=TRUE,annotate=TRUE)
 
 
 ###################################################
-### code chunk number 42: mrbin.Rnw:701-719 (eval = FALSE)
+### code chunk number 45: mrbin.Rnw:815-833 (eval = FALSE)
 ###################################################
 ## #First, define group membership and create the example feature data
 ## group<-factor(c(rep("Group1",4),rep("Group2",5)))
